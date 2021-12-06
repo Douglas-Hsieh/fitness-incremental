@@ -7,9 +7,13 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
-    "eject": "expo eject"
+    "eject": "expo eject",
+    "storybook": "start-storybook -p 7007 -h 192.168.1.118",
+    "build-storybook": "build-storybook",
+    "test": "jest"
   },
   "dependencies": {
+    "@expo/vector-icons": "^12.0.0",
     "@react-navigation/native": "^6.0.6",
     "@react-navigation/native-stack": "^6.2.5",
     "expo": "~43.0.2",
@@ -19,16 +23,38 @@
     "react-dom": "17.0.1",
     "react-native": "0.64.3",
     "react-native-blurhash": "^1.1.5",
+    "react-native-gesture-handler": "~1.10.2",
     "react-native-google-fit": "^0.18.0",
     "react-native-safe-area-context": "3.3.2",
     "react-native-screens": "~3.8.0",
-    "react-native-web": "0.17.1"
+    "react-native-web": "0.17.1",
+    "styled-components": "^5.3.3"
   },
   "devDependencies": {
-    "@babel/core": "^7.12.9",
+    "@babel/core": "^7.16.0",
+    "@storybook/addon-actions": "^5.3",
+    "@storybook/addon-knobs": "^5.3",
+    "@storybook/addon-links": "^5.3",
+    "@storybook/addon-ondevice-actions": "^5.3.23",
+    "@storybook/addon-ondevice-knobs": "^5.3.25",
+    "@storybook/react-native": "^5.3.25",
+    "@storybook/react-native-server": "^5.3.23",
     "@types/react": "~17.0.21",
     "@types/react-native": "~0.64.12",
+    "babel-jest": "^27.4.2",
+    "babel-loader": "^8.2.3",
+    "jest-expo": "^43.0.1",
+    "react-test-renderer": "^17.0.2",
     "typescript": "~4.3.5"
   },
-  "private": true
+  "private": true,
+  "jest": {
+    "preset": "jest-expo",
+    "transformIgnorePatterns": [
+      "node_modules/(?!((jest-)?react-native|@react-native(-community)?)|expo(nent)?|@expo(nent)?/.*|@expo-google-fonts/.*|react-navigation|@react-navigation/.*|@unimodules/.*|unimodules|sentry-expo|native-base|react-native-svg)"
+    ],
+    "setupFilesAfterEnv": [
+      "<rootDir>/__mocks__/globalMock.js"
+    ]
+  }
 }
