@@ -4,6 +4,9 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import React, { useEffect, useState } from 'react';
 import GoogleFit, { Scopes } from 'react-native-google-fit'
 import { HomeScreen } from './src/screens/HomeScreen';
+import useCachedResources from './hooks/useCachedResources';
+import { UpgradesScreen } from './src/screens/UpgradesScreen';
+import EStyleSheet from 'react-native-extended-stylesheet';
 
 const {Navigator, Screen} = createNativeStackNavigator();
 
@@ -12,8 +15,11 @@ export default function App() {
   const [isAuthorized, setIsAuthorized] = useState<boolean>(false);
   const [steps, setSteps] = useState<number>();
 
+  const isLoadingComplete = useCachedResources();
 
   useEffect(() => {
+    EStyleSheet.build();
+
     GoogleFit.checkIsAuthorized().then(() => {
       console.log(GoogleFit.isAuthorized) // Then you can simply refer to `GoogleFit.isAuthorized` boolean.
       setIsAuthorized(GoogleFit.isAuthorized);
@@ -56,10 +62,15 @@ export default function App() {
     }
   }, [isAuthorized])
 
+
+  if (!isLoadingComplete) {
+    return null;
+  }
+
   return <NavigationContainer>
     <Navigator>
       <Screen name='Home' component={HomeScreen} options={{headerShown: false}}/>
-      {/* <Screen name='Stats' component={StatsScreen} options={{headerShown: false}}></Screen> */}
+      <Screen name='Upgrades' component={UpgradesScreen} options={{headerShown: false}}></Screen>
     </Navigator>
   </NavigationContainer>
 
