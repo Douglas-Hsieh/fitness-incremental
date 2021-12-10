@@ -1,25 +1,34 @@
+import { Map } from 'immutable';
+
 export interface GeneratorState {
-  count: number;  // # of generators
-  steps: number;  // # of stored steps
+  owned: number;  // # of generators
+  progress: number;  // # of unspent steps
 }
 
-export const INITIAL_GENERATOR_STATE = {
-  count: 0,
-  steps: 0,
+const INITIAL_GENERATOR_STATE: GeneratorState = {
+  owned: 0,
+  progress: 0,
 }
 
-const INITIAL_GAME_STATE = {
-  currency: 0,
-  generatorStateById: {
-    1: 1,
-    2: 0,
-    3: 0,
-    4: 0,
-    5: 0,
-    6: 0,
-    7: 0,
-    8: 0,
-    9: 0,
-    10: 0,
-  }
+export interface GameState {
+  balance: number;
+  generatorStateById: Map<number, GeneratorState>;
+  upgradesById: {};
+}
+
+export const INITIAL_GAME_STATE: GameState = {
+  balance: 1000000,
+  generatorStateById: Map<number, GeneratorState>([
+    [1, {owned: 1, progress: 0}],
+    [2, INITIAL_GENERATOR_STATE],
+    [3, INITIAL_GENERATOR_STATE],
+    [4, INITIAL_GENERATOR_STATE],
+    [5, INITIAL_GENERATOR_STATE],
+    [6, INITIAL_GENERATOR_STATE],
+    [7, INITIAL_GENERATOR_STATE],
+    [8, INITIAL_GENERATOR_STATE],
+    [9, INITIAL_GENERATOR_STATE],
+    [10, INITIAL_GENERATOR_STATE],
+  ]),
+  upgradesById: {}
 }

@@ -1,40 +1,126 @@
 import { Feather } from "@expo/vector-icons";
-import React, { useState } from "react";
-import { View, Text, StyleSheet, Image, TouchableOpacity, SafeAreaView } from "react-native";
+import React, { useEffect, useState } from "react";
+import { View, Text, Image, TouchableOpacity, SafeAreaView } from "react-native";
 import EStyleSheet from "react-native-extended-stylesheet";
 import { ScrollView } from "react-native-gesture-handler";
 import colors from "../../assets/colors/colors";
 import { CURRENCY_GENERATORS } from "../../assets/data/CurrencyGenerators";
+import { GameState, GeneratorState, INITIAL_GAME_STATE } from "../../assets/data/GameState";
+import BuyAmount from "../enums/BuyAmount";
+import { calculateMaxBuy, calculatePrice, numberToHumanFormat } from "../math";
 import useInterval from "../util/useInterval";
+import { Map } from 'immutable';
 
-export const HomeScreen = ({navigation}) => {
+export const HomeScreen = (props: {navigation: any}) => {
 
+  const [gameState, setGameState] = useState<GameState>(INITIAL_GAME_STATE);
   const [isMenuShown, setIsMenuShown] = useState<boolean>(false);
-  const [progress, setProgress] = useState<number>(0);
+  const [buyAmount, setBuyAmount] = useState<BuyAmount>(BuyAmount.One);
 
-  // useInterval(() => {
-  //   if (progress >= 1) {
-  //     setProgress(0)
-  //   } else {
-  //     setProgress(progress + 0.01)
-  //   }
-  // }, 500)
+  const [priceOf1ByGeneratorId, setPriceOf1ByGeneratorId] = useState<Map<number,number>>(Map());
+  const [priceOf10ByGeneratorId, setPriceOf10ByGeneratorId] = useState<Map<number,number>>(Map());
+  const [priceOf100ByGeneratorId, setPriceOf100ByGeneratorId] = useState<Map<number,number>>(Map());
+  const [priceOfMaxByGeneratorId, setPriceOfMaxByGeneratorId] = useState<Map<number,number>>(Map());
+  const [maxBuyByGeneratorId, setMaxBuyByGeneratorId] = useState<Map<number,number>>(Map());
+  const [priceByGeneratorId, setPriceByGeneratorId] = useState<Map<number,number>>(priceOf1ByGeneratorId);
 
-  const TopBar = () => (
+
+  useEffect(() => {
+    // Calculate max buy for each generator
+    let priceOfMaxByGeneratorId = Map<number, number>();
+    let maxBuyByGeneratorId = Map<number,number>();
+
+    CURRENCY_GENERATORS.forEach(generator => {
+      const generatorState = gameState.generatorStateById.get(generator.id)!;
+      const maxBuy = calculateMaxBuy(gameState.balance, generator.initialPrice, generator.growthRate, generatorState.owned);
+      maxBuyByGeneratorId = maxBuyByGeneratorId.set(generator.id, maxBuy);
+      priceOfMaxByGeneratorId = priceOfMaxByGeneratorId.set(generator.id, calculatePrice(maxBuy, generator.initialPrice, generator.growthRate, generatorState.owned))
+    });
+
+    setMaxBuyByGeneratorId(maxBuyByGeneratorId);
+    setPriceOfMaxByGeneratorId(priceOfMaxByGeneratorId);
+  }, [gameState.balance])
+
+  useEffect(() => {
+    // Calculate x1, x10, x100 prices for each generator
+
+    let priceOf1ByGeneratorId = Map<number, number>();
+    let priceOf10ByGeneratorId = Map<number, number>();
+    let priceOf100ByGeneratorId = Map<number, number>();
+
+    CURRENCY_GENERATORS.forEach(generator => {
+      const generatorState = gameState.generatorStateById.get(generator.id)!;
+      priceOf1ByGeneratorId = priceOf1ByGeneratorId.set(generator.id, calculatePrice(1, generator.initialPrice, generator.growthRate, generatorState.owned));
+      priceOf10ByGeneratorId = priceOf10ByGeneratorId.set(generator.id, calculatePrice(10, generator.initialPrice, generator.growthRate, generatorState.owned));
+      priceOf100ByGeneratorId = priceOf100ByGeneratorId.set(generator.id, calculatePrice(100, generator.initialPrice, generator.growthRate, generatorState.owned));
+    })
+
+    setPriceOf1ByGeneratorId(priceOf1ByGeneratorId);
+    setPriceOf10ByGeneratorId(priceOf10ByGeneratorId);
+    setPriceOf100ByGeneratorId(priceOf100ByGeneratorId);
+
+    // TODO: Test
+    console.log('generator owned changes')
+  }, [JSON.stringify(Array.from(gameState.generatorStateById.values()).map(generatorState => generatorState.owned))])
+
+  useEffect(() => {
+    if (buyAmount === BuyAmount.One) {
+      setPriceByGeneratorId(priceOf1ByGeneratorId);
+    } else if (buyAmount === BuyAmount.Ten) {
+      setPriceByGeneratorId(priceOf10ByGeneratorId);
+    } else if (buyAmount === BuyAmount.Hundred) {
+      setPriceByGeneratorId(priceOf100ByGeneratorId);
+    } else if (buyAmount === BuyAmount.Max) {
+      setPriceByGeneratorId(priceOfMaxByGeneratorId);
+    }
+  }, [buyAmount])
+
+  const toggleBuyAmount = () => {
+    if (buyAmount === BuyAmount.One) setBuyAmount(BuyAmount.Ten);
+    else if (buyAmount === BuyAmount.Ten) setBuyAmount(BuyAmount.Hundred);
+    else if (buyAmount === BuyAmount.Hundred) setBuyAmount(BuyAmount.Max);
+    else setBuyAmount(BuyAmount.One);
+  }
+
+  // TODO: Test
+  const buyGenerator = (generatorId: number, amount: number) => {
+    const generator = CURRENCY_GENERATORS[generatorId - 1];
+    const generatorState = gameState.generatorStateById.get(generatorId)!;
+    const price = calculatePrice(amount, generator.initialPrice, generator.growthRate, generatorState.owned);
+
+    if (price <= gameState.balance) {
+      const generatorStateById = gameState.generatorStateById;
+      const generatorState = generatorStateById.get(generatorId);
+      generatorState!.owned = generatorState!.owned + amount;
+      gameState.generatorStateById.set(generatorId, generatorState!);
+
+      setGameState({
+        ...gameState,
+        balance: gameState.balance - price,
+        generatorStateById: generatorStateById,
+      })
+    }
+  }
+
+  // Components
+  const TopBar = () => {
+    const [coefficient, scale] = numberToHumanFormat(gameState.balance);
+
+    return (
     <View style={styles.topBar}>
       <View style={styles.overlay}/>
       <Image source={require('../../assets/images/male-avatar.png')} style={styles.avatar}/>
       <Image source={require('../../assets/images/steps.png')} style={styles.steps}/>
       <View style={styles.stepsCountWrapper}>
-        <Text style={styles.stepsCountText}>1.398</Text>
-        <Text style={styles.stepsScaleText}>Billion</Text>
+        <Text style={styles.stepsCountText}>{coefficient}</Text>
+        <Text style={styles.stepsScaleText}>{scale}</Text>
       </View>
-      <TouchableOpacity style={styles.buyAmountButton} activeOpacity={.8}>
+      <TouchableOpacity style={styles.buyAmountButton} activeOpacity={.8} onPress={toggleBuyAmount}>
         <Text style={styles.buyAmountBuyText}>Buy</Text>
-        <Text style={styles.buyAmountAmountText}>MAX</Text>
+        <Text style={styles.buyAmountAmountText}>{buyAmount}</Text>
       </TouchableOpacity>
     </View>
-  )
+  )}
 
   const GeneratorIcon = (props: {image: any}) => (
     <View style={styles.iconContainer1}>
@@ -46,14 +132,14 @@ export const HomeScreen = ({navigation}) => {
     </View>
   )
 
-  const GeneratorProgressBar = (props: {progress: number}) => (
+  const GeneratorProgressBar = (props: {generatorState: GeneratorState, progress: number}) => (
     <View style={styles.generatorProgressBarContainer}>
       <View style={[
         styles.generatorProgressBar,
         {width: props.progress * styles.generatorProgressBar.width},
       ]}>
       </View>
-      <Text style={styles.generatorProgressBarText}>50/100</Text>
+      <Text style={styles.generatorProgressBarText}>{props.generatorState.owned}</Text>
     </View>
   )
 
@@ -73,22 +159,30 @@ export const HomeScreen = ({navigation}) => {
     </View>
   )
 
-  const BuyGeneratorButton = () => (
+  const BuyGeneratorButton = (props: {price: number, maxBuy: number}) => {
+    const [coefficient, scale] = numberToHumanFormat(props.price)
+
+    let buyAmountText = buyAmount.toString();
+    if (buyAmount === BuyAmount.Max) {
+      buyAmountText = `x${props.maxBuy}`;
+    }
+
+    return (
     <TouchableOpacity activeOpacity={.8}>
       <View style={styles.buyGeneratorButton1}>
         <View style={styles.buyGeneratorButton2}>
           <View style={styles.buyGeneratorBuyAmountWrapper}>
             <Text style={styles.buyGeneratorBuyText}>Buy</Text>
-            <Text style={styles.buyGeneratorAmountText}>x1</Text>
+            <Text style={styles.buyGeneratorAmountText}>{buyAmountText}</Text>
           </View>
           <View style={styles.buyGeneratorPriceWrapper}>
-            <Text style={styles.buyGeneratorPriceText}>2.096</Text>
-            <Text style={styles.buyGeneratorPriceScaleText}>million</Text>
+            <Text style={styles.buyGeneratorPriceText}>{coefficient}</Text>
+            <Text style={styles.buyGeneratorPriceScaleText}>{scale}</Text>
           </View>
         </View>
       </View>
     </TouchableOpacity>
-  )
+  )}
 
   const BottomBar = () => (
     <View style={styles.bottomBar}>
@@ -103,7 +197,7 @@ export const HomeScreen = ({navigation}) => {
     <View style={styles.menu}>
       <TouchableOpacity style={styles.menuOverlay} activeOpacity={.5} onPress={() => setIsMenuShown(false)}/>
 
-      <TouchableOpacity style={styles.menuItem} activeOpacity={.9} onPress={() => navigation.navigate('Upgrades')}>
+      <TouchableOpacity style={styles.menuItem} activeOpacity={.9} onPress={() => props.navigation.navigate('Upgrades')}>
         <Text style={styles.menuItemText}>Upgrades</Text>
       </TouchableOpacity>
       <TouchableOpacity style={styles.menuItem} activeOpacity={.9}>
@@ -114,6 +208,7 @@ export const HomeScreen = ({navigation}) => {
       </TouchableOpacity>
     </View>
   )
+  
 
   return (
     <SafeAreaView style={styles.container}>
@@ -130,11 +225,11 @@ export const HomeScreen = ({navigation}) => {
               <View key={generator.id} style={styles.generatorWrapper}>
                 <View style={styles.generatorLeftWrapper}>
                   <GeneratorIcon image={generator.image}/>
-                  <GeneratorProgressBar progress={1}/>
+                  <GeneratorProgressBar generatorState={gameState.generatorStateById.get(generator.id)!} progress={1}/>
                 </View>
                 <View style={styles.generatorRightWrapper}>
                   <StepProgressBar progress={1}/>
-                  <BuyGeneratorButton/>
+                  <BuyGeneratorButton price={priceByGeneratorId.get(generator.id)!} maxBuy={maxBuyByGeneratorId.get(generator.id)!}/>
                 </View>
               </View>
             )}

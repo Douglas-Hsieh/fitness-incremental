@@ -1,8 +1,8 @@
 export interface CurrencyGenerator {
   id: number;
   name: string;
-  initialCost: number;
-  coefficient: number;
+  initialPrice: number;  // Cost of first generator
+  growthRate: number;  // Rate at which cost grows
   initialRevenue: number;
   initialSteps: number;
   initialProductivity: number;  // initialRevenue / initialSteps
@@ -13,8 +13,8 @@ export const CURRENCY_GENERATORS: CurrencyGenerator[] = [
   {
     id: 1,
     name: 'Puppies',
-    initialCost: 3.738,
-    coefficient: 1.07,
+    initialPrice: 3.738,
+    growthRate: 1.07,
     initialSteps: 0.6,
     initialRevenue: 1,
     initialProductivity: 1.67,
@@ -23,8 +23,8 @@ export const CURRENCY_GENERATORS: CurrencyGenerator[] = [
   {
     id: 2,
     name: 'Friends',
-    initialCost: 60,
-    coefficient: 1.15,
+    initialPrice: 60,
+    growthRate: 1.15,
     initialSteps: 3,
     initialRevenue: 60,
     initialProductivity: 20,
@@ -33,8 +33,8 @@ export const CURRENCY_GENERATORS: CurrencyGenerator[] = [
   {
     id: 3,
     name: 'Athletes',
-    initialCost: 720,
-    coefficient: 1.14,
+    initialPrice: 720,
+    growthRate: 1.14,
     initialSteps: 6,
     initialRevenue: 540,
     initialProductivity: 90,
@@ -43,8 +43,8 @@ export const CURRENCY_GENERATORS: CurrencyGenerator[] = [
   {
     id: 4,
     name: 'Playgrounds',
-    initialCost: 8640,
-    coefficient: 1.13,
+    initialPrice: 8640,
+    growthRate: 1.13,
     initialSteps: 12,
     initialRevenue: 4320,
     initialProductivity: 360,
@@ -53,8 +53,8 @@ export const CURRENCY_GENERATORS: CurrencyGenerator[] = [
   {
     id: 5,
     name: 'Soccer Teams',
-    initialCost: 103680,
-    coefficient: 1.12,
+    initialPrice: 103680,
+    growthRate: 1.12,
     initialSteps: 24,
     initialRevenue: 51840,
     initialProductivity: 2160,
@@ -63,8 +63,8 @@ export const CURRENCY_GENERATORS: CurrencyGenerator[] = [
   {
     id: 6,
     name: 'Gyms',
-    initialCost: 1244160,
-    coefficient: 1.11,
+    initialPrice: 1244160,
+    growthRate: 1.11,
     initialSteps: 96,
     initialRevenue: 622080,
     initialProductivity: 6480,
@@ -73,8 +73,8 @@ export const CURRENCY_GENERATORS: CurrencyGenerator[] = [
   {
     id: 7,
     name: 'Police Departments',
-    initialCost: 14929920,
-    coefficient: 1.10,
+    initialPrice: 14929920,
+    growthRate: 1.10,
     initialSteps: 384,
     initialRevenue: 7464960,
     initialProductivity: 19440,
@@ -83,8 +83,8 @@ export const CURRENCY_GENERATORS: CurrencyGenerator[] = [
   {
     id: 8,
     name: 'Ninja Villages',
-    initialCost: 179159040,
-    coefficient: 1.09,
+    initialPrice: 179159040,
+    growthRate: 1.09,
     initialSteps: 1536,
     initialRevenue: 89579520,
     initialProductivity: 58320,
@@ -93,8 +93,8 @@ export const CURRENCY_GENERATORS: CurrencyGenerator[] = [
   {
     id: 9,
     name: 'Cities',
-    initialCost: 2149908480,
-    coefficient: 1.08,
+    initialPrice: 2149908480,
+    growthRate: 1.08,
     initialSteps: 6144,
     initialRevenue: 1074954240,
     initialProductivity: 174960,
@@ -103,8 +103,8 @@ export const CURRENCY_GENERATORS: CurrencyGenerator[] = [
   {
     id: 10,
     name: 'Armies',
-    initialCost: 25798901760,
-    coefficient: 1.07,
+    initialPrice: 25798901760,
+    growthRate: 1.07,
     initialSteps: 36864,
     initialRevenue: 29668737024,
     initialProductivity: 804816,

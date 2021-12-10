@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { SafeAreaView, View, Text, StyleSheet, Image, TouchableOpacity} from "react-native";
+import React from "react";
+import { SafeAreaView, View, Text, Image, TouchableOpacity} from "react-native";
 import EStyleSheet from "react-native-extended-stylesheet";
 import { ScrollView } from "react-native-gesture-handler";
 import colors from "../../assets/colors/colors";
@@ -15,7 +15,7 @@ export const UpgradesScreen = () => {
       <View style={styles.upgradeTextWrapper}>
         <Text style={styles.upgradeTitle}>{props.title}</Text>
         <Text style={styles.upgradeDescription}>{props.description}</Text>
-        <Text style={styles.upgradePrice}>{props.priceCoefficient} {Scale[props.priceScale.toString()]} steps</Text>
+        <Text style={styles.upgradePrice}>{props.priceCoefficient} {Scale.get(props.priceScale)} steps</Text>
       </View>
       <TouchableOpacity activeOpacity={.8}>
         <View style={styles.buyUpgradeButton}>
