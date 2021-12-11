@@ -7,7 +7,7 @@ import colors from "../../assets/colors/colors";
 import { CURRENCY_GENERATORS } from "../../assets/data/CurrencyGenerators";
 import { GameState, GeneratorState, INITIAL_GAME_STATE } from "../../assets/data/GameState";
 import BuyAmount from "../enums/BuyAmount";
-import { calculateMaxBuy, calculatePrice, numberToHumanFormat } from "../math";
+import { calculateMaxBuy, calculateOneTickRevenue, calculatePrice, numberToHumanFormat } from "../math";
 import useInterval from "../util/useInterval";
 import { Map } from 'immutable';
 
@@ -22,11 +22,12 @@ export const HomeScreen = (props: {navigation: any}) => {
   const [priceOf100ByGeneratorId, setPriceOf100ByGeneratorId] = useState<Map<number,number>>(Map());
   const [priceOfMaxByGeneratorId, setPriceOfMaxByGeneratorId] = useState<Map<number,number>>(Map());
   const [maxBuyByGeneratorId, setMaxBuyByGeneratorId] = useState<Map<number,number>>(Map());
-  const [priceByGeneratorId, setPriceByGeneratorId] = useState<Map<number,number>>(priceOf1ByGeneratorId);
+  const [priceByGeneratorId, setPriceByGeneratorId] = useState<Map<number,number>>(Map());
 
 
   useEffect(() => {
-    // Calculate max buy for each generator
+    console.log('Calculate max buy for each generator')
+
     let priceOfMaxByGeneratorId = Map<number, number>();
     let maxBuyByGeneratorId = Map<number,number>();
 
@@ -42,7 +43,7 @@ export const HomeScreen = (props: {navigation: any}) => {
   }, [gameState.balance])
 
   useEffect(() => {
-    // Calculate x1, x10, x100 prices for each generator
+    console.log('Calculate x1, x10, x100 prices for each generator')
 
     let priceOf1ByGeneratorId = Map<number, number>();
     let priceOf10ByGeneratorId = Map<number, number>();
@@ -59,11 +60,11 @@ export const HomeScreen = (props: {navigation: any}) => {
     setPriceOf10ByGeneratorId(priceOf10ByGeneratorId);
     setPriceOf100ByGeneratorId(priceOf100ByGeneratorId);
 
-    // TODO: Test
-    console.log('generator owned changes')
   }, [JSON.stringify(Array.from(gameState.generatorStateById.values()).map(generatorState => generatorState.owned))])
 
   useEffect(() => {
+    console.log('Display x1, x10, x100, or MAX prices');
+
     if (buyAmount === BuyAmount.One) {
       setPriceByGeneratorId(priceOf1ByGeneratorId);
     } else if (buyAmount === BuyAmount.Ten) {
@@ -73,7 +74,22 @@ export const HomeScreen = (props: {navigation: any}) => {
     } else if (buyAmount === BuyAmount.Max) {
       setPriceByGeneratorId(priceOfMaxByGeneratorId);
     }
-  }, [buyAmount])
+  }, [
+    buyAmount,
+    priceOf1ByGeneratorId,
+    priceOf10ByGeneratorId,
+    priceOf100ByGeneratorId,
+    priceOfMaxByGeneratorId,
+  ])
+
+  useInterval(() => {
+    const revenue = calculateOneTickRevenue(CURRENCY_GENERATORS, gameState.generatorStateById);
+    console.log('revenue', revenue);
+    setGameState({
+      ...gameState,
+      balance: gameState.balance + revenue,
+    })
+  }, 1000)
 
   const toggleBuyAmount = () => {
     if (buyAmount === BuyAmount.One) setBuyAmount(BuyAmount.Ten);
@@ -159,21 +175,16 @@ export const HomeScreen = (props: {navigation: any}) => {
     </View>
   )
 
-  const BuyGeneratorButton = (props: {price: number, maxBuy: number}) => {
+  const BuyGeneratorButton = (props: {generatorId: number, amount: number, price: number, isDisabled: boolean}) => {
     const [coefficient, scale] = numberToHumanFormat(props.price)
 
-    let buyAmountText = buyAmount.toString();
-    if (buyAmount === BuyAmount.Max) {
-      buyAmountText = `x${props.maxBuy}`;
-    }
-
     return (
-    <TouchableOpacity activeOpacity={.8}>
+    <TouchableOpacity activeOpacity={.8} disabled={props.isDisabled} onPress={() => buyGenerator(props.generatorId, props.amount)}>
       <View style={styles.buyGeneratorButton1}>
-        <View style={styles.buyGeneratorButton2}>
+        <View style={[styles.buyGeneratorButton2, props.isDisabled ? {backgroundColor: colors.gray4} : {}]}>
           <View style={styles.buyGeneratorBuyAmountWrapper}>
             <Text style={styles.buyGeneratorBuyText}>Buy</Text>
-            <Text style={styles.buyGeneratorAmountText}>{buyAmountText}</Text>
+            <Text style={styles.buyGeneratorAmountText}>{`x${props.amount}`}</Text>
           </View>
           <View style={styles.buyGeneratorPriceWrapper}>
             <Text style={styles.buyGeneratorPriceText}>{coefficient}</Text>
@@ -221,7 +232,24 @@ export const HomeScreen = (props: {navigation: any}) => {
           style={styles.scroll}
         >
           <View style={styles.generatorListWrapper}>
-            {CURRENCY_GENERATORS.map(generator => 
+            {CURRENCY_GENERATORS.map(generator => {
+              let price = priceByGeneratorId.get(generator.id)!;
+              let isDisabled = price > gameState.balance;
+              let amount: number;
+              const generatorState = gameState.generatorStateById.get(generator.id)!;
+
+              if (buyAmount === BuyAmount.Max) {
+                amount = maxBuyByGeneratorId.get(generator.id)!;
+                if (amount === 0) {
+                  amount = 1;
+                  price = calculatePrice(amount, generator.initialPrice, generator.growthRate, generatorState.owned)
+                  isDisabled = true;
+                }
+              } else {
+                amount = buyAmount.valueOf();
+              }
+
+              return (
               <View key={generator.id} style={styles.generatorWrapper}>
                 <View style={styles.generatorLeftWrapper}>
                   <GeneratorIcon image={generator.image}/>
@@ -229,9 +257,15 @@ export const HomeScreen = (props: {navigation: any}) => {
                 </View>
                 <View style={styles.generatorRightWrapper}>
                   <StepProgressBar progress={1}/>
-                  <BuyGeneratorButton price={priceByGeneratorId.get(generator.id)!} maxBuy={maxBuyByGeneratorId.get(generator.id)!}/>
+                  <BuyGeneratorButton
+                    generatorId={generator.id}
+                    price={price}
+                    amount={amount}
+                    isDisabled={isDisabled}
+                  />
                 </View>
-              </View>
+              </View>)
+              }
             )}
           </View>
           <View style={{height: 150}}/>

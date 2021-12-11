@@ -1,7 +1,7 @@
 enum BuyAmount {
-  One = 'x1',
-  Ten = 'x10',
-  Hundred = 'x100',
+  One = 1,
+  Ten = 10,
+  Hundred = 100,
   Max = 'MAX',
 }
 export default BuyAmount;

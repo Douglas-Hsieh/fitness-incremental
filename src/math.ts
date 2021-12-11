@@ -1,4 +1,7 @@
+import { CurrencyGenerator } from "../assets/data/CurrencyGenerators"
+import { GeneratorState } from "../assets/data/GameState"
 import Scale from "../assets/data/Scale"
+import { Map } from 'immutable'
 
 // Get price of buying amountToBuy generators
 export const calculatePrice = (
@@ -36,4 +39,17 @@ export const numberToHumanFormat = (number: number): [string, string] => {
 
   // ['1.2345', 'thousand']
   return [(coefficient * Math.pow(10, roundedDownDigits)).toFixed(3), Scale.get(roundedDownScale)!]
+}
+
+
+export const calculateOneTickRevenue = (
+  currencyGenerators: CurrencyGenerator[],
+  generatorStateById: Map<number, GeneratorState>
+): number => {
+  return currencyGenerators.map(generator => {
+    const generatorState = generatorStateById.get(generator.id)!;
+    const multipliers = 1;
+    const revenue = (generator.initialRevenue * generatorState.owned) * multipliers;
+    return revenue;
+  }).reduce((r1, r2) => r1 + r2);
 }
