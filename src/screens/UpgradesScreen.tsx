@@ -6,16 +6,24 @@ import colors from "../../assets/colors/colors";
 import { CURRENCY_GENERATORS } from "../../assets/data/CurrencyGenerators";
 import CurrencyUpgrades from "../../assets/data/CurrencyUpgrades";
 import Scale from "../../assets/data/Scale";
+import { numberToHumanFormat } from "../math";
 
-export const UpgradesScreen = () => {
+interface UpgradeComponentProps {
+  title: string;
+  description: string;
+  price: number;
+  image: any;
+}
 
-  const Upgrade = (props: {title: string, description: string, priceCoefficient: number, priceScale: number, image: any}) => (
+const UpgradeComponent = ({title, description, price, image}: UpgradeComponentProps) => {
+  const [coefficient, scale] = numberToHumanFormat(price);
+  return (
     <View style={styles.upgradeWrapper}>
-      <Image style={styles.generatorIcon} source={props.image}/>
+      <Image style={styles.generatorIcon} source={image}/>
       <View style={styles.upgradeTextWrapper}>
-        <Text style={styles.upgradeTitle}>{props.title}</Text>
-        <Text style={styles.upgradeDescription}>{props.description}</Text>
-        <Text style={styles.upgradePrice}>{props.priceCoefficient} {Scale.get(props.priceScale)} steps</Text>
+        <Text style={styles.upgradeTitle}>{title}</Text>
+        <Text style={styles.upgradeDescription}>{description}</Text>
+        <Text style={styles.upgradePrice}>{coefficient} {scale} steps</Text>
       </View>
       <TouchableOpacity activeOpacity={.8}>
         <View style={styles.buyUpgradeButton}>
@@ -23,7 +31,9 @@ export const UpgradesScreen = () => {
         </View>
       </TouchableOpacity>
     </View>
-  )
+)}
+
+export const UpgradesScreen = () => {
 
   return (
     <SafeAreaView style={styles.container}>
@@ -60,12 +70,11 @@ export const UpgradesScreen = () => {
             
             if (generator) {
               return (
-                <Upgrade
-                  key={`${upgrade.priceCoefficient}-${upgrade.priceScale}`}
+                <UpgradeComponent
+                  key={`${upgrade.price}`}
                   title={generator.name}
                   description={`${generator.name} steps x3`}
-                  priceCoefficient={upgrade.priceCoefficient}
-                  priceScale={upgrade.priceScale}
+                  price={upgrade.price}
                   image={generator.image}
                 />
               )
