@@ -23,7 +23,7 @@ export const calculateMaxBuy = (
   return Math.floor(Math.log(((balance * (growthRate - 1)) / (initialPrice * (Math.pow(growthRate, owned)))) + 1) / Math.log(growthRate))
 }
 
-export const numberToHumanFormat = (number: number): [string, string] => {
+export const numberToHumanFormat = (number: number, smallNumberFractionDigits: number = 2, fractionDigits: number = 3): [string, string] => {
   if (number === undefined) {
     return ['NaN', 'NaN'];
   }
@@ -34,11 +34,11 @@ export const numberToHumanFormat = (number: number): [string, string] => {
   const roundedDownScale = scale - roundedDownDigits;  // 4 - 1 == 3
 
   if (roundedDownScale === 0 || roundedDownScale === 3) {
-    return [number.toFixed(2), ''];
+    return [number.toFixed(smallNumberFractionDigits), ''];
   }
 
   // ['1.2345', 'thousand']
-  return [(coefficient * Math.pow(10, roundedDownDigits)).toFixed(3), Scale.get(roundedDownScale)!]
+  return [(coefficient * Math.pow(10, roundedDownDigits)).toFixed(fractionDigits), Scale.get(roundedDownScale)!]
 }
 
 

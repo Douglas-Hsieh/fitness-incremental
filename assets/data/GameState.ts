@@ -12,7 +12,7 @@ export interface GameState {
 }
 
 export const INITIAL_GAME_STATE: GameState = {
-  balance: 10000,
+  balance: 100,
   generatorStateById: Map<number, GeneratorState>([
     [1, {owned: 1, progress: 0}],
     [2, {owned: 0, progress: 0}],

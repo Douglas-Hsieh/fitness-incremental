@@ -7,15 +7,19 @@ import { HomeScreen } from './src/screens/HomeScreen';
 import useCachedResources from './hooks/useCachedResources';
 import { UpgradesScreen } from './src/screens/UpgradesScreen';
 import EStyleSheet from 'react-native-extended-stylesheet';
-
-const {Navigator, Screen} = createNativeStackNavigator();
+import { WelcomeBackScreen } from './src/screens/WelcomeBackScreen';
+import { GameState, INITIAL_GAME_STATE } from './assets/data/GameState';
+import Screen from './src/enums/Screen';
 
 export default function App() {
+  const isLoadingComplete = useCachedResources();
 
   const [isAuthorized, setIsAuthorized] = useState<boolean>(false);
   const [steps, setSteps] = useState<number>();
 
-  const isLoadingComplete = useCachedResources();
+  const [screen, setScreen] = useState<Screen>(Screen.WelcomeBack);
+  const [gameState, setGameState] = useState<GameState>(INITIAL_GAME_STATE);
+
 
   useEffect(() => {
     EStyleSheet.build();
@@ -67,12 +71,31 @@ export default function App() {
     return null;
   }
 
-  return <NavigationContainer>
-    <Navigator>
-      <Screen name='Home' component={HomeScreen} options={{headerShown: false}}/>
-      <Screen name='Upgrades' component={UpgradesScreen} options={{headerShown: false}}></Screen>
-    </Navigator>
-  </NavigationContainer>
+  switch(screen) {
+    case Screen.WelcomeBack: 
+      return (
+        <WelcomeBackScreen
+          setScreen={setScreen}
+        />
+      )
+    case Screen.Home:
+      return (
+        <HomeScreen
+          setScreen={setScreen}
+          gameState={gameState}
+          setGameState={setGameState}
+        />
+      )
+    case Screen.Upgrades:
+      return (
+        <UpgradesScreen
+          setScreen={setScreen}
+        />
+      )
+
+
+
+  }
 
 }
 

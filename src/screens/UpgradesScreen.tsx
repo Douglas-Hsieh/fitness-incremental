@@ -5,7 +5,8 @@ import { ScrollView } from "react-native-gesture-handler";
 import colors from "../../assets/colors/colors";
 import { CURRENCY_GENERATORS } from "../../assets/data/CurrencyGenerators";
 import CurrencyUpgrades from "../../assets/data/CurrencyUpgrades";
-import Scale from "../../assets/data/Scale";
+import { BottomBar } from "../components/BottomBar";
+import Screen from "../enums/Screen";
 import { numberToHumanFormat } from "../math";
 
 interface UpgradeComponentProps {
@@ -16,7 +17,12 @@ interface UpgradeComponentProps {
 }
 
 const UpgradeComponent = ({title, description, price, image}: UpgradeComponentProps) => {
-  const [coefficient, scale] = numberToHumanFormat(price);
+  const [coefficient, scale] = numberToHumanFormat(price, 0, 0);
+
+  const buyUpgrade = () => {
+    
+  }
+  
   return (
     <View style={styles.upgradeWrapper}>
       <Image style={styles.generatorIcon} source={image}/>
@@ -33,7 +39,11 @@ const UpgradeComponent = ({title, description, price, image}: UpgradeComponentPr
     </View>
 )}
 
-export const UpgradesScreen = () => {
+interface UpgradesScreenProps {
+  setScreen: (screen: Screen) => void;
+}
+
+export const UpgradesScreen = ({setScreen}: UpgradesScreenProps) => {
 
   return (
     <SafeAreaView style={styles.container}>
@@ -81,12 +91,9 @@ export const UpgradesScreen = () => {
             }
           })}
         </ScrollView>
-
-
       </View>
 
-
-
+      <BottomBar setScreen={setScreen}/>
     </SafeAreaView>
   );
 }
@@ -125,6 +132,13 @@ const styles = EStyleSheet.create({
     fontFamily: 'oleo-script-bold',
     color: colors.white,
     fontSize: '1.5rem',
+  },
+
+  // Exit
+  exitButton: {
+    width: '5%',
+    height: '5%',
+    backgroundColor: colors.white,
   },
 
   // Upgrade Type
