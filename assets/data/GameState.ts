@@ -1,4 +1,4 @@
-import { Map } from 'immutable';
+import { Map, Set } from 'immutable';
 
 export interface GeneratorState {
   owned: number;  // # of generators
@@ -7,12 +7,12 @@ export interface GeneratorState {
 export interface GameState {
   balance: number;
   generatorStateById: Map<number, GeneratorState>;
-  upgradesById: {};
-  unlocksById: {};
+  upgradeIds: Set<number>;
+  unlockIds: Set<string>;
 }
 
 export const INITIAL_GAME_STATE: GameState = {
-  balance: 100,
+  balance: 2.5e+12,
   generatorStateById: Map<number, GeneratorState>([
     [1, {owned: 1, progress: 0}],
     [2, {owned: 0, progress: 0}],
@@ -25,6 +25,6 @@ export const INITIAL_GAME_STATE: GameState = {
     [9, {owned: 0, progress: 0}],
     [10, {owned: 0, progress: 0}],
   ]),
-  upgradesById: {},
-  unlocksById: {},
+  upgradeIds: Set(),
+  unlockIds: Set(),
 }

@@ -5,7 +5,7 @@ import { ScrollView } from "react-native-gesture-handler";
 import { CURRENCY_GENERATORS } from "../../assets/data/CurrencyGenerators";
 import { GameState } from "../../assets/data/GameState";
 import BuyAmount from "../enums/BuyAmount";
-import { calculateMaxBuy, calculateOneTickRevenue, calculatePrice } from "../math";
+import { calculateMaxBuy, calculateOneTickRevenue, calculatePrice, calculateUnlocksFromGenerators } from "../math";
 import useInterval from "../util/useInterval";
 import { Map } from 'immutable';
 import { TopBar } from "../components/TopBar";
@@ -14,6 +14,8 @@ import { BottomBar } from "../components/BottomBar";
 import { Menu } from "../components/Menu";
 import { BackgroundImage } from "../components/BackgroundImage";
 import Screen from "../enums/Screen";
+import { Set } from 'immutable'
+import { getUnlockId } from "../../assets/data/GeneratorUnlocks";
 
 interface HomeScreenProps {
   setScreen: (screen: Screen) => void;
@@ -51,8 +53,9 @@ export const HomeScreen = ({setScreen, gameState, setGameState}: HomeScreenProps
   }, [gameState.balance])
 
   useEffect(() => {
-    console.log('Calculate x1, x10, x100 prices for each generator')
+    console.log('Generator count has changed')
 
+    // Calculate x1, x10, x100 prices for each generator
     let priceOf1ByGeneratorId = Map<number, number>();
     let priceOf10ByGeneratorId = Map<number, number>();
     let priceOf100ByGeneratorId = Map<number, number>();
@@ -67,6 +70,15 @@ export const HomeScreen = ({setScreen, gameState, setGameState}: HomeScreenProps
     setPriceOf1ByGeneratorId(priceOf1ByGeneratorId);
     setPriceOf10ByGeneratorId(priceOf10ByGeneratorId);
     setPriceOf100ByGeneratorId(priceOf100ByGeneratorId);
+
+    // Calculate unlocks
+    const unlocks = calculateUnlocksFromGenerators(gameState.generatorStateById)
+    const unlockIds = Set(unlocks.map(unlock => getUnlockId(unlock)))
+
+    setGameState({
+      ...gameState,
+      unlockIds: unlockIds,
+    })
 
   }, [JSON.stringify(Array.from(gameState.generatorStateById.values()).map(generatorState => generatorState.owned))])
 
@@ -90,8 +102,18 @@ export const HomeScreen = ({setScreen, gameState, setGameState}: HomeScreenProps
     priceOfMaxByGeneratorId,
   ])
 
+  useEffect(() => {
+    console.log('New Unlocks: ', JSON.stringify(gameState.unlockIds))
+
+  }, [JSON.stringify(gameState.unlockIds)])
+
   useInterval(() => {
-    const revenue = calculateOneTickRevenue(CURRENCY_GENERATORS, gameState.generatorStateById);
+    const revenue = calculateOneTickRevenue(
+      CURRENCY_GENERATORS,
+      gameState.generatorStateById,
+      gameState.upgradeIds,
+      gameState.unlockIds,
+    );
     console.log('Revenue this tick: ', revenue);
     setGameState({
       ...gameState,

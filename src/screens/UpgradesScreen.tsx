@@ -4,23 +4,35 @@ import EStyleSheet from "react-native-extended-stylesheet";
 import { ScrollView } from "react-native-gesture-handler";
 import colors from "../../assets/colors/colors";
 import { CURRENCY_GENERATORS } from "../../assets/data/CurrencyGenerators";
-import CurrencyUpgrades from "../../assets/data/CurrencyUpgrades";
+import { CURRENCY_UPGRADES } from "../../assets/data/CurrencyUpgrades";
+import { GameState } from "../../assets/data/GameState";
 import { BottomBar } from "../components/BottomBar";
 import Screen from "../enums/Screen";
 import { numberToHumanFormat } from "../math";
 
 interface UpgradeComponentProps {
+  upgradeId: number;
   title: string;
   description: string;
   price: number;
   image: any;
+  gameState: GameState;
+  setGameState: (gameState: GameState) => void;
 }
 
-const UpgradeComponent = ({title, description, price, image}: UpgradeComponentProps) => {
+const UpgradeComponent = ({upgradeId, title, description, price, image, gameState, setGameState}: UpgradeComponentProps) => {
   const [coefficient, scale] = numberToHumanFormat(price, 0, 0);
+  const isDisabled = price > gameState.balance;
 
   const buyUpgrade = () => {
-    
+    if (!isDisabled) {
+      const upgradeIds = gameState.upgradeIds.add(upgradeId);
+      setGameState({
+        ...gameState,
+        balance: gameState.balance - price,
+        upgradeIds: upgradeIds,
+      })
+    }
   }
   
   return (
@@ -31,19 +43,52 @@ const UpgradeComponent = ({title, description, price, image}: UpgradeComponentPr
         <Text style={styles.upgradeDescription}>{description}</Text>
         <Text style={styles.upgradePrice}>{coefficient} {scale} steps</Text>
       </View>
-      <TouchableOpacity activeOpacity={.8}>
-        <View style={styles.buyUpgradeButton}>
-          <Text style={styles.buyUpgradeText}>Buy!</Text>
-        </View>
+      <TouchableOpacity style={[styles.buyUpgradeButton, isDisabled ? {backgroundColor: colors.gray4} : {}]} activeOpacity={.8} onPress={buyUpgrade} disabled={isDisabled}>
+        <Text style={styles.buyUpgradeText}>Buy!</Text>
       </TouchableOpacity>
     </View>
 )}
 
-interface UpgradesScreenProps {
-  setScreen: (screen: Screen) => void;
+interface UpgradesListProps {
+  gameState: GameState;
+  setGameState: (gameState: GameState) => void;
 }
 
-export const UpgradesScreen = ({setScreen}: UpgradesScreenProps) => {
+const UpgradesList = ({gameState, setGameState}: UpgradesListProps) => {
+  const remainingUpgrades = CURRENCY_UPGRADES.filter(upgrade => !gameState.upgradeIds.contains(upgrade.id))
+
+  return (
+    <View>
+      { remainingUpgrades.map(upgrade => {
+
+        const generator = CURRENCY_GENERATORS.find(generator => generator.id == upgrade.generatorId);
+
+        if (generator) {
+          return (
+            <UpgradeComponent
+              key={`${upgrade.id}`}
+              upgradeId={upgrade.id}
+              title={generator.name}
+              description={`${generator.name} steps x3`}
+              price={upgrade.price}
+              image={generator.image}
+              gameState={gameState}
+              setGameState={setGameState}
+            />
+          )
+        }
+        })}
+    </View>
+  )  
+}
+
+interface UpgradesScreenProps {
+  setScreen: (screen: Screen) => void;
+  gameState: GameState;
+  setGameState: (gameState: GameState) => void;
+}
+
+export const UpgradesScreen = ({setScreen, gameState, setGameState}: UpgradesScreenProps) => {
 
   return (
     <SafeAreaView style={styles.container}>
@@ -74,22 +119,10 @@ export const UpgradesScreen = ({setScreen}: UpgradesScreenProps) => {
           contentInsetAdjustmentBehavior='automatic'
           showsVerticalScrollIndicator={false}
         >
-          { CurrencyUpgrades.map(upgrade => {
-
-            const generator = CURRENCY_GENERATORS.find(generator => generator.id == upgrade.generatorId);
-            
-            if (generator) {
-              return (
-                <UpgradeComponent
-                  key={`${upgrade.price}`}
-                  title={generator.name}
-                  description={`${generator.name} steps x3`}
-                  price={upgrade.price}
-                  image={generator.image}
-                />
-              )
-            }
-          })}
+          <UpgradesList
+            gameState={gameState}
+            setGameState={setGameState}
+          />
         </ScrollView>
       </View>
 

@@ -1,6 +1,4 @@
 import 'react-native-gesture-handler';
-import { NavigationContainer } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import React, { useEffect, useState } from 'react';
 import GoogleFit, { Scopes } from 'react-native-google-fit'
 import { HomeScreen } from './src/screens/HomeScreen';
@@ -90,6 +88,8 @@ export default function App() {
       return (
         <UpgradesScreen
           setScreen={setScreen}
+          gameState={gameState}
+          setGameState={setGameState}
         />
       )
 
