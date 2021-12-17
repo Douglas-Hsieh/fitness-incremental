@@ -8,6 +8,7 @@ import EStyleSheet from 'react-native-extended-stylesheet';
 import { WelcomeBackScreen } from './src/screens/WelcomeBackScreen';
 import { GameState, INITIAL_GAME_STATE } from './assets/data/GameState';
 import Screen from './src/enums/Screen';
+import { UnlocksScreen } from './src/screens/UnlocksScreen';
 
 export default function App() {
   const isLoadingComplete = useCachedResources();
@@ -90,6 +91,13 @@ export default function App() {
           setScreen={setScreen}
           gameState={gameState}
           setGameState={setGameState}
+        />
+      )
+    case Screen.Unlocks:
+      return (
+        <UnlocksScreen
+          setScreen={setScreen}
+          gameState={gameState}
         />
       )
 

@@ -1,3 +1,5 @@
+import { Map } from "immutable"
+
 export interface CurrencyGenerator {
   id: number;
   name: string;
@@ -9,8 +11,8 @@ export interface CurrencyGenerator {
   image: any;
 }
 
-export const CURRENCY_GENERATORS: CurrencyGenerator[] = [
-  {
+export const CURRENCY_GENERATORS_BY_ID: Map<number, CurrencyGenerator> = Map([
+  [1, {
     id: 1,
     name: 'Puppies',
     initialPrice: 3.738,
@@ -19,8 +21,8 @@ export const CURRENCY_GENERATORS: CurrencyGenerator[] = [
     initialRevenue: 1,
     initialProductivity: 1.67,
     image: require('../images/puppy.png'),
-  },
-  {
+  }],
+  [2, {
     id: 2,
     name: 'Friends',
     initialPrice: 60,
@@ -29,8 +31,8 @@ export const CURRENCY_GENERATORS: CurrencyGenerator[] = [
     initialRevenue: 60,
     initialProductivity: 20,
     image: require('../images/friend.png'),
-  },
-  {
+  }],
+  [3, {
     id: 3,
     name: 'Athletes',
     initialPrice: 720,
@@ -39,8 +41,8 @@ export const CURRENCY_GENERATORS: CurrencyGenerator[] = [
     initialRevenue: 540,
     initialProductivity: 90,
     image: require('../images/athlete.png'),
-  },
-  {
+  }],
+  [4, {
     id: 4,
     name: 'Playgrounds',
     initialPrice: 8640,
@@ -49,8 +51,8 @@ export const CURRENCY_GENERATORS: CurrencyGenerator[] = [
     initialRevenue: 4320,
     initialProductivity: 360,
     image: require('../images/playground.png'),
-  },
-  {
+  }],
+  [5, {
     id: 5,
     name: 'Soccer Teams',
     initialPrice: 103680,
@@ -59,8 +61,8 @@ export const CURRENCY_GENERATORS: CurrencyGenerator[] = [
     initialRevenue: 51840,
     initialProductivity: 2160,
     image: require('../images/soccer-team.png'),
-  },
-  {
+  }],
+  [6, {
     id: 6,
     name: 'Gyms',
     initialPrice: 1244160,
@@ -69,8 +71,8 @@ export const CURRENCY_GENERATORS: CurrencyGenerator[] = [
     initialRevenue: 622080,
     initialProductivity: 6480,
     image: require('../images/treadmill.png'),
-  },
-  {
+  }],
+  [7, {
     id: 7,
     name: 'Police Departments',
     initialPrice: 14929920,
@@ -79,8 +81,8 @@ export const CURRENCY_GENERATORS: CurrencyGenerator[] = [
     initialRevenue: 7464960,
     initialProductivity: 19440,
     image: require('../images/police.png'),
-  },
-  {
+  }],
+  [8, {
     id: 8,
     name: 'Ninja Villages',
     initialPrice: 179159040,
@@ -89,8 +91,8 @@ export const CURRENCY_GENERATORS: CurrencyGenerator[] = [
     initialRevenue: 89579520,
     initialProductivity: 58320,
     image: require('../images/ninja.png'),
-  },
-  {
+  }],
+  [9, {
     id: 9,
     name: 'Cities',
     initialPrice: 2149908480,
@@ -99,8 +101,8 @@ export const CURRENCY_GENERATORS: CurrencyGenerator[] = [
     initialRevenue: 1074954240,
     initialProductivity: 174960,
     image: require('../images/cities.png'),
-  },
-  {
+  }],
+  [10, {
     id: 10,
     name: 'Armies',
     initialPrice: 25798901760,
@@ -109,5 +111,7 @@ export const CURRENCY_GENERATORS: CurrencyGenerator[] = [
     initialRevenue: 29668737024,
     initialProductivity: 804816,
     image: require('../images/soldier.png'),
-  },
-]
+  }],
+])
+
+export const CURRENCY_GENERATORS = Array.from(CURRENCY_GENERATORS_BY_ID.values())

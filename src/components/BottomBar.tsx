@@ -1,4 +1,4 @@
-import { MaterialIcons, Foundation } from "@expo/vector-icons"
+import { MaterialIcons, Ionicons } from "@expo/vector-icons"
 import React, { memo } from "react"
 import { TouchableOpacity, View } from "react-native"
 import EStyleSheet from "react-native-extended-stylesheet"
@@ -6,18 +6,22 @@ import colors from "../../assets/colors/colors"
 import Screen from "../enums/Screen"
 
 interface BottomBarProps {
+  screen: Screen;
   setScreen: (screen: Screen) => void;
 }
 
-export const BottomBar = memo(({ setScreen }: BottomBarProps) => (
+export const BottomBar = memo(({ screen, setScreen }: BottomBarProps) => (
   <View style={styles.bottomBar}>
     <View style={styles.overlay}/>
     <View style={styles.bottomBarWrapper}> 
       <TouchableOpacity onPress={() => setScreen(Screen.Home)}>
-        <Foundation name={'home'} size={36}/>
+        <Ionicons name={screen === Screen.Home ? 'home-sharp' : 'home-outline'} size={36}/>
       </TouchableOpacity>
       <TouchableOpacity onPress={() => setScreen(Screen.Upgrades)}>
-        <MaterialIcons name={'upgrade'} size={36}/>
+        <Ionicons name={screen === Screen.Upgrades ? 'arrow-up-circle' : 'arrow-up-circle-outline'} size={36}/>
+      </TouchableOpacity>
+      <TouchableOpacity onPress={() => setScreen(Screen.Unlocks)}>
+        <Ionicons name={screen === Screen.Unlocks ? 'lock-open-sharp' : 'lock-closed-outline'} size={36}/>
       </TouchableOpacity>
     </View>
   </View>

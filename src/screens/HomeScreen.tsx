@@ -148,7 +148,7 @@ export const HomeScreen = ({setScreen, gameState, setGameState}: HomeScreenProps
         />
         <View style={{flex: 1}}/>
         { isMenuShown && <Menu setIsMenuShown={setIsMenuShown} setScreen={setScreen}/>}
-        <BottomBar setScreen={setScreen}/>
+        <BottomBar screen={Screen.Home} setScreen={setScreen}/>
 
     </SafeAreaView>
 

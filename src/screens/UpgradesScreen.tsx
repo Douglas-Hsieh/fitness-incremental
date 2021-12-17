@@ -1,4 +1,4 @@
-import React from "react";
+import React, { memo } from "react";
 import { SafeAreaView, View, Text, Image, TouchableOpacity} from "react-native";
 import EStyleSheet from "react-native-extended-stylesheet";
 import { ScrollView } from "react-native-gesture-handler";
@@ -6,7 +6,10 @@ import colors from "../../assets/colors/colors";
 import { CURRENCY_GENERATORS } from "../../assets/data/CurrencyGenerators";
 import { CURRENCY_UPGRADES } from "../../assets/data/CurrencyUpgrades";
 import { GameState } from "../../assets/data/GameState";
+import { BackgroundImage } from "../components/BackgroundImage";
 import { BottomBar } from "../components/BottomBar";
+import { Description } from "../components/Description";
+import { Header } from "../components/Header";
 import Screen from "../enums/Screen";
 import { numberToHumanFormat } from "../math";
 
@@ -92,13 +95,11 @@ export const UpgradesScreen = ({setScreen, gameState, setGameState}: UpgradesScr
 
   return (
     <SafeAreaView style={styles.container}>
-      <Image source={require('../../assets/images/background.png')} style={styles.backgroundImage}/>
+      <BackgroundImage/>
       <View style={styles.backgroundOverlay}/>
       
       <View style={styles.upgradesWrapper}>
-        <View style={styles.upgradesHeaderWrapper}>
-          <Text style={styles.upgradesHeaderText}>Upgrades</Text>
-        </View>
+        <Header title={'Upgrades'}/>
 
         <View style={styles.upgradeIconList}>
           <View style={styles.upgradeIconContainer}>
@@ -109,13 +110,13 @@ export const UpgradesScreen = ({setScreen, gameState, setGameState}: UpgradesScr
           </View>
         </View>
 
-        <View style={styles.upgradesDescriptionWrapper}>
-          <Text style={styles.upgradesDescriptionTitle}>The best investment you can ever make is in your own health.</Text>
-          <Text style={styles.upgradesDescriptionBody}>Spend your hard earned steps to give your followers a boost.</Text>
-        </View>
+        <Description
+          title={'The best investment you can ever make is in your own health.'}
+          body={'Spend your hard earned steps to give your followers a boost.'}
+        />
 
         <ScrollView
-          style={styles.upgradeList}
+          style={styles.scroll}
           contentInsetAdjustmentBehavior='automatic'
           showsVerticalScrollIndicator={false}
         >
@@ -126,7 +127,7 @@ export const UpgradesScreen = ({setScreen, gameState, setGameState}: UpgradesScr
         </ScrollView>
       </View>
 
-      <BottomBar setScreen={setScreen}/>
+      <BottomBar screen={Screen.Upgrades} setScreen={setScreen}/>
     </SafeAreaView>
   );
 }
@@ -134,11 +135,6 @@ export const UpgradesScreen = ({setScreen, gameState, setGameState}: UpgradesScr
 const styles = EStyleSheet.create({
   container: {
     flex: 1,
-  },
-  backgroundImage: {
-    position: 'absolute',
-    width: 2000,
-    height: 2000,
   },
   backgroundOverlay: {
     position: 'absolute',
@@ -150,21 +146,6 @@ const styles = EStyleSheet.create({
   upgradesWrapper: {
     flex: 1,
     alignItems: 'center',
-  },
-
-  // Upgrades Header
-  upgradesHeaderWrapper: {
-    width: '50%',
-    height: '8%',
-    backgroundColor: colors.orange3,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: 5,
-  },
-  upgradesHeaderText: {
-    fontFamily: 'oleo-script-bold',
-    color: colors.white,
-    fontSize: '1.5rem',
   },
 
   // Exit
@@ -193,28 +174,8 @@ const styles = EStyleSheet.create({
     width: 45,
   },
 
-  // Upgrades Description
-  upgradesDescriptionWrapper: {
-    marginTop: 10,
-    width: '90%',
-    height: '10%',
-    borderRadius: 10,
-    backgroundColor: colors.white,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  upgradesDescriptionTitle: {
-    fontFamily: 'oleo-script',
-    color: colors.orange3,
-  },
-  upgradesDescriptionBody: {
-    marginTop: 5,
-    textAlign: 'center',
-    fontSize: 12,
-  },
-
   // Upgrades
-  upgradeList: {
+  scroll: {
     marginTop: 10,
   },
   upgradeWrapper: {

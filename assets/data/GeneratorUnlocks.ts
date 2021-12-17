@@ -639,3 +639,11 @@ export const GENERATOR_UNLOCKS_BY_ID: Map<string, GeneratorUnlock> = Map([
 ])
 
 export const GENERATOR_UNLOCKS = Array.from(GENERATOR_UNLOCKS_BY_ID.values())
+
+export const getNextUnlock = (generatorId: number, count: number) => {
+  const unlocks = GENERATOR_UNLOCKS.filter(unlock => unlock.generatorId === generatorId && unlock.count > count)
+  if (unlocks.length > 0) {
+    return unlocks.reduce((unlock1, unlock2) => unlock1.count< unlock2.count ? unlock1 : unlock2)
+  }
+  return null;
+}
