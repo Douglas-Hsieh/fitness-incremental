@@ -1,5 +1,6 @@
 import React, { memo } from "react"
 import { StyleSheet, Text, View } from "react-native";
+import EStyleSheet from "react-native-extended-stylesheet";
 import colors from "../../assets/colors/colors";
 
 interface DescriptionProps {
@@ -14,11 +15,11 @@ export const Description = memo(({title, body}: DescriptionProps) => (
   </View>
 ))
 
-const styles = StyleSheet.create({
+const styles = EStyleSheet.create({
     descriptionWrapper: {
       marginTop: 10,
       width: '90%',
-      height: '10%',
+      paddingVertical: 10,
       borderRadius: 10,
       backgroundColor: colors.white,
       alignItems: 'center',

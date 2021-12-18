@@ -23,6 +23,9 @@ export const BottomBar = memo(({ screen, setScreen }: BottomBarProps) => (
       <TouchableOpacity onPress={() => setScreen(Screen.Unlocks)}>
         <Ionicons name={screen === Screen.Unlocks ? 'lock-open-sharp' : 'lock-closed-outline'} size={36}/>
       </TouchableOpacity>
+      <TouchableOpacity onPress={() => setScreen(Screen.Prestige)}>
+        <Ionicons name={screen === Screen.Prestige ? 'star' : 'star-outline'} size={36}/>
+      </TouchableOpacity>
     </View>
   </View>
 ))

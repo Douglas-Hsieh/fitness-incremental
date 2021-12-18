@@ -9,6 +9,7 @@ import { WelcomeBackScreen } from './src/screens/WelcomeBackScreen';
 import { GameState, INITIAL_GAME_STATE } from './assets/data/GameState';
 import Screen from './src/enums/Screen';
 import { UnlocksScreen } from './src/screens/UnlocksScreen';
+import { PrestigeScreen } from './src/screens/PrestigeScreen';
 
 export default function App() {
   const isLoadingComplete = useCachedResources();
@@ -98,6 +99,14 @@ export default function App() {
         <UnlocksScreen
           setScreen={setScreen}
           gameState={gameState}
+        />
+      )
+    case Screen.Prestige:
+      return (
+        <PrestigeScreen
+          setScreen={setScreen}
+          gameState={gameState}
+          setGameState={setGameState}
         />
       )
 

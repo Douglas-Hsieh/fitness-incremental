@@ -3,7 +3,7 @@ enum Screen {
   Home,
   Upgrades,
   Unlocks,
-  Trainers,
+  Prestige,
 }
 
 export default Screen;
