@@ -56,40 +56,40 @@ const INITIAL_MULTIPLIERS_BY_GENERATOR_ID = Map<number, number>([
   [10,1],
 ])
 
-const calculateUpgradeMultipliersByGeneratorId = (
+const calculateMultipliersFromUpgrades = (
   upgradeIds: Set<number>,
 ): Map<number, number> => {
-  let multipliersByGeneratorId = INITIAL_MULTIPLIERS_BY_GENERATOR_ID;
-
-  upgradeIds.forEach(upgradeId => {
-    const upgrade = CURRENCY_UPGRADES_BY_ID.get(upgradeId)!
-    const currentMultiplier = multipliersByGeneratorId.get(upgrade.generatorId)!
-    multipliersByGeneratorId = multipliersByGeneratorId.set(upgrade.generatorId, currentMultiplier * upgrade.multiplier)
+  
+  const multipliersByGeneratorId = INITIAL_MULTIPLIERS_BY_GENERATOR_ID.withMutations(multByGenId => {
+    upgradeIds.forEach(upgradeId => {
+      const upgrade = CURRENCY_UPGRADES_BY_ID.get(upgradeId)!
+      const currentMultiplier = multByGenId.get(upgrade.generatorId)!
+      multByGenId.set(upgrade.generatorId, currentMultiplier * upgrade.multiplier)
+    })
   })
 
   return multipliersByGeneratorId
 }
 
-const calculateUnlockMultipliersByGeneratorId = (
+const calculateMultipliersFromUnlocks = (
   unlockIds: Set<string>,
 ) => {
-  let multipliersByGeneratorId = INITIAL_MULTIPLIERS_BY_GENERATOR_ID;
 
-  unlockIds.forEach(unlockId => {
-    const unlock = GENERATOR_UNLOCKS_BY_ID.get(unlockId)!
-
-    // TODO: Use Immutable.asMutable to replace intermediate internal collections
-
-    if (unlock.targetGeneratorId === 0) {
-      // all generators
-      for (const generatorId of multipliersByGeneratorId.keys()) {
-        const currentMultiplier = multipliersByGeneratorId.get(generatorId)!
-        multipliersByGeneratorId = multipliersByGeneratorId.set(generatorId, currentMultiplier * unlock.multiplier)
+  const multipliersByGeneratorId = INITIAL_MULTIPLIERS_BY_GENERATOR_ID.withMutations(multByGenId => {
+    unlockIds.forEach(unlockId => {
+      const unlock = GENERATOR_UNLOCKS_BY_ID.get(unlockId)!
+    
+      const allGenerators = unlock.targetGeneratorId === 0
+      if (allGenerators) {
+        for (const generatorId of multByGenId.keys()) {
+          const multiplier = multByGenId.get(generatorId)!
+          multByGenId.set(generatorId, multiplier * unlock.multiplier)
+        }
+      } else {
+        const multiplier = multByGenId.get(unlock.targetGeneratorId)!
+        multByGenId.set(unlock.targetGeneratorId, multiplier * unlock.multiplier)
       }
-    } else {
-      const currentMultiplier = multipliersByGeneratorId.get(unlock.targetGeneratorId)!
-      multipliersByGeneratorId = multipliersByGeneratorId.set(unlock.targetGeneratorId, currentMultiplier * unlock.multiplier)
-    }
+    })
   })
 
   return multipliersByGeneratorId
@@ -104,8 +104,8 @@ export const calculateOneTickRevenue = (
   return currencyGenerators.map(generator => {
     const generatorState = generatorStateById.get(generator.id)!;
 
-    const upgradeMultipliersByGeneratorId = calculateUpgradeMultipliersByGeneratorId(upgradeIds)
-    const unlockMultipliersByGeneratorId = calculateUnlockMultipliersByGeneratorId(unlockIds);
+    const upgradeMultipliersByGeneratorId = calculateMultipliersFromUpgrades(upgradeIds)
+    const unlockMultipliersByGeneratorId = calculateMultipliersFromUnlocks(unlockIds);
 
     const revenue = (generator.initialRevenue * generatorState.owned) * upgradeMultipliersByGeneratorId.get(generator.id)! * unlockMultipliersByGeneratorId.get(generator.id)!;
     return revenue;
