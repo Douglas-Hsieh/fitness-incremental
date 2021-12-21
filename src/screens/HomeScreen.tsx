@@ -5,7 +5,7 @@ import { ScrollView } from "react-native-gesture-handler";
 import { CURRENCY_GENERATORS } from "../../assets/data/CurrencyGenerators";
 import { GameState } from "../../assets/data/GameState";
 import BuyAmount from "../enums/BuyAmount";
-import { calculateMaxBuy, calculateOneTickRevenue, calculatePrice, calculateUnlocksFromGenerators } from "../math";
+import { calculateMaxBuy, calculateOneTickRevenue, calculateEarnedPrestige, calculatePrice, calculateUnlocksFromGenerators } from "../math";
 import useInterval from "../util/useInterval";
 import { Map } from 'immutable';
 import { TopBar } from "../components/TopBar";
@@ -26,7 +26,6 @@ interface HomeScreenProps {
 export const HomeScreen = ({setScreen, gameState, setGameState}: HomeScreenProps) => {
   console.log('HomeScreen render')
 
-  const [isMenuShown, setIsMenuShown] = useState<boolean>(false);
   const [buyAmount, setBuyAmount] = useState<BuyAmount>(BuyAmount.One);
   const [priceOf1ByGeneratorId, setPriceOf1ByGeneratorId] = useState<Map<number,number>>(Map());
   const [priceOf10ByGeneratorId, setPriceOf10ByGeneratorId] = useState<Map<number,number>>(Map());
@@ -108,16 +107,21 @@ export const HomeScreen = ({setScreen, gameState, setGameState}: HomeScreenProps
   }, [JSON.stringify(gameState.unlockIds)])
 
   useInterval(() => {
+
+    // Calculate revenue
     const revenue = calculateOneTickRevenue(
       CURRENCY_GENERATORS,
       gameState.generatorStateById,
       gameState.upgradeIds,
       gameState.unlockIds,
+      gameState.prestige,
     );
     console.log('Revenue this tick: ', revenue);
+
     setGameState({
       ...gameState,
       balance: gameState.balance + revenue,
+      lifetimeEarnings: gameState.lifetimeEarnings + revenue,
     })
   }, 1000)
 
@@ -147,7 +151,6 @@ export const HomeScreen = ({setScreen, gameState, setGameState}: HomeScreenProps
           setBuyAmount={setBuyAmount}
         />
         <View style={{flex: 1}}/>
-        { isMenuShown && <Menu setIsMenuShown={setIsMenuShown} setScreen={setScreen}/>}
         <BottomBar screen={Screen.Home} setScreen={setScreen}/>
 
     </SafeAreaView>

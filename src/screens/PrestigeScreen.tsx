@@ -1,13 +1,15 @@
+import { Set } from 'immutable'
 import React, { memo } from 'react'
 import { Image, SafeAreaView, StyleSheet, Text, View } from 'react-native'
 import { TouchableOpacity } from 'react-native-gesture-handler'
 import colors from '../../assets/colors/colors'
-import { GameState } from '../../assets/data/GameState'
+import { GameState, INITIAL_GENERATOR_STATE_BY_ID } from '../../assets/data/GameState'
 import { BackgroundImage } from '../components/BackgroundImage'
 import { BottomBar } from '../components/BottomBar'
 import { Description } from '../components/Description'
 import { Header } from '../components/Header'
 import Screen from '../enums/Screen'
+import { calculateEarnedPrestige } from '../math'
 
 const PrestigeIcon = memo(() => (
   <Image
@@ -22,38 +24,59 @@ interface PrestigeScreenProps {
   setGameState: (gameState: GameState) => void;
 }
 
-export const PrestigeScreen = ({setScreen, gameState, setGameState}: PrestigeScreenProps) => (
-  <SafeAreaView style={styles.container}>
-    <BackgroundImage/>
-    <View style={styles.screenWrapper}>
-      <Header title={'Trainers'}/>
-      <Description
-        title={'Teamwork makes the dream work'}
-        body={'The more steps everyone takes, the more Personal Trainers you attract! These world class instructors provide huge bonuses but you’ll need to abandon your followers to hire them.'}
-      />
+export const PrestigeScreen = ({setScreen, gameState, setGameState}: PrestigeScreenProps) => {
+  
+  const resetGame = () => {
 
-      <View style={styles.prestigeStatusWrapper}>
-        <PrestigeIcon/>
-        <View style={styles.prestigeStatusTextWrapper}>
-          <Text style={styles.prestigeStatusTitle}>Personal Trainers Employed</Text>
-          <Text style={styles.prestigeStatusBody}>100</Text>
+    const earnedPrestige = calculateEarnedPrestige(gameState.lifetimeEarnings, gameState.startingLifetimeEarnings)
+    const prestigeAfterReset = gameState.prestige + earnedPrestige
+
+    // https://adventure-capitalist.fandom.com/wiki/Angel_Investors
+    setGameState({
+      balance: 0,
+      prestige: prestigeAfterReset,
+      spentPrestige: 0,
+      startingLifetimeEarnings: (4e+11 / 9) * Math.pow(prestigeAfterReset + gameState.spentPrestige, 2),
+      lifetimeEarnings: gameState.lifetimeEarnings,
+      generatorStateById: INITIAL_GENERATOR_STATE_BY_ID,
+      upgradeIds: Set(),
+      unlockIds: Set(),
+    })
+  }
+
+  return (
+    <SafeAreaView style={styles.container}>
+      <BackgroundImage/>
+      <View style={styles.screenWrapper}>
+        <Header title={'Trainers'}/>
+        <Description
+          title={'Teamwork makes the dream work'}
+          body={'The more steps everyone takes, the more Personal Trainers you attract! These world class instructors provide huge bonuses but you’ll need to abandon your followers to hire them.'}
+        />
+
+        <View style={styles.prestigeStatusWrapper}>
+          <PrestigeIcon/>
+          <View style={styles.prestigeStatusTextWrapper}>
+            <Text style={styles.prestigeStatusTitle}>Personal Trainers Employed</Text>
+            <Text style={styles.prestigeStatusBody}>{gameState.prestige.toFixed()}</Text>
+          </View>
+          <PrestigeIcon/>
         </View>
-        <PrestigeIcon/>
-      </View>
 
-      <View style={styles.restartWrapper}>
-        <Text style={styles.restartTitle}>Trainers Hired on Restart</Text>
-        <Text style={styles.restartBody1}>78</Text>
-        <Text style={styles.restartBody2}>2% Step Bonus Per Trainer!</Text>
-        <TouchableOpacity style={styles.restartButton}>
-          <Text style={styles.restartButtonText}>Hire & Restart</Text>
-        </TouchableOpacity>
-      </View>
+        <View style={styles.restartWrapper}>
+          <Text style={styles.restartTitle}>Trainers Hired on Restart</Text>
+          <Text style={styles.restartBody1}>{calculateEarnedPrestige(gameState.lifetimeEarnings, gameState.startingLifetimeEarnings).toFixed()}</Text>
+          <Text style={styles.restartBody2}>2% Step Bonus Per Trainer!</Text>
+          <TouchableOpacity style={styles.restartButton} onPress={resetGame}>
+            <Text style={styles.restartButtonText}>Hire & Restart</Text>
+          </TouchableOpacity>
+        </View>
 
-    </View>
-    <BottomBar screen={Screen.Prestige} setScreen={setScreen}/>
-  </SafeAreaView>
-)
+      </View>
+      <BottomBar screen={Screen.Prestige} setScreen={setScreen}/>
+    </SafeAreaView>
+  )
+}
 
 const styles = StyleSheet.create({
   container: {

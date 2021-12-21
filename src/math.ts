@@ -100,14 +100,19 @@ export const calculateOneTickRevenue = (
   generatorStateById: Map<number, GeneratorState>,
   upgradeIds: Set<number>,
   unlockIds: Set<string>,
+  prestige: number,
 ): number => {
   return currencyGenerators.map(generator => {
     const generatorState = generatorStateById.get(generator.id)!;
 
     const upgradeMultipliersByGeneratorId = calculateMultipliersFromUpgrades(upgradeIds)
     const unlockMultipliersByGeneratorId = calculateMultipliersFromUnlocks(unlockIds);
+    const prestigeMultiplier = 1 + (prestige * 0.02)
 
-    const revenue = (generator.initialRevenue * generatorState.owned) * upgradeMultipliersByGeneratorId.get(generator.id)! * unlockMultipliersByGeneratorId.get(generator.id)!;
+    const revenue = (generator.initialProductivity * generatorState.owned)
+      * upgradeMultipliersByGeneratorId.get(generator.id)!
+      * unlockMultipliersByGeneratorId.get(generator.id)!
+      * prestigeMultiplier;
     return revenue;
   }).reduce((r1, r2) => r1 + r2);
 }
@@ -130,4 +135,8 @@ export const calculateUnlocksFromGenerators = (
   })
   
   return completedUnlocks
+}
+
+export const calculateEarnedPrestige = (lifeTimeEarnings: number, startingLifetimeEarnings: number): number => {
+  return Math.pow(lifeTimeEarnings / (4e+11/9), .5) - Math.pow(startingLifetimeEarnings / (4e+11/9), .5)
 }
