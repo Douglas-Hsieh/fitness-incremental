@@ -12,9 +12,11 @@ const WelcomeBackHeader = memo(() => (
 
 interface WelcomeBackScreenProps {
   setScreen: (screen: Screen) => void;
+  stepsTodayLastVisit: number;
+  stepsToday: number;
 }
 
-export const WelcomeBackScreen = ({setScreen}: WelcomeBackScreenProps) => {
+export const WelcomeBackScreen = ({setScreen, stepsTodayLastVisit, stepsToday}: WelcomeBackScreenProps) => {
   return (
     <SafeAreaView style={styles.container}>
       <BackgroundImage/>
@@ -22,13 +24,16 @@ export const WelcomeBackScreen = ({setScreen}: WelcomeBackScreenProps) => {
       <WelcomeBackHeader/>
 
       <View style={styles.personalStepsWrapper}>
-        <Text style={styles.personalStepsText}>You've taken {1928} steps since your last visit.</Text>
+        <Text style={styles.personalStepsText}>
+          You've taken
+          <Text style={{color: colors.blue2}}> {stepsToday - stepsTodayLastVisit} steps </Text>
+          since your last visit.
+        </Text>
       </View>
 
       <View style={styles.stepsWrapper}>
-        <Text style={styles.stepsText}>You have inspired your followers to take</Text>
+        <Text style={styles.stepsText}>Your actions have inspired your followers to take</Text>
         <Text style={[styles.stepsText, {color: colors.green3}]}>1.684 trillion steps</Text>
-        <Text style={styles.stepsText}>while you were gone</Text>
       </View>
 
       <TouchableOpacity style={styles.continueButton} onPress={() => setScreen(Screen.Home)}>
@@ -50,7 +55,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     width: '90%',
     height: '10%',
-    // backgroundColor: colors.black,
   },
   welcomeBackTitleText: {
     fontFamily: 'oleo-script',
@@ -61,7 +65,6 @@ const styles = StyleSheet.create({
   personalStepsWrapper: {
     marginTop: '10%',
     width: '90%',
-    // backgroundColor: colors.black,
     alignItems: 'center',
   },
   personalStepsText: {
