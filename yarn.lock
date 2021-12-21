@@ -10320,10 +10320,10 @@ react-native-gesture-handler@~1.10.2:
     invariant "^2.2.4"
     prop-types "^15.7.2"
 
-react-native-google-fit@^0.18.0:
-  version "0.18.0"
-  resolved "https://registry.yarnpkg.com/react-native-google-fit/-/react-native-google-fit-0.18.0.tgz#697fad429b022b282afc66fefa0849da56b51bf7"
-  integrity sha512-5mdUQh3HaSmqinKtXmVtYbX20gJCxpE7Aad9l6GTPkcmHnHk7Y4cKnznPV8Wgoxwsf21eY4sHX1un1q72VuIgw==
+react-native-google-fit@^0.18.2:
+  version "0.18.2"
+  resolved "https://registry.yarnpkg.com/react-native-google-fit/-/react-native-google-fit-0.18.2.tgz#c337b9e0575786f6978ed841d7c0c686f1c85518"
+  integrity sha512-0926Tg0xGrUW4kDwTNE3hyWYQ9QvF71rrSskOjs6kl8CVaUDoAY7Cs5BXkDAM8xETzBd/YExJYsv7DTkWvr3tQ==
   dependencies:
     moment "2.29.1"
 
