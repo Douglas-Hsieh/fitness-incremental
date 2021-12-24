@@ -27,18 +27,18 @@ export const HomeScreen = ({setScreen, gameState, setGameState}: HomeScreenProps
   console.log('HomeScreen render')
 
   const [buyAmount, setBuyAmount] = useState<BuyAmount>(BuyAmount.One);
-  const [priceOf1ByGeneratorId, setPriceOf1ByGeneratorId] = useState<Map<number,number>>(Map());
-  const [priceOf10ByGeneratorId, setPriceOf10ByGeneratorId] = useState<Map<number,number>>(Map());
-  const [priceOf100ByGeneratorId, setPriceOf100ByGeneratorId] = useState<Map<number,number>>(Map());
-  const [priceOfMaxByGeneratorId, setPriceOfMaxByGeneratorId] = useState<Map<number,number>>(Map());
-  const [maxBuyByGeneratorId, setMaxBuyByGeneratorId] = useState<Map<number,number>>(Map());
-  const [priceByGeneratorId, setPriceByGeneratorId] = useState<Map<number,number>>(Map());
+  const [priceOf1ByGeneratorId, setPriceOf1ByGeneratorId] = useState<Map<string,number>>(Map());
+  const [priceOf10ByGeneratorId, setPriceOf10ByGeneratorId] = useState<Map<string,number>>(Map());
+  const [priceOf100ByGeneratorId, setPriceOf100ByGeneratorId] = useState<Map<string,number>>(Map());
+  const [priceOfMaxByGeneratorId, setPriceOfMaxByGeneratorId] = useState<Map<string,number>>(Map());
+  const [maxBuyByGeneratorId, setMaxBuyByGeneratorId] = useState<Map<string,number>>(Map());
+  const [priceByGeneratorId, setPriceByGeneratorId] = useState<Map<string,number>>(Map());
 
   useEffect(() => {
     console.log('Calculate max buy for each generator')
 
-    let priceOfMaxByGeneratorId = Map<number, number>();
-    let maxBuyByGeneratorId = Map<number,number>();
+    let priceOfMaxByGeneratorId = Map<string, number>();
+    let maxBuyByGeneratorId = Map<string,number>();
 
     CURRENCY_GENERATORS.forEach(generator => {
       const generatorState = gameState.generatorStateById.get(generator.id)!;
@@ -55,9 +55,9 @@ export const HomeScreen = ({setScreen, gameState, setGameState}: HomeScreenProps
     console.log('Generator count has changed')
 
     // Calculate x1, x10, x100 prices for each generator
-    let priceOf1ByGeneratorId = Map<number, number>();
-    let priceOf10ByGeneratorId = Map<number, number>();
-    let priceOf100ByGeneratorId = Map<number, number>();
+    let priceOf1ByGeneratorId = Map<string, number>();
+    let priceOf10ByGeneratorId = Map<string, number>();
+    let priceOf100ByGeneratorId = Map<string, number>();
 
     CURRENCY_GENERATORS.forEach(generator => {
       const generatorState = gameState.generatorStateById.get(generator.id)!;
@@ -105,25 +105,6 @@ export const HomeScreen = ({setScreen, gameState, setGameState}: HomeScreenProps
     console.log('New Unlocks: ', JSON.stringify(gameState.unlockIds))
 
   }, [JSON.stringify(gameState.unlockIds)])
-
-  useInterval(() => {
-
-    // Calculate revenue
-    const revenue = calculateOneTickRevenue(
-      CURRENCY_GENERATORS,
-      gameState.generatorStateById,
-      gameState.upgradeIds,
-      gameState.unlockIds,
-      gameState.prestige,
-    );
-    console.log('Revenue this tick: ', revenue);
-
-    setGameState({
-      ...gameState,
-      balance: gameState.balance + revenue,
-      lifetimeEarnings: gameState.lifetimeEarnings + revenue,
-    })
-  }, 1000)
 
   return (
     <SafeAreaView style={styles.container}>

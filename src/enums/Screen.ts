@@ -1,4 +1,5 @@
 enum Screen {
+  Login,
   WelcomeBack,
   Home,
   Upgrades,

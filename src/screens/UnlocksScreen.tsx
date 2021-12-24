@@ -14,7 +14,7 @@ import { Header } from "../components/Header"
 import Screen from "../enums/Screen"
 
 interface UnlockCardListProps {
-  generatorStateById: Map<number, GeneratorState>;
+  generatorStateById: Map<string, GeneratorState>;
 }
 
 const UnlockCardList = ({generatorStateById}: UnlockCardListProps) => {
@@ -25,7 +25,7 @@ const UnlockCardList = ({generatorStateById}: UnlockCardListProps) => {
   const allGeneratorsMin = Array.from(generatorStateById.values())
     .map(generatorState => generatorState.owned)
     .reduce((owned1, owned2) => Math.min(owned1, owned2))
-  unlocks.push(getNextUnlock(0, allGeneratorsMin))
+  unlocks.push(getNextUnlock('0', allGeneratorsMin))
 
   const nextUnlocks = unlocks.filter(unlock => unlock) as GeneratorUnlock[]
 
@@ -41,7 +41,7 @@ const UnlockCardList = ({generatorStateById}: UnlockCardListProps) => {
         let image;
         let generatorName;
 
-        if (unlock.generatorId === 0) {
+        if (unlock.generatorId === '0') {
           key = 0,
           image = require('../../assets/images/everyone.png')
           generatorName = 'Everyone'

@@ -14,7 +14,7 @@ import Screen from "../enums/Screen";
 import { numberToHumanFormat } from "../math";
 
 interface UpgradeComponentProps {
-  upgradeId: number;
+  upgradeId: string;
   title: string;
   description: string;
   price: number;
@@ -58,7 +58,9 @@ interface UpgradesListProps {
 }
 
 const UpgradesList = ({gameState, setGameState}: UpgradesListProps) => {
-  const remainingUpgrades = CURRENCY_UPGRADES.filter(upgrade => !gameState.upgradeIds.contains(upgrade.id))
+  const remainingUpgrades = CURRENCY_UPGRADES
+    .filter(upgrade => !gameState.upgradeIds.contains(upgrade.id))
+    .sort((u1, u2) => u1.price - u2.price)
 
   return (
     <View>

@@ -107,8 +107,8 @@ const BuyGeneratorButton = ({gameState, setGameState, generator, amount, price, 
 interface GeneratorListProps {
   gameState: GameState;
   setGameState: (gameState: GameState) => void;
-  priceByGeneratorId: Map<number, number>;
-  maxBuyByGeneratorId: Map<number, number>;
+  priceByGeneratorId: Map<string, number>;
+  maxBuyByGeneratorId: Map<string, number>;
   buyAmount: BuyAmount;
 }
 

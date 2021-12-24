@@ -5,36 +5,71 @@ export interface GeneratorState {
   progress: number;  // # of unspent steps
 }
 
-export const INITIAL_GENERATOR_STATE_BY_ID = Map<number, GeneratorState>([
-  [1, {owned: 1, progress: 0}],
-  [2, {owned: 0, progress: 0}],
-  [3, {owned: 0, progress: 0}],
-  [4, {owned: 0, progress: 0}],
-  [5, {owned: 0, progress: 0}],
-  [6, {owned: 0, progress: 0}],
-  [7, {owned: 0, progress: 0}],
-  [8, {owned: 0, progress: 0}],
-  [9, {owned: 0, progress: 0}],
-  [10, {owned: 0, progress: 0}],
+export const INITIAL_GENERATOR_STATE_BY_ID = Map<string, GeneratorState>([
+  ["1", {owned: 1, progress: 0}],
+  ["2", {owned: 0, progress: 0}],
+  ["3", {owned: 0, progress: 0}],
+  ["4", {owned: 0, progress: 0}],
+  ["5", {owned: 0, progress: 0}],
+  ["6", {owned: 0, progress: 0}],
+  ["7", {owned: 0, progress: 0}],
+  ["8", {owned: 0, progress: 0}],
+  ["9", {owned: 0, progress: 0}],
+  ["10", {owned: 0, progress: 0}],
 ])
-export interface GameState {
+
+export class GameState {
   balance: number;
   prestige: number;
   spentPrestige: number;  // since last reset
   startingLifetimeEarnings: number;  // since last reset
   lifetimeEarnings: number;  // since beginning
-  generatorStateById: Map<number, GeneratorState>;
-  upgradeIds: Set<number>;
+  generatorStateById: Map<string, GeneratorState>;
+  upgradeIds: Set<string>;
   unlockIds: Set<string>;
+
+  constructor (
+    balance: number,
+    prestige: number,
+    spentPrestige: number,
+    startingLifetimeEarnings: number,
+    lifetimeEarnings: number,
+    generatorStateById: Map<string, GeneratorState>,
+    upgradeIds: Set<string>,
+    unlockIds: Set<string>
+  ) {
+    this.balance = balance
+    this.prestige = prestige
+    this.spentPrestige = spentPrestige
+    this.startingLifetimeEarnings = startingLifetimeEarnings
+    this.lifetimeEarnings = lifetimeEarnings
+    this.generatorStateById = generatorStateById
+    this.upgradeIds = upgradeIds
+    this.unlockIds = unlockIds
+  }
+
+  static fromJson(gameStateString: string) {
+    const obj = JSON.parse(gameStateString) as GameState
+    return new GameState(
+      obj.balance,
+      obj.prestige,
+      obj.spentPrestige,
+      obj.startingLifetimeEarnings,
+      obj.lifetimeEarnings,
+      Map(obj.generatorStateById),
+      Set(obj.upgradeIds),
+      Set(obj.unlockIds)
+    )
+  }
 }
 
-export const INITIAL_GAME_STATE: GameState = {
-  balance: 0,
-  prestige: 0,
-  spentPrestige: 0,
-  startingLifetimeEarnings: 0,
-  lifetimeEarnings: 0,
-  generatorStateById: INITIAL_GENERATOR_STATE_BY_ID,
-  upgradeIds: Set(),
-  unlockIds: Set(),
-}
+export const INITIAL_GAME_STATE = new GameState(
+  0,
+  0,
+  0,
+  0,
+  0,
+  INITIAL_GENERATOR_STATE_BY_ID,
+  Set(),
+  Set()
+)

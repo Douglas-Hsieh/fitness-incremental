@@ -43,22 +43,22 @@ export const numberToHumanFormat = (number: number, smallNumberFractionDigits: n
   return [(coefficient * Math.pow(10, roundedDownDigits)).toFixed(fractionDigits), Scale.get(roundedDownScale)!]
 }
 
-const INITIAL_MULTIPLIERS_BY_GENERATOR_ID = Map<number, number>([
-  [1,1],
-  [2,1],
-  [3,1],
-  [4,1],
-  [5,1],
-  [6,1],
-  [7,1],
-  [8,1],
-  [9,1],
-  [10,1],
+const INITIAL_MULTIPLIERS_BY_GENERATOR_ID = Map<string, number>([
+  ['1',1],
+  ['2',1],
+  ['3',1],
+  ['4',1],
+  ['5',1],
+  ['6',1],
+  ['7',1],
+  ['8',1],
+  ['9',1],
+  ['10',1],
 ])
 
 const calculateMultipliersFromUpgrades = (
-  upgradeIds: Set<number>,
-): Map<number, number> => {
+  upgradeIds: Set<string>,
+): Map<string, number> => {
   
   const multipliersByGeneratorId = INITIAL_MULTIPLIERS_BY_GENERATOR_ID.withMutations(multByGenId => {
     upgradeIds.forEach(upgradeId => {
@@ -79,7 +79,7 @@ const calculateMultipliersFromUnlocks = (
     unlockIds.forEach(unlockId => {
       const unlock = GENERATOR_UNLOCKS_BY_ID.get(unlockId)!
     
-      const allGenerators = unlock.targetGeneratorId === 0
+      const allGenerators = unlock.targetGeneratorId === '0'
       if (allGenerators) {
         for (const generatorId of multByGenId.keys()) {
           const multiplier = multByGenId.get(generatorId)!
@@ -97,8 +97,8 @@ const calculateMultipliersFromUnlocks = (
 
 export const calculateOneTickRevenue = (
   currencyGenerators: CurrencyGenerator[],
-  generatorStateById: Map<number, GeneratorState>,
-  upgradeIds: Set<number>,
+  generatorStateById: Map<string, GeneratorState>,
+  upgradeIds: Set<string>,
   unlockIds: Set<string>,
   prestige: number,
 ): number => {
@@ -118,11 +118,11 @@ export const calculateOneTickRevenue = (
 }
 
 export const calculateUnlocksFromGenerators = (
-  generatorStateById: Map<number, GeneratorState>,
+  generatorStateById: Map<string, GeneratorState>,
 ): GeneratorUnlock[] => {
 
   const completedUnlocks = GENERATOR_UNLOCKS.filter(unlock => {
-    if (unlock.generatorId === 0) {  // all generators
+    if (unlock.generatorId === '0') {  // all generators
 
       return Array.from(generatorStateById.values()).every(generatorState => generatorState.owned >= unlock.count)
 
@@ -138,5 +138,7 @@ export const calculateUnlocksFromGenerators = (
 }
 
 export const calculateEarnedPrestige = (lifeTimeEarnings: number, startingLifetimeEarnings: number): number => {
+  console.log('lifeTimeEarnings', lifeTimeEarnings)
+  console.log('startingLifetimeEarnings', startingLifetimeEarnings)
   return Math.pow(lifeTimeEarnings / (4e+11/9), .5) - Math.pow(startingLifetimeEarnings / (4e+11/9), .5)
 }
