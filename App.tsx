@@ -40,14 +40,21 @@ export default function App() {
     const lastVisitTimeString = await AsyncStorage.getItem('lastVisitTime')
     const now = new Date()
     console.log('lastVisitTimeString', lastVisitTimeString)
-    const lastVisitTime = lastVisitTimeString ? new Date(lastVisitTimeString) : now
 
-    const lastVisitSteps = await getStepsBetween(lastVisitTime, now)
-    
-    setLastVisit({
-      time: lastVisitTime,
-      steps: lastVisitSteps,
-    })
+    if (lastVisitTimeString) {
+      const lastVisitTime = new Date(lastVisitTimeString)
+      const lastVisitSteps = await getStepsBetween(lastVisitTime, now)
+      setLastVisit({
+        time: lastVisitTime,
+        steps: lastVisitSteps,
+      })
+    } else {
+      // First visit
+      setLastVisit({
+        time: now,
+        steps: 0,
+      })
+    }
 
     // Update time of last visit
     await AsyncStorage.setItem('lastVisitTime', now.toISOString())
@@ -62,7 +69,6 @@ export default function App() {
 
     const getAndSetGameState = async () => {
       const gameStateString = await AsyncStorage.getItem('gameState')
-      // const gameState = gameStateString ? JSON.parse(gameStateString) as GameState : INITIAL_GAME_STATE
       const gameState = gameStateString ? GameState.fromJson(gameStateString) : INITIAL_GAME_STATE
       console.log('gameState', gameState)
       setGameState(gameState)
