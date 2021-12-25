@@ -18,6 +18,8 @@ interface WelcomeBackScreenProps {
 }
 
 export const WelcomeBackScreen = ({setScreen, lastVisitSteps, lastVisitRevenue}: WelcomeBackScreenProps) => {
+  const [coefficient, scale] = numberToHumanFormat(lastVisitRevenue)
+
   return (
     <SafeAreaView style={styles.container}>
       <BackgroundImage/>
@@ -34,7 +36,7 @@ export const WelcomeBackScreen = ({setScreen, lastVisitSteps, lastVisitRevenue}:
 
       <View style={styles.stepsWrapper}>
         <Text style={styles.stepsText}>Your actions have inspired your followers to take</Text>
-        <Text style={[styles.stepsText, {color: colors.green3}]}>{numberToHumanFormat(lastVisitRevenue)} steps</Text>
+        <Text style={[styles.stepsText, {color: colors.green3}]}>{coefficient} {scale} steps</Text>
       </View>
 
       <TouchableOpacity style={styles.continueButton} onPress={() => setScreen(Screen.Home)}>
