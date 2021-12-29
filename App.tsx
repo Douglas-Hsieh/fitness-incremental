@@ -9,6 +9,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Game } from './src/Game';
 import { getStepsBetween, GOOGLE_FIT_AUTHORIZATION_OPTIONS } from './src/google-fit/google-fit';
 import { LastVisit } from './assets/data/LastVisit';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 export default function App() {
   const isLoadingComplete = useCachedResources();
@@ -97,15 +98,17 @@ export default function App() {
   }
 
   return (
-    <Game
-      screen={screen}
-      setScreen={setScreen}
-      gameState={gameState}
-      setGameState={setGameState}
-      lastVisit={lastVisit}
-      isAuthorized={isAuthorized}
-      requestAuthorizationFromGoogleFit={requestAuthorizationFromGoogleFit}
-    />
+    <GestureHandlerRootView style={{flex: 1}}>
+      <Game
+        screen={screen}
+        setScreen={setScreen}
+        gameState={gameState}
+        setGameState={setGameState}
+        lastVisit={lastVisit}
+        isAuthorized={isAuthorized}
+        requestAuthorizationFromGoogleFit={requestAuthorizationFromGoogleFit}
+      />
+    </GestureHandlerRootView>
   )
 
 }
