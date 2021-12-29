@@ -33,11 +33,11 @@ export const PrestigeScreen = ({setScreen, gameState, setGameState}: PrestigeScr
 
     // https://adventure-capitalist.fandom.com/wiki/Angel_Investors
     setGameState({
+      ...gameState,
       balance: 0,
       prestige: prestigeAfterReset,
       spentPrestige: 0,
       startingLifetimeEarnings: (4e+11 / 9) * Math.pow(prestigeAfterReset + gameState.spentPrestige, 2),
-      lifetimeEarnings: gameState.lifetimeEarnings,
       generatorStateById: INITIAL_GENERATOR_STATE_BY_ID,
       upgradeIds: Set(),
       unlockIds: Set(),

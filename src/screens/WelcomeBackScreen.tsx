@@ -3,7 +3,6 @@ import { SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from 'react-na
 import colors from '../../assets/colors/colors'
 import { BackgroundImage } from "../components/BackgroundImage"
 import Screen from '../enums/Screen'
-import { numberToHumanFormat } from '../math'
 
 const WelcomeBackHeader = memo(() => (
   <View style={styles.welcomeBackHeaderWrapper}>
@@ -14,11 +13,10 @@ const WelcomeBackHeader = memo(() => (
 interface WelcomeBackScreenProps {
   setScreen: (screen: Screen) => void;
   lastVisitSteps: number;
-  lastVisitRevenue: number;
 }
 
-export const WelcomeBackScreen = ({setScreen, lastVisitSteps, lastVisitRevenue}: WelcomeBackScreenProps) => {
-  const [coefficient, scale] = numberToHumanFormat(lastVisitRevenue)
+export const WelcomeBackScreen = ({setScreen, lastVisitSteps}: WelcomeBackScreenProps) => {
+  const lastVisitTicks = 20 * lastVisitSteps
 
   return (
     <SafeAreaView style={styles.container}>
@@ -35,8 +33,8 @@ export const WelcomeBackScreen = ({setScreen, lastVisitSteps, lastVisitRevenue}:
       </View>
 
       <View style={styles.stepsWrapper}>
-        <Text style={styles.stepsText}>Your actions have inspired your followers to take</Text>
-        <Text style={[styles.stepsText, {color: colors.green3}]}>{coefficient} {scale} steps</Text>
+        <Text style={styles.stepsText}>Your actions have given your followers</Text>
+        <Text style={[styles.stepsText, {color: colors.green3}]}>{lastVisitTicks} motivation</Text>
       </View>
 
       <TouchableOpacity style={styles.continueButton} onPress={() => setScreen(Screen.Home)}>

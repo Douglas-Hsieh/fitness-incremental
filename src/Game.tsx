@@ -11,6 +11,7 @@ import { UpgradesScreen } from "./screens/UpgradesScreen";
 import { WelcomeBackScreen } from "./screens/WelcomeBackScreen";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { LastVisit } from "../assets/data/LastVisit";
+import useInterval from "./util/useInterval";
 
 interface GameProps {
   screen: Screen;
@@ -24,26 +25,37 @@ interface GameProps {
 
 export const Game = ({screen, setScreen, gameState, setGameState, lastVisit, requestAuthorizationFromGoogleFit}: GameProps) => {
 
-  const [lastVisitRevenue, setLastVisitRevenue] = useState<number>(0)
+  useInterval(() => {
+    // Generate revenue from ticks
 
-  useEffect(() => {
-    const oneTickRevenue = calculateOneTickRevenue(
+    const revenue = calculateOneTickRevenue(
       CURRENCY_GENERATORS,
       gameState.generatorStateById,
       gameState.upgradeIds,
       gameState.unlockIds,
       gameState.prestige,
     );
-    
-    const revenue = oneTickRevenue * lastVisit.steps
-    console.log('Revenue: ', revenue)
 
     setGameState({
       ...gameState,
+      ticks: gameState.ticks - 1,
       balance: gameState.balance + revenue,
       lifetimeEarnings: gameState.lifetimeEarnings + revenue,
     })
-    setLastVisitRevenue(revenue)
+
+    console.log('revenue', revenue)
+  }, 1000)
+
+  useEffect(() => {
+    // Generate ticks from steps
+    
+    const ticks = 20 * lastVisit.steps
+    console.log('ticks', ticks)
+
+    setGameState({
+      ...gameState,
+      ticks: gameState.ticks + ticks,
+    })
   }, [lastVisit])
 
   // Autosave game
@@ -61,7 +73,6 @@ export const Game = ({screen, setScreen, gameState, setGameState, lastVisit, req
         <WelcomeBackScreen
           setScreen={setScreen}
           lastVisitSteps={lastVisit.steps}
-          lastVisitRevenue={lastVisitRevenue}
         />
       )
     case Screen.Home:

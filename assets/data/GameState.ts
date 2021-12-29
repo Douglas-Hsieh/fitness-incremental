@@ -27,6 +27,9 @@ export class GameState {
   generatorStateById: Map<string, GeneratorState>;
   upgradeIds: Set<string>;
   unlockIds: Set<string>;
+  ticks: number;  // Intermediate currency generated from user taking steps
+  steps: number;  // Steps user has taken
+  stepsUntilNextRandomReward: number;
 
   constructor (
     balance: number,
@@ -36,7 +39,10 @@ export class GameState {
     lifetimeEarnings: number,
     generatorStateById: Map<string, GeneratorState>,
     upgradeIds: Set<string>,
-    unlockIds: Set<string>
+    unlockIds: Set<string>,
+    ticks: number,
+    steps: number,
+    stepsUntilNextRandomReward: number,
   ) {
     this.balance = balance
     this.prestige = prestige
@@ -46,6 +52,9 @@ export class GameState {
     this.generatorStateById = generatorStateById
     this.upgradeIds = upgradeIds
     this.unlockIds = unlockIds
+    this.ticks = ticks
+    this.steps = steps
+    this.stepsUntilNextRandomReward = stepsUntilNextRandomReward
   }
 
   static fromJson(gameStateString: string) {
@@ -58,18 +67,24 @@ export class GameState {
       obj.lifetimeEarnings,
       Map(obj.generatorStateById),
       Set(obj.upgradeIds),
-      Set(obj.unlockIds)
+      Set(obj.unlockIds),
+      obj.ticks,
+      obj.steps,
+      obj.stepsUntilNextRandomReward,
     )
   }
 }
 
 export const INITIAL_GAME_STATE = new GameState(
-  0,
+  1e+9,
   0,
   0,
   0,
   0,
   INITIAL_GENERATOR_STATE_BY_ID,
   Set(),
-  Set()
+  Set(),
+  0,
+  0,
+  5000,
 )

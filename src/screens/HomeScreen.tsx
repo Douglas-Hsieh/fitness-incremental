@@ -128,6 +128,7 @@ export const HomeScreen = ({setScreen, gameState, setGameState}: HomeScreenProps
 
         <TopBar
           balance={gameState.balance}
+          ticks={gameState.ticks}
           buyAmount={buyAmount}
           setBuyAmount={setBuyAmount}
         />
