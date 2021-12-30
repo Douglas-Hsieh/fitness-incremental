@@ -28,7 +28,27 @@ export const Game = ({screen, setScreen, gameState, setGameState, lastVisit, req
   useInterval(() => {
     // Generate revenue from ticks
 
-    const revenue = calculateOneTickRevenue(
+    const ticks = gameState.ticks
+    let ticksUsed
+
+    if (ticks <= 0) {
+      return
+    }
+    if (ticks < 25000) {
+      ticksUsed = .25
+    } else if (ticks < 50000) {
+      ticksUsed = .5
+    } else if (ticks < 100000) {
+      ticksUsed = 1
+    } else if (ticks < 150000) {
+      ticksUsed = 2
+    } else if (ticks < 200000) {
+      ticksUsed = 3
+    } else {
+      ticksUsed = 4
+    }
+
+    const revenue = ticksUsed * calculateOneTickRevenue(
       CURRENCY_GENERATORS,
       gameState.generatorStateById,
       gameState.upgradeIds,
@@ -38,11 +58,11 @@ export const Game = ({screen, setScreen, gameState, setGameState, lastVisit, req
 
     setGameState({
       ...gameState,
-      ticks: gameState.ticks - 1,
+      ticks: gameState.ticks - ticksUsed,
       balance: gameState.balance + revenue,
       lifetimeEarnings: gameState.lifetimeEarnings + revenue,
     })
-
+    console.log('ticksUsed', ticksUsed)
     console.log('revenue', revenue)
   }, 1000)
 
