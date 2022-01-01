@@ -5,17 +5,16 @@ import { ScrollView } from "react-native-gesture-handler";
 import { CURRENCY_GENERATORS } from "../../assets/data/CurrencyGenerators";
 import { GameState } from "../../assets/data/GameState";
 import BuyAmount from "../enums/BuyAmount";
-import { calculateMaxBuy, calculateOneTickRevenue, calculateEarnedPrestige, calculatePrice, calculateUnlocksFromGenerators } from "../math";
-import useInterval from "../util/useInterval";
+import { calculateMaxBuy, calculatePrice, calculateUnlocksFromGenerators } from "../math";
 import { Map } from 'immutable';
 import { TopBar } from "../components/TopBar";
 import { GeneratorList } from "../components/GeneratorList";
 import { BottomBar } from "../components/BottomBar";
-import { Menu } from "../components/Menu";
 import { BackgroundImage } from "../components/BackgroundImage";
 import Screen from "../enums/Screen";
 import { Set } from 'immutable'
-import { getUnlockId } from "../../assets/data/GeneratorUnlocks";
+import { GeneratorUnlock, GENERATOR_UNLOCKS_BY_ID, getUnlockId } from "../../assets/data/GeneratorUnlocks";
+import { UnlockModal } from "../components/UnlockModal";
 
 interface HomeScreenProps {
   setScreen: (screen: Screen) => void;
@@ -33,6 +32,7 @@ export const HomeScreen = ({setScreen, gameState, setGameState}: HomeScreenProps
   const [priceOfMaxByGeneratorId, setPriceOfMaxByGeneratorId] = useState<Map<string,number>>(Map());
   const [maxBuyByGeneratorId, setMaxBuyByGeneratorId] = useState<Map<string,number>>(Map());
   const [priceByGeneratorId, setPriceByGeneratorId] = useState<Map<string,number>>(Map());
+  const [newUnlocks, setNewUnlocks] = useState<Set<GeneratorUnlock>>(Set())
 
   useEffect(() => {
     console.log('Calculate max buy for each generator')
@@ -71,13 +71,19 @@ export const HomeScreen = ({setScreen, gameState, setGameState}: HomeScreenProps
     setPriceOf100ByGeneratorId(priceOf100ByGeneratorId);
 
     // Calculate unlocks
+    const oldUnlockIds = gameState.unlockIds
     const unlocks = calculateUnlocksFromGenerators(gameState.generatorStateById)
     const unlockIds = Set(unlocks.map(unlock => getUnlockId(unlock)))
-
     setGameState({
       ...gameState,
       unlockIds: unlockIds,
     })
+
+    const newUnlockIds = Set([...unlockIds].filter(unlockId => !oldUnlockIds.has(unlockId)))
+    if (newUnlockIds.size > 0) {
+      const newUnlocks = newUnlockIds.map(newUnlockId => GENERATOR_UNLOCKS_BY_ID.get(newUnlockId)!) 
+      setNewUnlocks(newUnlocks)
+    }
 
   }, [JSON.stringify(Array.from(gameState.generatorStateById.values()).map(generatorState => generatorState.owned))])
 
@@ -102,7 +108,7 @@ export const HomeScreen = ({setScreen, gameState, setGameState}: HomeScreenProps
   ])
 
   useEffect(() => {
-    console.log('New Unlocks: ', JSON.stringify(gameState.unlockIds))
+    console.log('Unlocks: ', JSON.stringify(gameState.unlockIds))
 
   }, [JSON.stringify(gameState.unlockIds)])
 
@@ -135,6 +141,12 @@ export const HomeScreen = ({setScreen, gameState, setGameState}: HomeScreenProps
         <View style={{flex: 1}}/>
         <BottomBar screen={Screen.Home} setScreen={setScreen}/>
 
+        { newUnlocks.map(newUnlock => 
+          <UnlockModal
+            key={`${newUnlock.generatorId}-${newUnlock.count}`}
+            unlock={newUnlock}
+          />
+        )}
     </SafeAreaView>
 
   );
