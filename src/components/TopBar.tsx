@@ -4,6 +4,7 @@ import EStyleSheet from "react-native-extended-stylesheet";
 import colors from "../../assets/colors/colors";
 import BuyAmount from "../enums/BuyAmount";
 import { numberToHumanFormat } from "../math";
+import { playSound, SoundFile } from "../util/sounds";
 
 const AvatarImage = memo(() => (
   <Image source={require('../../assets/images/male-avatar.png')} style={styles.avatarIcon}/>
@@ -34,6 +35,8 @@ export const TopBar = memo(({balance, ticks, buyAmount, setBuyAmount}: TopBarPro
     else if (buyAmount === BuyAmount.Ten) setBuyAmount(BuyAmount.Hundred);
     else if (buyAmount === BuyAmount.Hundred) setBuyAmount(BuyAmount.Max);
     else setBuyAmount(BuyAmount.One);
+
+    playSound(SoundFile.SwitchOn)
   }
 
   return (
@@ -58,7 +61,7 @@ export const TopBar = memo(({balance, ticks, buyAmount, setBuyAmount}: TopBarPro
       </View>
       </View>
 
-      <TouchableOpacity style={styles.buyAmountButton} activeOpacity={.8} onPress={toggleBuyAmount}>
+      <TouchableOpacity style={styles.buyAmountButton} activeOpacity={.8} onPress={toggleBuyAmount} touchSoundDisabled={true}>
         <Text style={styles.buyAmountBuyText}>Buy</Text>
         <Text style={styles.buyAmountAmountText}>{buyAmount}</Text>
       </TouchableOpacity>
