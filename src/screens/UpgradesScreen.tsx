@@ -1,4 +1,4 @@
-import React, { memo } from "react";
+import React from "react";
 import { SafeAreaView, View, Text, Image, TouchableOpacity} from "react-native";
 import EStyleSheet from "react-native-extended-stylesheet";
 import { ScrollView } from "react-native-gesture-handler";
@@ -12,6 +12,7 @@ import { Description } from "../components/Description";
 import { Header } from "../components/Header";
 import Screen from "../enums/Screen";
 import { numberToHumanFormat } from "../math";
+import { playSound, SoundFile } from "../util/sounds";
 
 interface UpgradeComponentProps {
   upgradeId: string;
@@ -35,6 +36,7 @@ const UpgradeComponent = ({upgradeId, title, description, price, image, gameStat
         balance: gameState.balance - price,
         upgradeIds: upgradeIds,
       })
+      playSound(SoundFile.CashRegister)
     }
   }
   
@@ -94,6 +96,7 @@ interface UpgradesScreenProps {
 }
 
 export const UpgradesScreen = ({setScreen, gameState, setGameState}: UpgradesScreenProps) => {
+  console.log('UpgradesScreen render')
 
   return (
     <SafeAreaView style={styles.container}>

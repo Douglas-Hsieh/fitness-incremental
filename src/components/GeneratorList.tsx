@@ -1,4 +1,4 @@
-import React, { memo, useEffect, useState } from "react";
+import React, { memo } from "react";
 import { View, TouchableOpacity, Text, Image } from "react-native";
 import EStyleSheet from "react-native-extended-stylesheet";
 import colors from "../../assets/colors/colors";
@@ -7,7 +7,7 @@ import { GeneratorState, GameState } from "../../assets/data/GameState";
 import BuyAmount from "../enums/BuyAmount";
 import { calculatePrice, numberToHumanFormat } from "../math";
 import { Map } from 'immutable';
-import { Audio } from 'expo-av';
+import { playSound, SoundFile } from "../util/sounds";
 
 const GeneratorIcon = memo((props: {image: any}) => {
   console.log('GeneratorIcon render')
@@ -71,26 +71,6 @@ const BuyGeneratorButton = ({gameState, setGameState, generator, amount, price, 
   const [coefficient, scale] = numberToHumanFormat(price)
   const generatorState = gameState.generatorStateById.get(generator.id)!;
 
-  const [sound, setSound] = useState<Audio.Sound>()
-
-  async function playSound() {
-    console.log('Loading Sound');
-    const { sound } = await Audio.Sound.createAsync(
-       require('./../../assets/audio/menu-selection-click.wav')
-    );
-    setSound(sound);
-
-    console.log('Playing Sound');
-    await sound.playAsync(); }
-
-  useEffect(() => {
-    return sound
-      ? () => {
-          console.log('Unloading Sound');
-          sound.unloadAsync(); }
-      : undefined;
-  }, [sound]);
-
   const buyGenerator = () => {
     const price = calculatePrice(amount, generator.initialPrice, generator.growthRate, generatorState.owned);
 
@@ -105,12 +85,12 @@ const BuyGeneratorButton = ({gameState, setGameState, generator, amount, price, 
         generatorStateById: generatorStateById,
       })
 
-      playSound()
+      playSound(SoundFile.MenuSelectionClick)
     }
   }
 
   return (
-    <TouchableOpacity activeOpacity={.8} disabled={isDisabled} onPress={buyGenerator}>
+    <TouchableOpacity activeOpacity={.8} disabled={isDisabled} onPress={buyGenerator} touchSoundDisabled={true}>
       <View style={styles.buyGeneratorButton1}>
         <View style={[styles.buyGeneratorButton2, isDisabled ? {backgroundColor: colors.gray4} : {}]}>
           <View style={styles.buyGeneratorBuyAmountWrapper}>

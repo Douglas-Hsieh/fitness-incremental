@@ -25,7 +25,8 @@ interface PrestigeScreenProps {
 }
 
 export const PrestigeScreen = ({setScreen, gameState, setGameState}: PrestigeScreenProps) => {
-  
+  console.log('PrestigeScreen render')
+
   const resetGame = () => {
 
     const earnedPrestige = calculateEarnedPrestige(gameState.lifetimeEarnings, gameState.startingLifetimeEarnings)

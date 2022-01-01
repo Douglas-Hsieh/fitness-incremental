@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { CURRENCY_GENERATORS } from "../assets/data/CurrencyGenerators";
 import { GameState } from "../assets/data/GameState";
 import Screen from "./enums/Screen";

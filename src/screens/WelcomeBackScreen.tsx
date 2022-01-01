@@ -16,6 +16,8 @@ interface WelcomeBackScreenProps {
 }
 
 export const WelcomeBackScreen = ({setScreen, lastVisitSteps}: WelcomeBackScreenProps) => {
+  console.log('WelcomeBackScreen render')
+
   const lastVisitTicks = 20 * lastVisitSteps
 
   return (
