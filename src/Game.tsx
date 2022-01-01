@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { CURRENCY_GENERATORS } from "../assets/data/CurrencyGenerators";
 import { GameState } from "../assets/data/GameState";
 import Screen from "./enums/Screen";
-import { calculateOneTickRevenue } from "./math";
+import { calculateOneTickRevenue, calculateTicksToUse } from "./math";
 import { HomeScreen } from "./screens/HomeScreen";
 import { LoginScreen } from "./screens/LoginScreen";
 import { PrestigeScreen } from "./screens/PrestigeScreen";
@@ -27,28 +27,11 @@ export const Game = ({screen, setScreen, gameState, setGameState, lastVisit, req
 
   useInterval(() => {
     // Generate revenue from ticks
-
-    const ticks = gameState.ticks
-    let ticksUsed
-
-    if (ticks <= 0) {
+    const ticksToUse = calculateTicksToUse(gameState.ticks)
+    if (ticksToUse === 0) {
       return
     }
-    if (ticks < 25000) {
-      ticksUsed = .25
-    } else if (ticks < 50000) {
-      ticksUsed = .5
-    } else if (ticks < 100000) {
-      ticksUsed = 1
-    } else if (ticks < 150000) {
-      ticksUsed = 2
-    } else if (ticks < 200000) {
-      ticksUsed = 3
-    } else {
-      ticksUsed = 4
-    }
-
-    const revenue = ticksUsed * calculateOneTickRevenue(
+    const revenue = ticksToUse * calculateOneTickRevenue(
       CURRENCY_GENERATORS,
       gameState.generatorStateById,
       gameState.upgradeIds,
@@ -58,11 +41,11 @@ export const Game = ({screen, setScreen, gameState, setGameState, lastVisit, req
 
     setGameState({
       ...gameState,
-      ticks: gameState.ticks - ticksUsed,
+      ticks: gameState.ticks - ticksToUse,
       balance: gameState.balance + revenue,
       lifetimeEarnings: gameState.lifetimeEarnings + revenue,
     })
-    console.log('ticksUsed', ticksUsed)
+    console.log('ticksUsed', ticksToUse)
     console.log('revenue', revenue)
   }, 1000)
 

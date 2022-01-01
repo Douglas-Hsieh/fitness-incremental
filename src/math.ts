@@ -142,3 +142,21 @@ export const calculateEarnedPrestige = (lifeTimeEarnings: number, startingLifeti
   console.log('startingLifetimeEarnings', startingLifetimeEarnings)
   return Math.pow(lifeTimeEarnings / (4e+11/9), .5) - Math.pow(startingLifetimeEarnings / (4e+11/9), .5)
 }
+
+export const calculateTicksToUse = (ticksRemaining: number): number => {
+  if (ticksRemaining <= 0) {
+    return 0
+  } else if (ticksRemaining < 25000) {
+    return .25
+  } else if (ticksRemaining < 50000) {
+    return .5
+  } else if (ticksRemaining < 100000) {
+    return 1
+  } else if (ticksRemaining < 150000) {
+    return 2
+  } else if (ticksRemaining < 200000) {
+    return 3
+  } else {
+    return 4
+  }
+}
