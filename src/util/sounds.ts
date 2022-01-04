@@ -5,6 +5,8 @@ export enum SoundFile {
   CashRegister = 'cashRegister',
   MenuSelectionClick = 'menuSelectionClick',
   SwitchOn = 'switchOn',
+  Winning = 'winning',
+  CoinWinning = 'coinWinning'
 }
 
 export const playSound = async (soundFile: SoundFile) => {

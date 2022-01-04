@@ -5,6 +5,7 @@ enum Screen {
   Upgrades,
   Unlocks,
   Prestige,
+  Miscellaneous,
 }
 
 export default Screen;

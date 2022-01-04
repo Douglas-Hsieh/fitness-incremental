@@ -1,9 +1,10 @@
 import { CurrencyGenerator } from "../assets/data/CurrencyGenerators"
-import { GeneratorState } from "../assets/data/GameState"
+import { GameState, GeneratorState } from "../assets/data/GameState"
 import Scale from "../assets/data/Scale"
 import { Map, Set } from 'immutable'
 import { CURRENCY_UPGRADES_BY_ID } from "../assets/data/CurrencyUpgrades"
 import { GeneratorUnlock, GENERATOR_UNLOCKS, GENERATOR_UNLOCKS_BY_ID, getUnlockId } from "../assets/data/GeneratorUnlocks"
+import { TemporaryMultiplier } from "./types/TemporaryMultiplier"
 
 // Get price of buying amountToBuy generators
 export const calculatePrice = (
@@ -95,13 +96,22 @@ const calculateMultipliersFromUnlocks = (
   return multipliersByGeneratorId
 }
 
-export const calculateOneTickRevenue = (
+const calculateTemporaryMultipliers = (temporaryMultipliers: Set<TemporaryMultiplier>) => {
+  const now = new Date()
+
+  const cumulativeMultiplier = Array.from(temporaryMultipliers)
+    .filter(tempMult => now < tempMult.expirationDate)
+    .map(tempMult => tempMult.multiplier)
+    .reduce((mult1, mult2) => mult1 + mult2, 0)
+  return cumulativeMultiplier === 0 ? 1 : cumulativeMultiplier
+}
+
+export const calculateOneTickBaseRevenue = (
   currencyGenerators: CurrencyGenerator[],
-  generatorStateById: Map<string, GeneratorState>,
-  upgradeIds: Set<string>,
-  unlockIds: Set<string>,
-  prestige: number,
+  gameState: GameState,
 ): number => {
+  const {generatorStateById, upgradeIds, unlockIds, prestige} = gameState
+
   return currencyGenerators.map(generator => {
     const generatorState = generatorStateById.get(generator.id)!;
 
@@ -115,6 +125,15 @@ export const calculateOneTickRevenue = (
       * prestigeMultiplier;
     return revenue;
   }).reduce((r1, r2) => r1 + r2);
+}
+
+export const calculateOneTickRevenue = (
+  currencyGenerators: CurrencyGenerator[],
+  gameState: GameState,
+) => {
+  const baseRevenue = calculateOneTickBaseRevenue(currencyGenerators, gameState)
+  const temporaryMultiplier = calculateTemporaryMultipliers(gameState.temporaryMultipliers)
+  return baseRevenue * temporaryMultiplier
 }
 
 export const calculateUnlocksFromGenerators = (

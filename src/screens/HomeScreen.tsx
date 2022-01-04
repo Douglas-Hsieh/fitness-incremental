@@ -3,9 +3,9 @@ import { View, SafeAreaView } from "react-native";
 import EStyleSheet from "react-native-extended-stylesheet";
 import { ScrollView } from "react-native-gesture-handler";
 import { CURRENCY_GENERATORS } from "../../assets/data/CurrencyGenerators";
-import { GameState } from "../../assets/data/GameState";
+import { GameState, INITIAL_STEPS_UNTIL_NEXT_RANDOM_REWARD } from "../../assets/data/GameState";
 import BuyAmount from "../enums/BuyAmount";
-import { calculateMaxBuy, calculatePrice, calculateUnlocksFromGenerators } from "../math";
+import { calculateMaxBuy, calculateOneTickBaseRevenue, calculatePrice, calculateUnlocksFromGenerators, numberToHumanFormat } from "../math";
 import { Map } from 'immutable';
 import { TopBar } from "../components/TopBar";
 import { GeneratorList } from "../components/GeneratorList";
@@ -15,6 +15,10 @@ import Screen from "../enums/Screen";
 import { Set } from 'immutable'
 import { GeneratorUnlock, GENERATOR_UNLOCKS_BY_ID, getUnlockId } from "../../assets/data/GeneratorUnlocks";
 import { UnlockModal } from "../components/UnlockModal";
+import { RewardModal } from "../components/RewardModal";
+import { Overlay } from "../components/Overlay";
+import { generateRandomReward, Reward, generateInstantBonus, generateTemporaryMultiplier } from "../rewards";
+import RewardModalDetails from "../types/RewardModalDetails";
 
 interface HomeScreenProps {
   setScreen: (screen: Screen) => void;
@@ -32,7 +36,12 @@ export const HomeScreen = ({setScreen, gameState, setGameState}: HomeScreenProps
   const [priceOfMaxByGeneratorId, setPriceOfMaxByGeneratorId] = useState<Map<string,number>>(Map());
   const [maxBuyByGeneratorId, setMaxBuyByGeneratorId] = useState<Map<string,number>>(Map());
   const [priceByGeneratorId, setPriceByGeneratorId] = useState<Map<string,number>>(Map());
+
   const [newUnlocks, setNewUnlocks] = useState<Set<GeneratorUnlock>>(Set())
+
+  const [showOverlay, setShowOverlay] = useState<boolean>(false)
+  const [rewardModalDetails, setRewardModalDetails] = useState<RewardModalDetails>()
+  const [showRewardModal, setShowRewardModal] = useState<boolean>(false)
 
   useEffect(() => {
     console.log('Calculate max buy for each generator')
@@ -112,6 +121,63 @@ export const HomeScreen = ({setScreen, gameState, setGameState}: HomeScreenProps
 
   }, [JSON.stringify(gameState.unlockIds)])
 
+  useEffect(() => {
+    // Give random rewards
+
+    if (gameState.stepsUntilNextRandomReward > 0) {
+      return
+    }
+
+    const reward = generateRandomReward()
+    let title: string, body: string
+
+    if (reward === Reward.Nothing) {
+      setGameState({
+        ...gameState,
+        stepsUntilNextRandomReward: INITIAL_STEPS_UNTIL_NEXT_RANDOM_REWARD,
+      })
+      title = 'Nothing :('
+      body = 'Better luck next time...'
+
+    } else if (reward === Reward.InstantBonus) {
+      const oneTickBaseRevenue = calculateOneTickBaseRevenue(CURRENCY_GENERATORS, gameState)
+      const bonus = generateInstantBonus(oneTickBaseRevenue)
+      const [coefficient, scale] = numberToHumanFormat(bonus)
+      setGameState({
+        ...gameState,
+        stepsUntilNextRandomReward: INITIAL_STEPS_UNTIL_NEXT_RANDOM_REWARD,
+        balance: gameState.balance + bonus,
+        lifetimeEarnings: gameState.lifetimeEarnings + bonus,
+      })
+      title = 'Instant Bonus'
+      body = `You just gained ${coefficient} ${scale} steps!`
+
+    } else {
+      const temporaryMultiplier = generateTemporaryMultiplier()
+      setGameState({
+        ...gameState,
+        stepsUntilNextRandomReward: INITIAL_STEPS_UNTIL_NEXT_RANDOM_REWARD,
+        temporaryMultipliers: gameState.temporaryMultipliers.add(temporaryMultiplier),
+      })
+      title = 'Temporary Multiplier'
+      body = `You will produce x${temporaryMultiplier.multiplier} as much for 24 hours!`
+    }
+
+    setRewardModalDetails({
+      reward: reward,
+      title: title,
+      body: body,
+    })
+    setShowOverlay(true)
+    setShowRewardModal(true)
+
+  }, [gameState.stepsUntilNextRandomReward])
+
+  const handleCloseRewardModal = () => {
+    setTimeout(() => {setShowRewardModal(false), 5000})
+    setShowOverlay(false)
+  }
+
   return (
     <SafeAreaView style={styles.container}>
 
@@ -147,6 +213,10 @@ export const HomeScreen = ({setScreen, gameState, setGameState}: HomeScreenProps
             unlock={newUnlock}
           />
         )}
+
+        { rewardModalDetails && showOverlay && <Overlay/>}
+        { rewardModalDetails && showRewardModal && <RewardModal details={rewardModalDetails} onClose={handleCloseRewardModal}/>}
+
     </SafeAreaView>
 
   );

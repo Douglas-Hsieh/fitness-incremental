@@ -12,6 +12,7 @@ import { WelcomeBackScreen } from "./screens/WelcomeBackScreen";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { LastVisit } from "../assets/data/LastVisit";
 import useInterval from "./util/useInterval";
+import { MiscellaneousScreen } from "./screens/MiscellaneousScreen";
 
 interface GameProps {
   screen: Screen;
@@ -31,13 +32,7 @@ export const Game = ({screen, setScreen, gameState, setGameState, lastVisit, req
     if (ticksToUse === 0) {
       return
     }
-    const revenue = ticksToUse * calculateOneTickRevenue(
-      CURRENCY_GENERATORS,
-      gameState.generatorStateById,
-      gameState.upgradeIds,
-      gameState.unlockIds,
-      gameState.prestige,
-    );
+    const revenue = ticksToUse * calculateOneTickRevenue(CURRENCY_GENERATORS, gameState)
 
     setGameState({
       ...gameState,
@@ -50,7 +45,7 @@ export const Game = ({screen, setScreen, gameState, setGameState, lastVisit, req
   }, 1000)
 
   useEffect(() => {
-    // Generate ticks from steps
+    // User took steps since last visit
     
     const ticks = 20 * lastVisit.steps
     console.log('ticks', ticks)
@@ -58,6 +53,7 @@ export const Game = ({screen, setScreen, gameState, setGameState, lastVisit, req
     setGameState({
       ...gameState,
       ticks: gameState.ticks + ticks,
+      stepsUntilNextRandomReward: gameState.stepsUntilNextRandomReward - lastVisit.steps
     })
   }, [lastVisit])
 
@@ -109,7 +105,13 @@ export const Game = ({screen, setScreen, gameState, setGameState, lastVisit, req
           setGameState={setGameState}
         />
       )
-
+    case Screen.Miscellaneous:
+      return (
+        <MiscellaneousScreen
+          setScreen={setScreen}
+          setGameState={setGameState}
+        />
+      )
 
 
   }

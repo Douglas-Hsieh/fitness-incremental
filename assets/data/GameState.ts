@@ -1,4 +1,5 @@
 import { Map, Set } from 'immutable';
+import { TemporaryMultiplier } from '../../src/types/TemporaryMultiplier';
 
 export interface GeneratorState {
   owned: number;  // # of generators
@@ -28,8 +29,9 @@ export class GameState {
   upgradeIds: Set<string>;
   unlockIds: Set<string>;
   ticks: number;  // Intermediate currency generated from user taking steps
-  steps: number;  // Steps user has taken
   stepsUntilNextRandomReward: number;
+  lifetimeSteps: number;
+  temporaryMultipliers: Set<TemporaryMultiplier>;
 
   constructor (
     balance: number,
@@ -41,8 +43,9 @@ export class GameState {
     upgradeIds: Set<string>,
     unlockIds: Set<string>,
     ticks: number,
-    steps: number,
     stepsUntilNextRandomReward: number,
+    lifetimeSteps: number,
+    temporaryMultipliers: Set<TemporaryMultiplier>,
   ) {
     this.balance = balance
     this.prestige = prestige
@@ -53,8 +56,9 @@ export class GameState {
     this.upgradeIds = upgradeIds
     this.unlockIds = unlockIds
     this.ticks = ticks
-    this.steps = steps
     this.stepsUntilNextRandomReward = stepsUntilNextRandomReward
+    this.lifetimeSteps = lifetimeSteps
+    this.temporaryMultipliers = temporaryMultipliers
   }
 
   static fromJson(gameStateString: string) {
@@ -69,14 +73,19 @@ export class GameState {
       Set(obj.upgradeIds),
       Set(obj.unlockIds),
       obj.ticks,
-      obj.steps,
       obj.stepsUntilNextRandomReward,
+      obj.lifetimeSteps,
+      Set(obj.temporaryMultipliers),
     )
   }
 }
 
+const INITIAL_BALANCE = 1e+50
+export const INITIAL_STEPS_UNTIL_NEXT_RANDOM_REWARD = 5000
+const INITIAL_TICKS = 1e+5
+
 export const INITIAL_GAME_STATE = new GameState(
-  1e+9,
+  INITIAL_BALANCE,
   0,
   0,
   0,
@@ -84,7 +93,8 @@ export const INITIAL_GAME_STATE = new GameState(
   INITIAL_GENERATOR_STATE_BY_ID,
   Set(),
   Set(),
+  INITIAL_TICKS,
+  INITIAL_STEPS_UNTIL_NEXT_RANDOM_REWARD,
   0,
-  0,
-  5000,
+  Set(),
 )
