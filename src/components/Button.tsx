@@ -1,6 +1,5 @@
-import { GestureResponderEvent, Text } from "react-native"
+import { GestureResponderEvent, Pressable, Text } from "react-native"
 import EStyleSheet from "react-native-extended-stylesheet"
-import { TouchableOpacity } from "react-native-gesture-handler"
 import colors from "../../assets/colors/colors"
 
 interface ButtonProps {
@@ -25,9 +24,11 @@ export const Button = ({text, onPress, color = colors.orange3}: ButtonProps) => 
   })
 
   return (
-    <TouchableOpacity style={styles.button} onPress={onPress}>
+    <Pressable
+      style={({pressed}) => [{opacity: pressed ? 0.5 : 1.0}, styles.button]}
+      onPress={onPress}>
       <Text style={styles.text}>{text}</Text>
-    </TouchableOpacity>
+    </Pressable>
   )
 }
 

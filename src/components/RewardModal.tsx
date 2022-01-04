@@ -83,9 +83,6 @@ export const RewardModal = ({details, onClose}: RewardModalProps) => {
 }
 
 const styles = EStyleSheet.create({
-  overlay: {
-    position: 'absolute',
-  },
   modal: {
     position: 'absolute',
     marginLeft: window.width / 6,

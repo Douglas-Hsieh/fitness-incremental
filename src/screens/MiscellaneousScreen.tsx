@@ -1,10 +1,10 @@
+import { useState } from "react";
 import { SafeAreaView, StyleSheet, View } from "react-native";
-import { Colors } from "react-native/Libraries/NewAppScreen";
-import colors from "../../assets/colors/colors";
 import { GameState, INITIAL_GAME_STATE } from "../../assets/data/GameState";
 import { BackgroundImage } from "../components/BackgroundImage";
 import { BottomBar } from "../components/BottomBar";
 import { Button } from "../components/Button";
+import { ConfirmationModal } from "../components/ConfirmationModal";
 import Screen from "../enums/Screen";
 
 interface MiscellaneousScreenProps {
@@ -13,8 +13,9 @@ interface MiscellaneousScreenProps {
 }
 
 export const MiscellaneousScreen = ({setScreen, setGameState}: MiscellaneousScreenProps) => {
+  const [showDeleteDataModal, setShowDeleteDataModal] = useState<boolean>(false)
 
-  const handleDeleteData = () => {
+  const deleteData = () => {
     setGameState(INITIAL_GAME_STATE)
   }
 
@@ -22,10 +23,21 @@ export const MiscellaneousScreen = ({setScreen, setGameState}: MiscellaneousScre
     <SafeAreaView style={styles.container}>
       <BackgroundImage/>
       <View style={styles.screenWrapper}>
-        <Button text={'Delete Data'} color={'red'} onPress={handleDeleteData}/>
+        <Button text={'Delete Data'} color={'red'} onPress={() => setShowDeleteDataModal(true)}/>
       </View>
 
       <BottomBar screen={Screen.Miscellaneous} setScreen={setScreen}/>
+
+      <ConfirmationModal
+        visible={showDeleteDataModal}
+        title={'Confirm Deletion'}
+        body={'Are you sure you want to delete all data and progress?'}
+        onConfirm={() => {
+          deleteData()
+          setShowDeleteDataModal(false)
+        }}
+        onCancel={() => {setShowDeleteDataModal(false)}}
+      />
     </SafeAreaView>
   )
 }
