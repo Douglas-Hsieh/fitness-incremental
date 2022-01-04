@@ -48,6 +48,7 @@ const styles = EStyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-around',
     padding: 10,
+    borderWidth: 1,
   },
   title: {
     fontSize: '1.5rem',

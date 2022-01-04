@@ -80,7 +80,7 @@ export class GameState {
   }
 }
 
-const INITIAL_BALANCE = 1e+50
+export const INITIAL_BALANCE = 1e+50
 export const INITIAL_STEPS_UNTIL_NEXT_RANDOM_REWARD = 5000
 const INITIAL_TICKS = 1e+5
 

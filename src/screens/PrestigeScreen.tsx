@@ -1,11 +1,13 @@
 import { Set } from 'immutable'
-import React, { memo } from 'react'
+import React, { memo, useState } from 'react'
 import { Image, SafeAreaView, StyleSheet, Text, View } from 'react-native'
 import { TouchableOpacity } from 'react-native-gesture-handler'
 import colors from '../../assets/colors/colors'
-import { GameState, INITIAL_GENERATOR_STATE_BY_ID } from '../../assets/data/GameState'
+import { GameState, INITIAL_BALANCE, INITIAL_GENERATOR_STATE_BY_ID } from '../../assets/data/GameState'
 import { BackgroundImage } from '../components/BackgroundImage'
 import { BottomBar } from '../components/BottomBar'
+import { Button } from '../components/Button'
+import { ConfirmationModal } from '../components/ConfirmationModal'
 import { Description } from '../components/Description'
 import { Header } from '../components/Header'
 import Screen from '../enums/Screen'
@@ -27,6 +29,8 @@ interface PrestigeScreenProps {
 export const PrestigeScreen = ({setScreen, gameState, setGameState}: PrestigeScreenProps) => {
   console.log('PrestigeScreen render')
 
+  const [showClaimPrestigeModal, setShowClaimPrestigeModal] = useState<boolean>(false) 
+
   const resetGame = () => {
 
     const earnedPrestige = calculateEarnedPrestige(gameState.lifetimeEarnings, gameState.startingLifetimeEarnings)
@@ -35,7 +39,7 @@ export const PrestigeScreen = ({setScreen, gameState, setGameState}: PrestigeScr
     // https://adventure-capitalist.fandom.com/wiki/Angel_Investors
     setGameState({
       ...gameState,
-      balance: 0,
+      balance: INITIAL_BALANCE,
       prestige: prestigeAfterReset,
       spentPrestige: 0,
       startingLifetimeEarnings: (4e+11 / 9) * Math.pow(prestigeAfterReset + gameState.spentPrestige, 2),
@@ -45,6 +49,8 @@ export const PrestigeScreen = ({setScreen, gameState, setGameState}: PrestigeScr
     })
   }
 
+  const prestige = calculateEarnedPrestige(gameState.lifetimeEarnings, gameState.startingLifetimeEarnings).toFixed()
+
   return (
     <SafeAreaView style={styles.container}>
       <BackgroundImage/>
@@ -52,7 +58,7 @@ export const PrestigeScreen = ({setScreen, gameState, setGameState}: PrestigeScr
         <Header title={'Trainers'}/>
         <Description
           title={'Teamwork makes the dream work'}
-          body={'The more steps everyone takes, the more Personal Trainers you attract! These world class instructors provide huge bonuses but you’ll need to abandon your followers to hire them.'}
+          body={'The more steps everyone takes, the more Personal Trainers you attract! These world class instructors provide huge bonuses but you’ll need to restart your business to hire them.'}
         />
 
         <View style={styles.prestigeStatusWrapper}>
@@ -66,15 +72,24 @@ export const PrestigeScreen = ({setScreen, gameState, setGameState}: PrestigeScr
 
         <View style={styles.restartWrapper}>
           <Text style={styles.restartTitle}>Trainers Hired on Restart</Text>
-          <Text style={styles.restartBody1}>{calculateEarnedPrestige(gameState.lifetimeEarnings, gameState.startingLifetimeEarnings).toFixed()}</Text>
+          <Text style={styles.restartBody1}>{prestige}</Text>
           <Text style={styles.restartBody2}>2% Step Bonus Per Trainer!</Text>
-          <TouchableOpacity style={styles.restartButton} onPress={resetGame}>
-            <Text style={styles.restartButtonText}>Hire & Restart</Text>
-          </TouchableOpacity>
+          <Button text={'Hire & Restart'} onPress={() => setShowClaimPrestigeModal(true)}/>
         </View>
 
       </View>
       <BottomBar screen={Screen.Prestige} setScreen={setScreen}/>
+
+      <ConfirmationModal
+        visible={showClaimPrestigeModal}
+        title={`You can hire ${prestige} trainers!`}
+        body={"Hiring requires resetting your follower count, upgrades, and balance."}
+        onConfirm={() => {
+          resetGame()
+          setShowClaimPrestigeModal(false)
+        }}
+        onCancel={() => {setShowClaimPrestigeModal(false)}}
+      />
     </SafeAreaView>
   )
 }
