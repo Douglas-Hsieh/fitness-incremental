@@ -1,7 +1,8 @@
 import React from "react";
 import { StyleSheet, View } from "react-native";
+import colors from "../../assets/colors/colors";
 import { CurrencyGenerator } from "../../assets/data/CurrencyGenerators";
-import { GeneratorState } from "../../assets/data/GameState";
+import { GeneratorState } from "../../assets/data/GeneratorState";
 import { getLastUnlock, getNextUnlock } from "../../assets/data/GeneratorUnlocks";
 import { ProgressBar } from "./ProgressBar";
 
@@ -35,6 +36,7 @@ export const UnlockProgressBar = ({generator, generatorState}: UnlockProgressBar
       <ProgressBar
         progress={progress}
         text={text}
+        textStyle={styles.dropShadow}
       />
     </View>
   )
@@ -44,5 +46,9 @@ const styles = StyleSheet.create({
   container: {
     width: '100%',
     marginTop: -15,
-  }
+  },
+  dropShadow: {
+    textShadowColor: colors.black,
+    textShadowRadius: 5,
+  },
 })

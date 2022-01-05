@@ -3,12 +3,14 @@ import { View, TouchableOpacity, Text, Image } from "react-native";
 import EStyleSheet from "react-native-extended-stylesheet";
 import colors from "../../assets/colors/colors";
 import { CurrencyGenerator, CURRENCY_GENERATORS } from "../../assets/data/CurrencyGenerators";
-import { GeneratorState, GameState } from "../../assets/data/GameState";
+import { GameState } from "../../assets/data/GameState";
+import { GeneratorState } from "../../assets/data/GeneratorState";
 import BuyAmount from "../enums/BuyAmount";
 import { calculatePrice, numberToHumanFormat } from "../math";
 import { Map } from 'immutable';
 import { playSound, SoundFile } from "../util/sounds";
 import { UnlockProgressBar } from "./UnlockProgressBar";
+import { GeneratorProgressBar } from "./GeneratorProgressBar";
 
 const GeneratorIcon = memo((props: {image: any}) => {
   console.log('GeneratorIcon render')
@@ -21,26 +23,6 @@ const GeneratorIcon = memo((props: {image: any}) => {
     </View>
   </View>
 )})
-
-interface StepProgressBarProps {
-  progress: number;
-}
-
-const StepProgressBar = ({progress}: StepProgressBarProps) => (
-  <View style={styles.stepProgressBarWrapper}>
-    <View style={styles.stepProgressBarContainer1}>
-      <View style={styles.stepProgressBarContainer2}>
-        <View style={styles.stepProgressBarContainer3}>
-          <View style={[
-            styles.stepProgressBar,
-            {width: progress * styles.stepProgressBar.width},
-          ]}/>
-        </View>
-      </View>
-    </View>
-    <Text style={styles.stepProgressBarText}>6440.00 / step</Text>
-  </View>
-)
 
 interface BuyGeneratorButtonProps {
   gameState: GameState;
@@ -132,7 +114,7 @@ export const GeneratorList = ({
             <UnlockProgressBar generator={generator} generatorState={generatorState}/>
           </View>
           <View style={styles.generatorRightWrapper}>
-            <StepProgressBar progress={1}/>
+            <GeneratorProgressBar generator={generator} generatorState={generatorState}/>
             <BuyGeneratorButton
               gameState={gameState}
               setGameState={setGameState}
@@ -196,45 +178,6 @@ const styles = EStyleSheet.create({
   icon: {
     height: '80%',
     width: '80%',
-  },
-
-  // Step Progress Bar
-  stepProgressBarWrapper: {
-    alignItems: 'center',
-    width: 200,
-    height: 35,
-  },
-  stepProgressBarContainer1: {
-    width: '100%',
-    height: '100%',
-    backgroundColor: colors.black,
-    borderRadius: 100,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  stepProgressBarContainer2: {
-    width: '99%',
-    height: '95%',
-    backgroundColor: colors.green1,
-    borderRadius: 100,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  stepProgressBarContainer3: {
-    width: '99%',
-    height: '95%',
-    backgroundColor: colors.white,
-    borderRadius: 100,
-  },
-  stepProgressBar: {
-    width: 196,
-    height: '100%',
-    backgroundColor: colors.green3,
-    borderRadius: 100,
-  },
-  stepProgressBarText: {
-    marginTop: -30,
-    color: colors.black,
   },
 
   // Buy Button
