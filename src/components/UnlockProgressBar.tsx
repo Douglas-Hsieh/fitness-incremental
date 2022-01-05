@@ -1,9 +1,9 @@
 import React from "react";
-import { StyleSheet, Text, View } from "react-native";
-import colors from "../../assets/colors/colors";
+import { StyleSheet, View } from "react-native";
 import { CurrencyGenerator } from "../../assets/data/CurrencyGenerators";
 import { GeneratorState } from "../../assets/data/GameState";
 import { getLastUnlock, getNextUnlock } from "../../assets/data/GeneratorUnlocks";
+import { ProgressBar } from "./ProgressBar";
 
 interface UnlockProgressBarProps {
   generator: CurrencyGenerator;
@@ -27,41 +27,22 @@ export const UnlockProgressBar = ({generator, generatorState}: UnlockProgressBar
   if (nextUnlock) {
     text = `${generatorState.owned}/${nextUnlock.count}`
   } else {
-    text = generatorState.owned
+    text = generatorState.owned.toString()
   }
 
   return (
     <View style={styles.container}>
-      <View style={[
-        styles.progressBar,
-        {width: progress * styles.progressBar.width},
-      ]}/>
-      <Text style={styles.text}>{text}</Text>
+      <ProgressBar
+        progress={progress}
+        text={text}
+      />
     </View>
   )
 }
 
 const styles = StyleSheet.create({
   container: {
-    marginTop: -20,
-
-    width: 90,
-    height: 25,
-    backgroundColor: colors.blue3,
-    borderRadius: 20,
-    alignItems: 'center',
-  },
-  progressBar: {
-    marginTop: 2.5,
-    width: 85,
-    height: 20,
-    backgroundColor: colors.green2,
-    borderRadius: 19,
-  },
-  text: {
-    marginTop: -20,
-    color: colors.white,
-    textShadowColor: colors.black,
-    textShadowRadius: 5,
-  },
+    width: '100%',
+    marginTop: -15,
+  }
 })
