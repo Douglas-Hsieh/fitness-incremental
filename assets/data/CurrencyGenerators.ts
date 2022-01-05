@@ -6,8 +6,8 @@ export interface CurrencyGenerator {
   initialPrice: number;  // Cost of first generator
   growthRate: number;  // Rate at which cost grows
   initialRevenue: number;
-  initialSteps: number;
-  initialProductivity: number;  // initialRevenue / initialSteps
+  initialTicks: number;  // initial # of ticks required to produce revenue
+  initialProductivity: number;  // initialRevenue / initialTicks
   image: any;
 }
 
@@ -17,7 +17,7 @@ export const CURRENCY_GENERATORS_BY_ID: Map<string, CurrencyGenerator> = Map([
     name: 'Puppies',
     initialPrice: 3.738,
     growthRate: 1.07,
-    initialSteps: 0.6,
+    initialTicks: 0.6,
     initialRevenue: 1,
     initialProductivity: 1.67,
     image: require('../images/puppy.png'),
@@ -27,7 +27,7 @@ export const CURRENCY_GENERATORS_BY_ID: Map<string, CurrencyGenerator> = Map([
     name: 'Friends',
     initialPrice: 60,
     growthRate: 1.15,
-    initialSteps: 3,
+    initialTicks: 3,
     initialRevenue: 60,
     initialProductivity: 20,
     image: require('../images/friend.png'),
@@ -37,7 +37,7 @@ export const CURRENCY_GENERATORS_BY_ID: Map<string, CurrencyGenerator> = Map([
     name: 'Athletes',
     initialPrice: 720,
     growthRate: 1.14,
-    initialSteps: 6,
+    initialTicks: 6,
     initialRevenue: 540,
     initialProductivity: 90,
     image: require('../images/athlete.png'),
@@ -47,7 +47,7 @@ export const CURRENCY_GENERATORS_BY_ID: Map<string, CurrencyGenerator> = Map([
     name: 'Playgrounds',
     initialPrice: 8640,
     growthRate: 1.13,
-    initialSteps: 12,
+    initialTicks: 12,
     initialRevenue: 4320,
     initialProductivity: 360,
     image: require('../images/playground.png'),
@@ -57,7 +57,7 @@ export const CURRENCY_GENERATORS_BY_ID: Map<string, CurrencyGenerator> = Map([
     name: 'Soccer Teams',
     initialPrice: 103680,
     growthRate: 1.12,
-    initialSteps: 24,
+    initialTicks: 24,
     initialRevenue: 51840,
     initialProductivity: 2160,
     image: require('../images/soccer-team.png'),
@@ -67,7 +67,7 @@ export const CURRENCY_GENERATORS_BY_ID: Map<string, CurrencyGenerator> = Map([
     name: 'Gyms',
     initialPrice: 1244160,
     growthRate: 1.11,
-    initialSteps: 96,
+    initialTicks: 96,
     initialRevenue: 622080,
     initialProductivity: 6480,
     image: require('../images/treadmill.png'),
@@ -77,7 +77,7 @@ export const CURRENCY_GENERATORS_BY_ID: Map<string, CurrencyGenerator> = Map([
     name: 'Police Departments',
     initialPrice: 14929920,
     growthRate: 1.10,
-    initialSteps: 384,
+    initialTicks: 384,
     initialRevenue: 7464960,
     initialProductivity: 19440,
     image: require('../images/police.png'),
@@ -87,7 +87,7 @@ export const CURRENCY_GENERATORS_BY_ID: Map<string, CurrencyGenerator> = Map([
     name: 'Ninja Villages',
     initialPrice: 179159040,
     growthRate: 1.09,
-    initialSteps: 1536,
+    initialTicks: 1536,
     initialRevenue: 89579520,
     initialProductivity: 58320,
     image: require('../images/ninja.png'),
@@ -97,7 +97,7 @@ export const CURRENCY_GENERATORS_BY_ID: Map<string, CurrencyGenerator> = Map([
     name: 'Cities',
     initialPrice: 2149908480,
     growthRate: 1.08,
-    initialSteps: 6144,
+    initialTicks: 6144,
     initialRevenue: 1074954240,
     initialProductivity: 174960,
     image: require('../images/cities.png'),
@@ -107,7 +107,7 @@ export const CURRENCY_GENERATORS_BY_ID: Map<string, CurrencyGenerator> = Map([
     name: 'Armies',
     initialPrice: 25798901760,
     growthRate: 1.07,
-    initialSteps: 36864,
+    initialTicks: 36864,
     initialRevenue: 29668737024,
     initialProductivity: 804816,
     image: require('../images/soldier.png'),

@@ -1,8 +1,8 @@
 import React, { useEffect } from "react";
-import { CURRENCY_GENERATORS } from "../assets/data/CurrencyGenerators";
+import { CURRENCY_GENERATORS_BY_ID } from "../assets/data/CurrencyGenerators";
 import { GameState } from "../assets/data/GameState";
 import Screen from "./enums/Screen";
-import { calculateOneTickRevenue, calculateTicksToUse } from "./math";
+import { calculateGeneratorRevenue, calculateTicksToUse } from "./math";
 import { HomeScreen } from "./screens/HomeScreen";
 import { LoginScreen } from "./screens/LoginScreen";
 import { PrestigeScreen } from "./screens/PrestigeScreen";
@@ -26,27 +26,8 @@ interface GameProps {
 
 export const Game = ({screen, setScreen, gameState, setGameState, lastVisit, requestAuthorizationFromGoogleFit}: GameProps) => {
 
-  useInterval(() => {
-    // Generate revenue from ticks
-    const ticksToUse = calculateTicksToUse(gameState.ticks)
-    if (ticksToUse === 0) {
-      return
-    }
-    const revenue = ticksToUse * calculateOneTickRevenue(CURRENCY_GENERATORS, gameState)
-
-    setGameState({
-      ...gameState,
-      ticks: gameState.ticks - ticksToUse,
-      balance: gameState.balance + revenue,
-      lifetimeEarnings: gameState.lifetimeEarnings + revenue,
-    })
-    console.log('ticksUsed', ticksToUse)
-    console.log('revenue', revenue)
-  }, 1000)
-
   useEffect(() => {
     // User took steps since last visit
-    
     const ticks = 20 * lastVisit.steps
     console.log('ticks', ticks)
 
@@ -56,6 +37,49 @@ export const Game = ({screen, setScreen, gameState, setGameState, lastVisit, req
       stepsUntilNextRandomReward: gameState.stepsUntilNextRandomReward - lastVisit.steps
     })
   }, [lastVisit])
+
+  useInterval(() => {
+    // Generators progress and generate revenue using ticks
+    const ticksToUse = calculateTicksToUse(gameState.ticks)
+    if (ticksToUse === 0) {
+      return
+    }
+    let revenue = 0
+
+    const generatorStateById = gameState.generatorStateById.withMutations(genStateById => {
+      Array.from(genStateById.entries())
+        .forEach(([id, genState]) => {
+
+          const generator = CURRENCY_GENERATORS_BY_ID.get(id)!
+          const newTicks = genState.ticks + ticksToUse
+
+          if (newTicks >= generator.initialTicks) {
+            const timesProduced = Math.floor(newTicks / generator.initialTicks)
+            genStateById.set(id, {
+              ...genState,
+              ticks: newTicks % generator.initialTicks,
+            })
+            revenue += timesProduced * calculateGeneratorRevenue(generator, gameState)
+          } else {
+            genStateById.set(id, {
+              ...genState,
+              ticks: newTicks,
+            })
+          }
+        })
+    })
+
+    setGameState({
+      ...gameState,
+      generatorStateById: generatorStateById,
+      ticks: gameState.ticks - ticksToUse,
+      balance: gameState.balance + revenue,
+      lifetimeEarnings: gameState.lifetimeEarnings + revenue,
+    })
+
+    console.log('ticksToUse', ticksToUse)
+    console.log('revenue', revenue)
+  }, 1000)
 
   // Autosave game
   useEffect(() => {

@@ -1,5 +1,6 @@
 import { CurrencyGenerator } from "../assets/data/CurrencyGenerators"
-import { GameState, GeneratorState } from "../assets/data/GameState"
+import { GameState } from "../assets/data/GameState"
+import { GeneratorState } from "../assets/data/GeneratorState"
 import Scale from "../assets/data/Scale"
 import { Map, Set } from 'immutable'
 import { CURRENCY_UPGRADES_BY_ID } from "../assets/data/CurrencyUpgrades"
@@ -106,34 +107,53 @@ const calculateTemporaryMultipliers = (temporaryMultipliers: Set<TemporaryMultip
   return cumulativeMultiplier === 0 ? 1 : cumulativeMultiplier
 }
 
+export const calculateGeneratorBaseRevenue = (
+  generator: CurrencyGenerator,
+  gameState: GameState,
+) => {
+  const {generatorStateById, upgradeIds, unlockIds, prestige} = gameState
+
+  const generatorState = generatorStateById.get(generator.id)!
+
+  const upgradeMultipliersByGeneratorId = calculateMultipliersFromUpgrades(upgradeIds)
+  const unlockMultipliersByGeneratorId = calculateMultipliersFromUnlocks(unlockIds)
+  const prestigeMultiplier = 1 + (prestige * 0.02)
+
+  const revenue = (generator.initialRevenue * generatorState.owned)
+    * upgradeMultipliersByGeneratorId.get(generator.id)!
+    * unlockMultipliersByGeneratorId.get(generator.id)!
+    * prestigeMultiplier;
+  
+  return revenue
+}
+
+export const calculateGeneratorRevenue = (
+  generator: CurrencyGenerator,
+  gameState: GameState,
+) => {
+  const baseRevenue = calculateGeneratorBaseRevenue(generator, gameState)
+  const temporaryMultiplier = calculateTemporaryMultipliers(gameState.temporaryMultipliers)
+  return baseRevenue * temporaryMultiplier
+}
+
 export const calculateOneTickBaseRevenue = (
   currencyGenerators: CurrencyGenerator[],
   gameState: GameState,
 ): number => {
   const {generatorStateById, upgradeIds, unlockIds, prestige} = gameState
 
+  const upgradeMultipliersByGeneratorId = calculateMultipliersFromUpgrades(upgradeIds)
+  const unlockMultipliersByGeneratorId = calculateMultipliersFromUnlocks(unlockIds)
+  const prestigeMultiplier = 1 + (prestige * 0.02)
+
   return currencyGenerators.map(generator => {
-    const generatorState = generatorStateById.get(generator.id)!;
-
-    const upgradeMultipliersByGeneratorId = calculateMultipliersFromUpgrades(upgradeIds)
-    const unlockMultipliersByGeneratorId = calculateMultipliersFromUnlocks(unlockIds);
-    const prestigeMultiplier = 1 + (prestige * 0.02)
-
+    const generatorState = generatorStateById.get(generator.id)!
     const revenue = (generator.initialProductivity * generatorState.owned)
       * upgradeMultipliersByGeneratorId.get(generator.id)!
       * unlockMultipliersByGeneratorId.get(generator.id)!
       * prestigeMultiplier;
     return revenue;
   }).reduce((r1, r2) => r1 + r2);
-}
-
-export const calculateOneTickRevenue = (
-  currencyGenerators: CurrencyGenerator[],
-  gameState: GameState,
-) => {
-  const baseRevenue = calculateOneTickBaseRevenue(currencyGenerators, gameState)
-  const temporaryMultiplier = calculateTemporaryMultipliers(gameState.temporaryMultipliers)
-  return baseRevenue * temporaryMultiplier
 }
 
 export const calculateUnlocksFromGenerators = (
