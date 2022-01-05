@@ -8,6 +8,7 @@ import BuyAmount from "../enums/BuyAmount";
 import { calculatePrice, numberToHumanFormat } from "../math";
 import { Map } from 'immutable';
 import { playSound, SoundFile } from "../util/sounds";
+import { UnlockProgressBar } from "./UnlockProgressBar";
 
 const GeneratorIcon = memo((props: {image: any}) => {
   console.log('GeneratorIcon render')
@@ -20,22 +21,6 @@ const GeneratorIcon = memo((props: {image: any}) => {
     </View>
   </View>
 )})
-
-interface GeneratorProgressBarProps {
-  generatorState: GeneratorState;
-  progress: number;
-}
-
-const GeneratorProgressBar = ({generatorState, progress}: GeneratorProgressBarProps) => (
-  <View style={styles.generatorProgressBarContainer}>
-    <View style={[
-      styles.generatorProgressBar,
-      {width: progress * styles.generatorProgressBar.width},
-    ]}>
-    </View>
-    <Text style={styles.generatorProgressBarText}>{generatorState.owned}</Text>
-  </View>
-)
 
 interface StepProgressBarProps {
   progress: number;
@@ -144,7 +129,7 @@ export const GeneratorList = ({
         <View key={generator.id} style={styles.generatorWrapper}>
           <View style={styles.generatorLeftWrapper}>
             <GeneratorIcon image={generator.image}/>
-            <GeneratorProgressBar generatorState={generatorState} progress={1}/>
+            <UnlockProgressBar generator={generator} generatorState={generatorState}/>
           </View>
           <View style={styles.generatorRightWrapper}>
             <StepProgressBar progress={1}/>
@@ -211,30 +196,6 @@ const styles = EStyleSheet.create({
   icon: {
     height: '80%',
     width: '80%',
-  },
-
-  // Generator Progress Bar
-  generatorProgressBarContainer: {
-    marginTop: -20,
-
-    width: 90,
-    height: 25,
-    backgroundColor: colors.blue3,
-    borderRadius: 20,
-    alignItems: 'center',
-  },
-  generatorProgressBar: {
-    marginTop: 2.5,
-    width: 85,
-    height: 20,
-    backgroundColor: colors.green2,
-    borderRadius: 19,
-  },
-  generatorProgressBarText: {
-    marginTop: -20,
-    color: colors.white,
-    textShadowColor: colors.black,
-    textShadowRadius: 5,
   },
 
   // Step Progress Bar

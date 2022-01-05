@@ -1,7 +1,6 @@
 import { Set } from 'immutable'
 import React, { memo, useState } from 'react'
 import { Image, SafeAreaView, StyleSheet, Text, View } from 'react-native'
-import { TouchableOpacity } from 'react-native-gesture-handler'
 import colors from '../../assets/colors/colors'
 import { GameState, INITIAL_BALANCE, INITIAL_GENERATOR_STATE_BY_ID } from '../../assets/data/GameState'
 import { BackgroundImage } from '../components/BackgroundImage'
