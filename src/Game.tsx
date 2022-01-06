@@ -49,6 +49,9 @@ export const Game = ({screen, setScreen, gameState, setGameState, lastVisit, req
     const generatorStateById = gameState.generatorStateById.withMutations(genStateById => {
       Array.from(genStateById.entries())
         .forEach(([id, genState]) => {
+          if (genState.owned <= 0) {
+            return
+          }
 
           const generator = CURRENCY_GENERATORS_BY_ID.get(id)!
           const newTicks = genState.ticks + ticksToUse
