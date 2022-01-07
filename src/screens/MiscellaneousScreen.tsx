@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { SafeAreaView, StyleSheet, View } from "react-native";
 import { GameState, INITIAL_GAME_STATE } from "../../assets/data/GameState";
 import { BackgroundImage } from "../components/BackgroundImage";

@@ -1,26 +1,48 @@
 import React from "react"
+import { StyleSheet, Text } from "react-native"
+import AnimatedProgress from "react-native-reanimated-progress-bar"
+import colors from "../../assets/colors/colors"
 import { CurrencyGenerator } from "../../assets/data/CurrencyGenerators"
-import { GeneratorState } from "../../assets/data/GeneratorState"
-import { ProgressBar } from "./ProgressBar"
+import { GameState } from "../../assets/data/GameState"
+import { calculateGeneratorRevenue, numberToHumanFormat } from "../math"
 
 interface GeneratorProgressBarProps {
   generator: CurrencyGenerator;
-  generatorState: GeneratorState;
+  gameState: GameState;
 }
 
-export const GeneratorProgressBar = ({generator, generatorState}: GeneratorProgressBarProps) => {
+export const GeneratorProgressBar = ({generator, gameState}: GeneratorProgressBarProps) => {
+  console.log('GeneratorProgressBar render')
+
   // Calculate progress
+  const generatorState = gameState.generatorStateById.get(generator.id)!
   const progress = generatorState.ticks / generator.initialTicks
-  const text = `${(progress * 100).toFixed(2)}%`
+  const revenue = calculateGeneratorRevenue(generator, gameState)
+  const [coefficient, scale] = numberToHumanFormat(revenue)
+  const text = `${coefficient} ${scale}`
 
   return (
-    <ProgressBar
-      progress={progress}
-      text={text}
-      containerClassnames={'h-9'}
-      progressBarBackgroundClassnames={'bg-white'}
-      progressBarClassnames={'bg-green-400'}
-      textClassnames={'text-black'}
-    />
+    <>
+      <AnimatedProgress
+        fill={colors.green3}
+        current={progress}
+        total={1}
+        style={styles.animatedProgress}
+      />
+      <Text style={styles.text}>{text}</Text>
+    </>
   )
 }
+
+const styles = StyleSheet.create({
+  animatedProgress: {
+    flex: .75,
+    width: '100%',
+    borderRadius: 100,
+    borderWidth: 1,
+  },
+  text: {
+    position: 'absolute',
+    alignSelf: 'center',
+  },
+})

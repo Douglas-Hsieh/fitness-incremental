@@ -114,7 +114,7 @@ export const GeneratorList = ({
             <UnlockProgressBar generator={generator} generatorState={generatorState}/>
           </View>
           <View style={styles.generatorRightWrapper}>
-            <GeneratorProgressBar generator={generator} generatorState={generatorState}/>
+            <GeneratorProgressBar generator={generator} gameState={gameState}/>
             <BuyGeneratorButton
               gameState={gameState}
               setGameState={setGameState}
