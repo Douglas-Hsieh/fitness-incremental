@@ -1,4 +1,4 @@
-import { CurrencyGenerator } from "../assets/data/CurrencyGenerators"
+import { CurrencyGenerator, CURRENCY_GENERATORS_BY_ID } from "../assets/data/CurrencyGenerators"
 import { GameState } from "../assets/data/GameState"
 import { GeneratorState } from "../assets/data/GeneratorState"
 import Scale from "../assets/data/Scale"
@@ -197,5 +197,42 @@ export const calculateTicksToUse = (ticksRemaining: number): number => {
     return 3
   } else {
     return 4
+  }
+}
+
+export const progressGenerators = (
+  gameState: GameState,
+  ticksToUse: number,
+) => {
+  let revenue = 0
+  const generatorStateById = gameState.generatorStateById.withMutations(genStateById => {
+    Array.from(genStateById.entries())
+      .forEach(([id, genState]) => {
+        if (genState.owned <= 0) {
+          return
+        }
+
+        const generator = CURRENCY_GENERATORS_BY_ID.get(id)!
+        const newTicks = genState.ticks + ticksToUse
+
+        if (newTicks >= generator.initialTicks) {
+          const timesProduced = Math.floor(newTicks / generator.initialTicks)
+          genStateById.set(id, {
+            ...genState,
+            ticks: newTicks % generator.initialTicks,
+          })
+          revenue += timesProduced * calculateGeneratorRevenue(generator, gameState)
+        } else {
+          genStateById.set(id, {
+            ...genState,
+            ticks: newTicks,
+          })
+        }
+      })
+  })
+
+  return {
+    generatorStateById: generatorStateById,
+    revenue: revenue,
   }
 }

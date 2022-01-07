@@ -1,8 +1,7 @@
 import React, { useEffect } from "react";
-import { CURRENCY_GENERATORS_BY_ID } from "../assets/data/CurrencyGenerators";
 import { GameState } from "../assets/data/GameState";
 import Screen from "./enums/Screen";
-import { calculateGeneratorRevenue, calculateTicksToUse } from "./math";
+import { calculateTicksToUse, progressGenerators } from "./math";
 import { HomeScreen } from "./screens/HomeScreen";
 import { LoginScreen } from "./screens/LoginScreen";
 import { PrestigeScreen } from "./screens/PrestigeScreen";
@@ -27,55 +26,47 @@ interface GameProps {
 export const Game = ({screen, setScreen, gameState, setGameState, lastVisit, requestAuthorizationFromGoogleFit}: GameProps) => {
 
   useEffect(() => {
-    // User took steps since last visit
+    // User earned ticks from steps since last visit
     const ticks = 20 * lastVisit.steps
     console.log('ticks', ticks)
 
+    // Generators progressed from ticks since last visit
+    const now = new Date()
+    const secondsLastVisit = (now.getTime() - lastVisit.time.getTime()) / 1000;
+    let ticksRemaining = gameState.ticks
+    let ticksToUseTotal = 0
+    for (let i = 0; i < secondsLastVisit; ++i) {
+      const ticksToUse = calculateTicksToUse(ticksRemaining)
+      ticksRemaining -= ticksToUse
+      ticksToUseTotal += ticksToUse
+    }
+    const {generatorStateById, revenue} = progressGenerators(gameState, ticksToUseTotal)
+
+    console.log('ticksToUse since last visit', ticksToUseTotal)
+    console.log('revenue since last visit', revenue)
+
     setGameState({
       ...gameState,
-      ticks: gameState.ticks + ticks,
-      stepsUntilNextRandomReward: gameState.stepsUntilNextRandomReward - lastVisit.steps
+      stepsUntilNextRandomReward: gameState.stepsUntilNextRandomReward - lastVisit.steps,
+      ticks: gameState.ticks + ticks - ticksToUseTotal,
+      generatorStateById: generatorStateById,
+      balance: gameState.balance + revenue,
+      lifetimeEarnings: gameState.lifetimeEarnings + revenue,
     })
   }, [lastVisit])
 
   useInterval(() => {
     // Generators progress and generate revenue using ticks
     const ticksToUse = calculateTicksToUse(gameState.ticks)
-    if (ticksToUse === 0) {
+    if (ticksToUse <= 0) {
       return
     }
-    let revenue = 0
-
-    const generatorStateById = gameState.generatorStateById.withMutations(genStateById => {
-      Array.from(genStateById.entries())
-        .forEach(([id, genState]) => {
-          if (genState.owned <= 0) {
-            return
-          }
-
-          const generator = CURRENCY_GENERATORS_BY_ID.get(id)!
-          const newTicks = genState.ticks + ticksToUse
-
-          if (newTicks >= generator.initialTicks) {
-            const timesProduced = Math.floor(newTicks / generator.initialTicks)
-            genStateById.set(id, {
-              ...genState,
-              ticks: newTicks % generator.initialTicks,
-            })
-            revenue += timesProduced * calculateGeneratorRevenue(generator, gameState)
-          } else {
-            genStateById.set(id, {
-              ...genState,
-              ticks: newTicks,
-            })
-          }
-        })
-    })
+    const {generatorStateById, revenue} = progressGenerators(gameState, ticksToUse)
 
     setGameState({
       ...gameState,
-      generatorStateById: generatorStateById,
       ticks: gameState.ticks - ticksToUse,
+      generatorStateById: generatorStateById,
       balance: gameState.balance + revenue,
       lifetimeEarnings: gameState.lifetimeEarnings + revenue,
     })

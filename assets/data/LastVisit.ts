@@ -1,4 +1,4 @@
 export interface LastVisit {
-  time: Date;
-  steps: number;
+  time: Date;  // time of last visit
+  steps: number;  // steps taken since last visit
 }
