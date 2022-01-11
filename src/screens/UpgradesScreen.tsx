@@ -1,58 +1,17 @@
 import React from "react";
-import { SafeAreaView, View, Text, Image, TouchableOpacity} from "react-native";
+import { SafeAreaView, View, Image} from "react-native";
 import EStyleSheet from "react-native-extended-stylesheet";
-import { ScrollView } from "react-native-gesture-handler";
+import { FlatList } from "react-native-gesture-handler";
 import colors from "../../assets/colors/colors";
-import { CURRENCY_GENERATORS } from "../../assets/data/CurrencyGenerators";
-import { CURRENCY_UPGRADES } from "../../assets/data/CurrencyUpgrades";
+import { EVERYONE_GENERATOR, GENERATORS } from "../../assets/data/Generators";
+import { GENERATOR_MULTIPLIER_UPGRADES } from "../../assets/data/Upgrades";
 import { GameState } from "../../assets/data/GameState";
 import { BackgroundImage } from "../components/BackgroundImage";
 import { BottomBar } from "../components/BottomBar";
 import { Description } from "../components/Description";
 import { Header } from "../components/Header";
 import Screen from "../enums/Screen";
-import { numberToHumanFormat } from "../math";
-import { playSound, SoundFile } from "../util/sounds";
-
-interface UpgradeComponentProps {
-  upgradeId: string;
-  title: string;
-  description: string;
-  price: number;
-  image: any;
-  gameState: GameState;
-  setGameState: (gameState: GameState) => void;
-}
-
-const UpgradeComponent = ({upgradeId, title, description, price, image, gameState, setGameState}: UpgradeComponentProps) => {
-  const [coefficient, scale] = numberToHumanFormat(price, 0, 0);
-  const isDisabled = price > gameState.balance;
-
-  const buyUpgrade = () => {
-    if (!isDisabled) {
-      const upgradeIds = gameState.upgradeIds.add(upgradeId);
-      setGameState({
-        ...gameState,
-        balance: gameState.balance - price,
-        upgradeIds: upgradeIds,
-      })
-      playSound(SoundFile.CashRegister)
-    }
-  }
-  
-  return (
-    <View style={styles.upgradeWrapper}>
-      <Image style={styles.generatorIcon} source={image}/>
-      <View style={styles.upgradeTextWrapper}>
-        <Text style={styles.upgradeTitle}>{title}</Text>
-        <Text style={styles.upgradeDescription}>{description}</Text>
-        <Text style={styles.upgradePrice}>{coefficient} {scale} steps</Text>
-      </View>
-      <TouchableOpacity style={[styles.buyUpgradeButton, isDisabled ? {backgroundColor: colors.gray4} : {}]} activeOpacity={.8} onPress={buyUpgrade} disabled={isDisabled}>
-        <Text style={styles.buyUpgradeText}>Buy!</Text>
-      </TouchableOpacity>
-    </View>
-)}
+import { UpgradeItem, UpgradeItemProps } from "../components/UpgradeItem";
 
 interface UpgradesListProps {
   gameState: GameState;
@@ -60,33 +19,46 @@ interface UpgradesListProps {
 }
 
 const UpgradesList = ({gameState, setGameState}: UpgradesListProps) => {
-  const remainingUpgrades = CURRENCY_UPGRADES
+  const remainingUpgrades = GENERATOR_MULTIPLIER_UPGRADES
     .filter(upgrade => !gameState.upgradeIds.contains(upgrade.id))
     .sort((u1, u2) => u1.price - u2.price)
 
+  const upgradeData = remainingUpgrades.map(upgrade => {
+    let image;
+    let generatorName;
+
+    if (upgrade.generatorId === '0') {
+      image = EVERYONE_GENERATOR.image
+      generatorName = EVERYONE_GENERATOR.name
+    } else {
+      const generator = GENERATORS.find(generator => generator.id == upgrade.generatorId)!;
+      image = generator.image
+      generatorName = generator.name
+    }
+
+    return {
+      upgradeId: upgrade.id,
+      title: generatorName,
+      description: `${generatorName} steps x3`,
+      price: upgrade.price,
+      image: image,
+      gameState: gameState,
+      setGameState: setGameState,
+    }
+  })
+
+  const renderItem = ({item}: {item: UpgradeItemProps}) => <UpgradeItem {...item} />
+
   return (
-    <View>
-      { remainingUpgrades.map(upgrade => {
-
-        const generator = CURRENCY_GENERATORS.find(generator => generator.id == upgrade.generatorId);
-
-        if (generator) {
-          return (
-            <UpgradeComponent
-              key={`${upgrade.id}`}
-              upgradeId={upgrade.id}
-              title={generator.name}
-              description={`${generator.name} steps x3`}
-              price={upgrade.price}
-              image={generator.image}
-              gameState={gameState}
-              setGameState={setGameState}
-            />
-          )
-        }
-        })}
-    </View>
-  )  
+    <FlatList
+      data={upgradeData}
+      renderItem={renderItem}
+      keyExtractor={item => item.upgradeId}
+      style={styles.scroll}
+      contentInsetAdjustmentBehavior='automatic'
+      showsVerticalScrollIndicator={false}
+    />
+  )
 }
 
 interface UpgradesScreenProps {
@@ -120,16 +92,10 @@ export const UpgradesScreen = ({setScreen, gameState, setGameState}: UpgradesScr
           body={'Spend your hard earned steps to give your followers a boost.'}
         />
 
-        <ScrollView
-          style={styles.scroll}
-          contentInsetAdjustmentBehavior='automatic'
-          showsVerticalScrollIndicator={false}
-        >
-          <UpgradesList
-            gameState={gameState}
-            setGameState={setGameState}
-          />
-        </ScrollView>
+        <UpgradesList
+          gameState={gameState}
+          setGameState={setGameState}
+        />
       </View>
 
       <BottomBar screen={Screen.Upgrades} setScreen={setScreen}/>
@@ -183,50 +149,5 @@ const styles = EStyleSheet.create({
   scroll: {
     marginTop: 10,
   },
-  upgradeWrapper: {
-    marginTop: 10,
-    width: '90%',
-    height: '5rem',
-    borderRadius: 10,
-    backgroundColor: colors.white,
-    flexDirection: 'row',
-    alignSelf: 'center',
-    alignItems: 'center',
-    justifyContent: 'space-between'
-  },
-  generatorIcon: {
-    height: 64,
-    width: 64,
-    marginLeft: 10,
-  },
-  upgradeTextWrapper: {
-    flexDirection: 'column',
-    alignItems: 'center',
-  },
-  upgradeTitle: {
-    fontFamily: 'oleo-script',
-    color: colors.orange3,
-  },
-  upgradeDescription: {
-
-  },
-  upgradePrice: {
-
-  },
-
-  buyUpgradeButton: {
-    marginRight: 10,
-    backgroundColor: colors.orange3,
-    width: 100,
-    height: 50,
-    borderRadius: 10,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  buyUpgradeText: {
-    fontFamily: 'oleo-script',
-    color: colors.white,
-    fontSize: '1.5rem',
-  }
 
 });
