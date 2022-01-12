@@ -1,13 +1,13 @@
 import React from "react";
 import { StyleSheet, View } from "react-native";
 import colors from "../../assets/colors/colors";
-import { CurrencyGenerator } from "../../assets/data/CurrencyGenerators";
+import { Generator } from "../../assets/data/Generators";
 import { GeneratorState } from "../../assets/data/GeneratorState";
 import { getLastUnlock, getNextUnlock } from "../../assets/data/GeneratorUnlocks";
 import { ProgressBar } from "./ProgressBar";
 
 interface UnlockProgressBarProps {
-  generator: CurrencyGenerator;
+  generator: Generator;
   generatorState: GeneratorState;
 }
 

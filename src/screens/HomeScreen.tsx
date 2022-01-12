@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { View, SafeAreaView } from "react-native";
 import EStyleSheet from "react-native-extended-stylesheet";
 import { ScrollView } from "react-native-gesture-handler";
-import { CURRENCY_GENERATORS } from "../../assets/data/CurrencyGenerators";
+import { GENERATORS } from "../../assets/data/Generators";
 import { GameState, INITIAL_STEPS_UNTIL_NEXT_RANDOM_REWARD } from "../../assets/data/GameState";
 import BuyAmount from "../enums/BuyAmount";
 import { calculateMaxBuy, calculateOneTickBaseRevenue, calculatePrice, calculateUnlocksFromGenerators, numberToHumanFormat } from "../math";
@@ -49,7 +49,7 @@ export const HomeScreen = ({setScreen, gameState, setGameState}: HomeScreenProps
     let priceOfMaxByGeneratorId = Map<string, number>();
     let maxBuyByGeneratorId = Map<string,number>();
 
-    CURRENCY_GENERATORS.forEach(generator => {
+    GENERATORS.forEach(generator => {
       const generatorState = gameState.generatorStateById.get(generator.id)!;
       const maxBuy = calculateMaxBuy(gameState.balance, generator.initialPrice, generator.growthRate, generatorState.owned);
       maxBuyByGeneratorId = maxBuyByGeneratorId.set(generator.id, maxBuy);
@@ -68,7 +68,7 @@ export const HomeScreen = ({setScreen, gameState, setGameState}: HomeScreenProps
     let priceOf10ByGeneratorId = Map<string, number>();
     let priceOf100ByGeneratorId = Map<string, number>();
 
-    CURRENCY_GENERATORS.forEach(generator => {
+    GENERATORS.forEach(generator => {
       const generatorState = gameState.generatorStateById.get(generator.id)!;
       priceOf1ByGeneratorId = priceOf1ByGeneratorId.set(generator.id, calculatePrice(1, generator.initialPrice, generator.growthRate, generatorState.owned));
       priceOf10ByGeneratorId = priceOf10ByGeneratorId.set(generator.id, calculatePrice(10, generator.initialPrice, generator.growthRate, generatorState.owned));
@@ -140,7 +140,7 @@ export const HomeScreen = ({setScreen, gameState, setGameState}: HomeScreenProps
       body = 'Better luck next time...'
 
     } else if (reward === Reward.InstantBonus) {
-      const oneTickBaseRevenue = calculateOneTickBaseRevenue(CURRENCY_GENERATORS, gameState)
+      const oneTickBaseRevenue = calculateOneTickBaseRevenue(GENERATORS, gameState)
       const bonus = generateInstantBonus(oneTickBaseRevenue)
       const [coefficient, scale] = numberToHumanFormat(bonus)
       setGameState({

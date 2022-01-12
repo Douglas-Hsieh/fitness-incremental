@@ -2,7 +2,7 @@ import React, { memo } from "react";
 import { View, TouchableOpacity, Text, Image } from "react-native";
 import EStyleSheet from "react-native-extended-stylesheet";
 import colors from "../../assets/colors/colors";
-import { CurrencyGenerator, CURRENCY_GENERATORS } from "../../assets/data/CurrencyGenerators";
+import { Generator, GENERATORS } from "../../assets/data/Generators";
 import { GameState } from "../../assets/data/GameState";
 import { GeneratorState } from "../../assets/data/GeneratorState";
 import BuyAmount from "../enums/BuyAmount";
@@ -27,7 +27,7 @@ const GeneratorIcon = memo((props: {image: any}) => {
 interface BuyGeneratorButtonProps {
   gameState: GameState;
   setGameState: (gameState: GameState) => void;
-  generator: CurrencyGenerator;
+  generator: Generator;
   generatorState: GeneratorState;
   amount: number;
   price: number;
@@ -90,7 +90,7 @@ export const GeneratorList = ({
   buyAmount,
 }: GeneratorListProps) => (
   <View style={styles.generatorListWrapper}>
-    {CURRENCY_GENERATORS.map(generator => {
+    {GENERATORS.map(generator => {
       let price = priceByGeneratorId.get(generator.id)!;
       let isDisabled = price > gameState.balance;
       let amount: number;

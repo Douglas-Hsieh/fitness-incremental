@@ -3,7 +3,7 @@ import { StyleSheet, View } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import Animated, { useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
 import colors from '../../assets/colors/colors';
-import { CURRENCY_GENERATORS_BY_ID } from '../../assets/data/CurrencyGenerators';
+import { GENERATORS_BY_ID } from '../../assets/data/Generators';
 import { GeneratorUnlock } from '../../assets/data/GeneratorUnlocks';
 import { playSound, SoundFile } from '../util/sounds';
 
@@ -45,7 +45,7 @@ export const UnlockModal = ({unlock}: UnlockModalProps) => {
   if (unlock.targetGeneratorId === '0') {
     title = 'Everyone'
   } else {
-    const generator = CURRENCY_GENERATORS_BY_ID.get(unlock.targetGeneratorId)!
+    const generator = GENERATORS_BY_ID.get(unlock.targetGeneratorId)!
     title = generator.name
   }
   body = `x${unlock.multiplier}`

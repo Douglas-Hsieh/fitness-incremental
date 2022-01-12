@@ -1,9 +1,9 @@
-import { CurrencyGenerator, CURRENCY_GENERATORS_BY_ID } from "../assets/data/CurrencyGenerators"
+import { Generator, GENERATORS_BY_ID } from "../assets/data/Generators"
 import { GameState } from "../assets/data/GameState"
 import { GeneratorState } from "../assets/data/GeneratorState"
 import Scale from "../assets/data/Scale"
 import { Map, Set } from 'immutable'
-import { CURRENCY_UPGRADES_BY_ID } from "../assets/data/CurrencyUpgrades"
+import { GENERATOR_MULTIPLIER_UPGRADES_BY_ID } from "../assets/data/Upgrades"
 import { GeneratorUnlock, GENERATOR_UNLOCKS, GENERATOR_UNLOCKS_BY_ID, getUnlockId } from "../assets/data/GeneratorUnlocks"
 import { TemporaryMultiplier } from "./types/TemporaryMultiplier"
 
@@ -64,7 +64,7 @@ const calculateMultipliersFromUpgrades = (
   
   const multipliersByGeneratorId = INITIAL_MULTIPLIERS_BY_GENERATOR_ID.withMutations(multByGenId => {
     upgradeIds.forEach(upgradeId => {
-      const upgrade = CURRENCY_UPGRADES_BY_ID.get(upgradeId)!
+      const upgrade = GENERATOR_MULTIPLIER_UPGRADES_BY_ID.get(upgradeId)!
       const currentMultiplier = multByGenId.get(upgrade.generatorId)!
       multByGenId.set(upgrade.generatorId, currentMultiplier * upgrade.multiplier)
     })
@@ -108,7 +108,7 @@ const calculateTemporaryMultipliers = (temporaryMultipliers: Set<TemporaryMultip
 }
 
 export const calculateGeneratorBaseRevenue = (
-  generator: CurrencyGenerator,
+  generator: Generator,
   gameState: GameState,
 ) => {
   const {generatorStateById, upgradeIds, unlockIds, prestige} = gameState
@@ -128,7 +128,7 @@ export const calculateGeneratorBaseRevenue = (
 }
 
 export const calculateGeneratorRevenue = (
-  generator: CurrencyGenerator,
+  generator: Generator,
   gameState: GameState,
 ) => {
   const baseRevenue = calculateGeneratorBaseRevenue(generator, gameState)
@@ -137,7 +137,7 @@ export const calculateGeneratorRevenue = (
 }
 
 export const calculateOneTickBaseRevenue = (
-  currencyGenerators: CurrencyGenerator[],
+  currencyGenerators: Generator[],
   gameState: GameState,
 ): number => {
   const {generatorStateById, upgradeIds, unlockIds, prestige} = gameState
@@ -212,7 +212,7 @@ export const progressGenerators = (
           return
         }
 
-        const generator = CURRENCY_GENERATORS_BY_ID.get(id)!
+        const generator = GENERATORS_BY_ID.get(id)!
         const newTicks = genState.ticks + ticksToUse
 
         if (newTicks >= generator.initialTicks) {

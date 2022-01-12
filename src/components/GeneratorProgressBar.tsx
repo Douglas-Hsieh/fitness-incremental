@@ -2,12 +2,12 @@ import React from "react"
 import { StyleSheet, Text } from "react-native"
 import AnimatedProgress from "react-native-reanimated-progress-bar"
 import colors from "../../assets/colors/colors"
-import { CurrencyGenerator } from "../../assets/data/CurrencyGenerators"
+import { Generator } from "../../assets/data/Generators"
 import { GameState } from "../../assets/data/GameState"
 import { calculateGeneratorRevenue, numberToHumanFormat } from "../math"
 
 interface GeneratorProgressBarProps {
-  generator: CurrencyGenerator;
+  generator: Generator;
   gameState: GameState;
 }
 

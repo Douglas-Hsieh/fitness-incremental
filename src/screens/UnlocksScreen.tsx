@@ -4,7 +4,7 @@ import { Image, SafeAreaView, Text, View } from "react-native"
 import EStyleSheet from "react-native-extended-stylesheet"
 import { ScrollView } from "react-native-gesture-handler"
 import colors from "../../assets/colors/colors"
-import { CURRENCY_GENERATORS_BY_ID } from "../../assets/data/CurrencyGenerators"
+import { GENERATORS_BY_ID } from "../../assets/data/Generators"
 import { GameState } from "../../assets/data/GameState"
 import { GeneratorState } from "../../assets/data/GeneratorState"
 import { GeneratorUnlock, getNextUnlock } from "../../assets/data/GeneratorUnlocks"
@@ -47,7 +47,7 @@ const UnlockCardList = ({generatorStateById}: UnlockCardListProps) => {
           image = require('../../assets/images/everyone.png')
           generatorName = 'Everyone'
         } else {
-          const generator = CURRENCY_GENERATORS_BY_ID.get(unlock.generatorId)!
+          const generator = GENERATORS_BY_ID.get(unlock.generatorId)!
           key = generator.id
           image = generator.image
           generatorName = generator.name

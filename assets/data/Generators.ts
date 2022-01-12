@@ -1,6 +1,6 @@
 import { Map } from "immutable"
 
-export interface CurrencyGenerator {
+export interface Generator {
   id: string;
   name: string;
   initialPrice: number;  // Cost of first generator
@@ -11,7 +11,7 @@ export interface CurrencyGenerator {
   image: any;
 }
 
-export const CURRENCY_GENERATORS_BY_ID: Map<string, CurrencyGenerator> = Map([
+export const GENERATORS_BY_ID: Map<string, Generator> = Map([
   ["1", {
     id: "1",
     name: 'Puppies',
@@ -100,7 +100,7 @@ export const CURRENCY_GENERATORS_BY_ID: Map<string, CurrencyGenerator> = Map([
     initialTicks: 6144,
     initialRevenue: 1074954240,
     initialProductivity: 174960,
-    image: require('../images/cities.png'),
+    image: require('../images/everyone.png'),
   }],
   ["10", {
     id: "10",
@@ -113,5 +113,11 @@ export const CURRENCY_GENERATORS_BY_ID: Map<string, CurrencyGenerator> = Map([
     image: require('../images/soldier.png'),
   }],
 ])
+export const GENERATORS = Array.from(GENERATORS_BY_ID.values())
 
-export const CURRENCY_GENERATORS = Array.from(CURRENCY_GENERATORS_BY_ID.values())
+// Not actually a generator, but used for upgrades, unlocks for all generators
+export const EVERYONE_GENERATOR = {
+  id: '0',
+  name: 'All Followers',
+  image: require('../images/cities.png')
+}
