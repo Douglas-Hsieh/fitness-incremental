@@ -4,7 +4,9 @@ import { GameState, INITIAL_GAME_STATE } from "../../assets/data/GameState";
 import { BackgroundImage } from "../components/BackgroundImage";
 import { BottomBar } from "../components/BottomBar";
 import { Button } from "../components/Button";
+import Center from "../components/Center";
 import { ConfirmationModal } from "../components/ConfirmationModal";
+import { Header } from "../components/Header";
 import Screen from "../enums/Screen";
 
 interface MiscellaneousScreenProps {
@@ -22,8 +24,12 @@ export const MiscellaneousScreen = ({setScreen, setGameState}: MiscellaneousScre
   return (
     <SafeAreaView style={styles.container}>
       <BackgroundImage/>
+
       <View style={styles.screenWrapper}>
-        <Button text={'Delete Data'} color={'red'} onPress={() => setShowDeleteDataModal(true)}/>
+        <Header title={'Miscellaneous'}/>
+        <Center>
+          <Button text={'Delete Data'} style={{backgroundColor: 'red'}} onPress={() => setShowDeleteDataModal(true)}/>
+        </Center>
       </View>
 
       <BottomBar screen={Screen.Miscellaneous} setScreen={setScreen}/>
@@ -49,6 +55,5 @@ const styles = StyleSheet.create({
   screenWrapper: {
     flex: 1,
     alignItems: 'center',
-    justifyContent: 'center',
   },
 })
