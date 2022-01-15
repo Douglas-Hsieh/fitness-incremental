@@ -19,6 +19,7 @@
     "expo-av": "~10.2.0",
     "expo-camera": "~12.0.3",
     "expo-dev-client": "~0.7.2",
+    "expo-image-manipulator": "~10.2.0",
     "expo-location": "~14.0.1",
     "expo-splash-screen": "~0.14.1",
     "expo-status-bar": "~1.2.0",

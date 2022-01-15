@@ -16,6 +16,7 @@ import { Feather } from "@expo/vector-icons";
 import Center from "../components/Center";
 import colors from "../../assets/colors/colors";
 import { TouchableOpacity } from "react-native-gesture-handler";
+import { manipulateAsync } from 'expo-image-manipulator'
 
 enum VerificationStatus {
   Unverified,
@@ -23,8 +24,13 @@ enum VerificationStatus {
   Verified,
 }
 
+const base64ToImageUri = (base64: string) => {
+  return 'data:image/jpeg;base64,' + base64
+}
+
 interface PhotoAndLocation {
-  photo: CameraCapturedPicture;
+  compressedImageUri: string;
+  imageUri: string;
   location: LocationObject;
 }
 
@@ -78,53 +84,45 @@ export const WorkoutScreen = ({setScreen, setGameState}: WorkoutScreenProps) => 
   const snap = async () => {
     if (cameraRef.current) {
       const camera = cameraRef.current
-      const photo = await camera.takePictureAsync({
+      const image = await camera.takePictureAsync({
         base64: true,
       })
       const location = await getCurrentPositionAsync()
-      console.log('photo', photo)
-      console.log('Object.keys(photo)', Object.keys(photo))
+      console.log('Object.keys(photo)', Object.keys(image))
       console.log('location', location)
+
+      // Compress photo
+      const compressedImage = await manipulateAsync(base64ToImageUri(image.base64!), [], { base64: true, compress: 0 });
+      console.log('compressedImage.base64?.length', compressedImage.base64?.length)
+
       setPhotoAndLocation({
-        photo: photo,
+        imageUri: base64ToImageUri(image.base64!),
+        compressedImageUri: base64ToImageUri(compressedImage.base64!),
         location: location,
       })
     }
   }
 
   const sendForVerification = async () => {
-    // TODO: Upload to api
-
     if (!photoAndLocation) {
       return
     }
 
-    // const data = new FormData()
-    // data.append('name', 'imageName')
-    // data.append('type', 'image/jpeg')
-    // data.append('uri', photoAndLocation.photo.uri)
-
-    // await fetch(`${SERVER_URL}/api/location`, {
-    //   method: 'POST',
-    //   body: data,
-    //   headers: {
-    //     'Content-Type': 'multipart/form-data'
-    //   }
-    // })
-
-    uploadAsync(
-      `${SERVER_URL}/api/location`,
-      photoAndLocation.photo.uri,
-      {
-        uploadType: FileSystemUploadType.MULTIPART,
-        fieldName: 'files',
-        mimeType: 'image/png'
-      }
-    )
+    await fetch(`${SERVER_URL}/api/location`, {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        imageUri: photoAndLocation.compressedImageUri,
+      }),
+    }).catch(error => {
+      alert(error)
+    })
 
     setIsTakingPicture(false)
     setVerificationStatus(VerificationStatus.AwaitingVerification)
-
   }
 
   const handleExitCamera = () => {
@@ -134,7 +132,7 @@ export const WorkoutScreen = ({setScreen, setGameState}: WorkoutScreenProps) => 
 
   useEffect(() => {
     // TODO: Check if photo is verified
-    setVerificationStatus(VerificationStatus.Verified)
+    setVerificationStatus(VerificationStatus.Unverified)
   }, [])
 
   if (!isTakingPicture) {
@@ -203,7 +201,7 @@ export const WorkoutScreen = ({setScreen, setGameState}: WorkoutScreenProps) => 
       { photoAndLocation &&
         <View style={styles.window}>
           <Image
-            source={{uri: 'data:image/jpeg;base64,' + photoAndLocation.photo.base64}}
+            source={{uri: photoAndLocation.imageUri}}
             style={styles.window}
           />
           <ExitCameraIcon onPress={handleExitCamera}/>
