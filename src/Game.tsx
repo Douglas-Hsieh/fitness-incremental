@@ -12,6 +12,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { LastVisit } from "../assets/data/LastVisit";
 import useInterval from "./util/useInterval";
 import { MiscellaneousScreen } from "./screens/MiscellaneousScreen";
+import { WorkoutScreen } from "./screens/WorkoutScreen";
 
 interface GameProps {
   screen: Screen;
@@ -55,25 +56,25 @@ export const Game = ({screen, setScreen, gameState, setGameState, lastVisit, req
     })
   }, [lastVisit])
 
-  useInterval(() => {
-    // Generators progress and generate revenue using ticks
-    const ticksToUse = calculateTicksToUse(gameState.ticks)
-    if (ticksToUse <= 0) {
-      return
-    }
-    const {generatorStateById, revenue} = progressGenerators(gameState, ticksToUse)
+  // useInterval(() => {
+  //   // Generators progress and generate revenue using ticks
+  //   const ticksToUse = calculateTicksToUse(gameState.ticks)
+  //   if (ticksToUse <= 0) {
+  //     return
+  //   }
+  //   const {generatorStateById, revenue} = progressGenerators(gameState, ticksToUse)
 
-    setGameState({
-      ...gameState,
-      ticks: gameState.ticks - ticksToUse,
-      generatorStateById: generatorStateById,
-      balance: gameState.balance + revenue,
-      lifetimeEarnings: gameState.lifetimeEarnings + revenue,
-    })
+  //   setGameState({
+  //     ...gameState,
+  //     ticks: gameState.ticks - ticksToUse,
+  //     generatorStateById: generatorStateById,
+  //     balance: gameState.balance + revenue,
+  //     lifetimeEarnings: gameState.lifetimeEarnings + revenue,
+  //   })
 
-    console.log('ticksToUse', ticksToUse)
-    console.log('revenue', revenue)
-  }, 1000)
+  //   console.log('ticksToUse', ticksToUse)
+  //   console.log('revenue', revenue)
+  // }, 1000)
 
   // Autosave game
   useEffect(() => {
@@ -130,7 +131,13 @@ export const Game = ({screen, setScreen, gameState, setGameState, lastVisit, req
           setGameState={setGameState}
         />
       )
-
+    case Screen.Workout:
+      return (
+        <WorkoutScreen
+          setScreen={setScreen}
+          setGameState={setGameState}
+        />
+      )
 
   }
 

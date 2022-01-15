@@ -17,7 +17,7 @@ export default function App() {
   const [isAuthorized, setIsAuthorized] = useState<boolean>(false);
   const [lastVisit, setLastVisit] = useState<LastVisit>()
 
-  const [screen, setScreen] = useState<Screen>(Screen.Login);
+  const [screen, setScreen] = useState<Screen>(Screen.Workout);
   const [gameState, setGameState] = useState<GameState>();
 
   const requestAuthorizationFromGoogleFit = () => {
