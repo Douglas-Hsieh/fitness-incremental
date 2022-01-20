@@ -7,6 +7,7 @@ enum Screen {
   Prestige,
   Miscellaneous,
   Workout,
+  FitnessLocationAdmin,
 }
 
 export default Screen;

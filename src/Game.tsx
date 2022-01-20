@@ -13,6 +13,7 @@ import { LastVisit } from "../assets/data/LastVisit";
 import useInterval from "./util/useInterval";
 import { MiscellaneousScreen } from "./screens/MiscellaneousScreen";
 import { WorkoutScreen } from "./screens/WorkoutScreen";
+import { FitnessLocationAdminScreen } from "./screens/FitnessLocationAdminScreen";
 
 interface GameProps {
   screen: Screen;
@@ -134,6 +135,13 @@ export const Game = ({screen, setScreen, gameState, setGameState, lastVisit, req
     case Screen.Workout:
       return (
         <WorkoutScreen
+          setScreen={setScreen}
+          setGameState={setGameState}
+        />
+      )
+    case Screen.FitnessLocationAdmin:
+      return (
+        <FitnessLocationAdminScreen
           setScreen={setScreen}
           setGameState={setGameState}
         />
