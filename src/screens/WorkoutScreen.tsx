@@ -7,22 +7,16 @@ import { Button } from "../components/Button";
 import { Description } from "../components/Description";
 import { Header } from "../components/Header";
 import Screen from "../enums/Screen";
-import { Camera, CameraCapturedPicture } from 'expo-camera';
+import { Camera } from 'expo-camera';
 import { window } from '../util/Window'
 import { requestForegroundPermissionsAsync, requestBackgroundPermissionsAsync, getCurrentPositionAsync, LocationObject } from 'expo-location'
 import { SERVER_URL } from "../config";
-import { uploadAsync, FileSystemUploadType } from 'expo-file-system'
 import { Feather } from "@expo/vector-icons";
 import Center from "../components/Center";
 import colors from "../../assets/colors/colors";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { manipulateAsync } from 'expo-image-manipulator'
-
-enum VerificationStatus {
-  Unverified,
-  AwaitingVerification,
-  Verified,
-}
+import { FitnessLocation } from "../../../fitness-incremental-shared/src/fitness-location.interface";
 
 const base64ToImageUri = (base64: string) => {
   return 'data:image/jpeg;base64,' + base64
@@ -60,8 +54,10 @@ export const WorkoutScreen = ({setScreen, setGameState}: WorkoutScreenProps) => 
 
   const [isTakingPicture, setIsTakingPicture] = useState<boolean>(false)
   const [photoAndLocation, setPhotoAndLocation] = useState<PhotoAndLocation>();
-  const [verificationStatus, setVerificationStatus] = useState<VerificationStatus>(VerificationStatus.Unverified);
+  const [fitnessLocation, setFitnessLocation] = useState<FitnessLocation>();
 
+  const userId = 'client'
+  const endpoint = `${SERVER_URL}/fitness-locations`
   
   const takePicture = () => {
 
@@ -107,22 +103,25 @@ export const WorkoutScreen = ({setScreen, setGameState}: WorkoutScreenProps) => 
     if (!photoAndLocation) {
       return
     }
+    const {latitude, longitude} = photoAndLocation.location.coords
 
-    await fetch(`${SERVER_URL}/api/location`, {
-      method: 'POST',
+    await fetch(`${endpoint}/${userId}`, {
+      method: 'PUT',
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
+        userId: userId,
         imageUri: photoAndLocation.compressedImageUri,
+        coordinates: [longitude, latitude],
+        isVerified: null,
       }),
     }).catch(error => {
       alert(error)
     })
 
     setIsTakingPicture(false)
-    setVerificationStatus(VerificationStatus.AwaitingVerification)
   }
 
   const handleExitCamera = () => {
@@ -131,8 +130,9 @@ export const WorkoutScreen = ({setScreen, setGameState}: WorkoutScreenProps) => 
   }
 
   useEffect(() => {
-    // TODO: Check if photo is verified
-    setVerificationStatus(VerificationStatus.Unverified)
+    fetch(`${endpoint}/${userId}`)
+      .then(res => res.json())
+      .then(res => setFitnessLocation(res.data))
   }, [])
 
   if (!isTakingPicture) {
@@ -147,7 +147,7 @@ export const WorkoutScreen = ({setScreen, setGameState}: WorkoutScreenProps) => 
             body={`Once per day, when you workout at the gym, you have a chance of winning a reward!`}
           />
 
-          { verificationStatus === VerificationStatus.Unverified &&
+          { !fitnessLocation &&
             <>
               <Description
                 title={'How to get started'}
@@ -159,20 +159,39 @@ export const WorkoutScreen = ({setScreen, setGameState}: WorkoutScreenProps) => 
             </>
           }
 
-          { verificationStatus === VerificationStatus.AwaitingVerification &&
+          { fitnessLocation && fitnessLocation.isVerified === null &&
             <Description
-              title={'Please wait... (this may take awhile)'}
-              body={'A human will verify your photo soon :)'}
+              title={'Photo awaiting review'}
+              body={'A human will review your gym photo soon :)\nThis may take awhile....'}
             />
           }
 
-          { verificationStatus === VerificationStatus.Verified &&
+          { fitnessLocation && fitnessLocation.isVerified === false &&
+            <>
+              <Description
+                title={'Review Failed :('}
+                body={'We were unable to determine that the photo you sent was a picture of the gym.\nPlease try again...'}
+              />
+              <Center>
+                <Button text={'Take a Picture'} onPress={takePicture}/>
+              </Center>
+            </>
+          }
+
+          { fitnessLocation && fitnessLocation.isVerified &&
+          <>
             <Description
               title={'Verified'}
-              body={'Congrats, visit this location daily for the chance to receive rewards!'}
+              body={'Congrats, visit this fitness location daily for the chance to receive rewards!'}
             />
+            <Center>
+              <Image
+                source={{ uri: fitnessLocation.imageUri }}
+                style={{ width: window.width / 2, height: window.height / 2 }}
+              />
+            </Center>
+          </>
           }
-
         </View>
   
         <BottomBar screen={Screen.Miscellaneous} setScreen={setScreen}/>
