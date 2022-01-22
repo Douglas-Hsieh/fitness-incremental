@@ -185,7 +185,7 @@ export const WorkoutScreen = ({setScreen, gameState, setGameState, currentLocati
               <Center>
                 <Image
                   source={{ uri: fitnessLocation.imageUri }}
-                  style={{ width: window.width / 2, height: window.height / 2 }}
+                  style={styles.imageSent}
                 />
               </Center>
             </>
@@ -274,5 +274,12 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     backgroundColor: colors.white,
     margin: 20,
+  },
+  imageSent: {
+    width: window.width / 2,
+    height: window.height / 2,
+    borderColor: 'white',
+    borderWidth: 2,
+    borderRadius: 5,
   },
 })
