@@ -9,14 +9,14 @@ import { Header } from "../components/Header";
 import Screen from "../enums/Screen";
 import { Camera } from 'expo-camera';
 import { window } from '../util/Window'
-import { requestForegroundPermissionsAsync, requestBackgroundPermissionsAsync, getCurrentPositionAsync, LocationObject } from 'expo-location'
+import { requestForegroundPermissionsAsync, getCurrentPositionAsync, LocationObject } from 'expo-location'
 import { SERVER_URL } from "../config";
 import { Feather } from "@expo/vector-icons";
 import Center from "../components/Center";
 import colors from "../../assets/colors/colors";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { manipulateAsync } from 'expo-image-manipulator'
-import { FitnessLocation } from "../../../fitness-incremental-shared/src/fitness-location.interface";
+import { WorkoutReward } from "../components/WorkoutReward";
 
 const base64ToImageUri = (base64: string) => {
   return 'data:image/jpeg;base64,' + base64
@@ -42,11 +42,16 @@ const ExitCameraIcon = ({onPress}: ExitCameraIconProps) => (
 
 interface WorkoutScreenProps {
   setScreen: (screen: Screen) => void;
+  gameState: GameState;
   setGameState: (gameState: GameState) => void;
+  currentLocation: LocationObject | undefined;
 }
 
-export const WorkoutScreen = ({setScreen, setGameState}: WorkoutScreenProps) => {
+export const userId = 'client'
+export const endpoint = `${SERVER_URL}/fitness-locations`
 
+export const WorkoutScreen = ({setScreen, gameState, setGameState, currentLocation}: WorkoutScreenProps) => {
+  const { fitnessLocation, lastWorkoutRewardTime } = gameState
   const [hasCameraPermission, setHasCameraPermission] = useState<boolean>();
   const cameraRef = useRef<Camera | null>()
   const [hasForegroundLocationPermission, setHasForegroundLocationPermission] = useState<boolean>();
@@ -54,26 +59,25 @@ export const WorkoutScreen = ({setScreen, setGameState}: WorkoutScreenProps) => 
 
   const [isTakingPicture, setIsTakingPicture] = useState<boolean>(false)
   const [photoAndLocation, setPhotoAndLocation] = useState<PhotoAndLocation>();
-  const [fitnessLocation, setFitnessLocation] = useState<FitnessLocation>();
 
-  const userId = 'client'
-  const endpoint = `${SERVER_URL}/fitness-locations`
-  
+  const requestAndSetCameraPermission = async () => {
+    const cameraResponse = await Camera.requestCameraPermissionsAsync()
+    setHasCameraPermission(cameraResponse.status === 'granted')
+  }
+
+  const requestAndSetForegroundLocationPermission = async () => {
+    const foregroundResponse = await requestForegroundPermissionsAsync()
+    setHasForegroundLocationPermission(foregroundResponse.status === 'granted')
+  }
+
+  const requestPermissions = (async () => {
+    await requestAndSetCameraPermission()
+    await requestAndSetForegroundLocationPermission()
+    // TODO: Background permissions
+  })
+
   const takePicture = () => {
-
-    const requestPermissions = (async () => {
-      const cameraResponse = await Camera.requestCameraPermissionsAsync()
-      setHasCameraPermission(cameraResponse.status === 'granted')
-
-      const foregroundResponse = await requestForegroundPermissionsAsync()
-      setHasForegroundLocationPermission(foregroundResponse.status === 'granted')
-
-      // TODO: Background permissions
-      // const backgroundResponse = await requestBackgroundPermissionsAsync()
-      // setHasBackgroundLocationPermission(backgroundResponse.status === 'granted')
-    })
     requestPermissions()
-
     setIsTakingPicture(true)
   }
 
@@ -129,12 +133,6 @@ export const WorkoutScreen = ({setScreen, setGameState}: WorkoutScreenProps) => 
     setPhotoAndLocation(undefined)
   }
 
-  useEffect(() => {
-    fetch(`${endpoint}/${userId}`)
-      .then(res => res.json())
-      .then(res => setFitnessLocation(res.data))
-  }, [])
-
   if (!isTakingPicture) {
     return (
       <SafeAreaView style={styles.container}>
@@ -179,22 +177,25 @@ export const WorkoutScreen = ({setScreen, setGameState}: WorkoutScreenProps) => 
           }
 
           { fitnessLocation && fitnessLocation.isVerified &&
-          <>
-            <Description
-              title={'Verified'}
-              body={'Congrats, visit this fitness location daily for the chance to receive rewards!'}
-            />
-            <Center>
-              <Image
-                source={{ uri: fitnessLocation.imageUri }}
-                style={{ width: window.width / 2, height: window.height / 2 }}
+            <>
+              <Description
+                title={'Verified'}
+                body={'Congrats, visit this fitness location daily for the chance to receive rewards!'}
               />
-            </Center>
-          </>
+              <Center>
+                <Image
+                  source={{ uri: fitnessLocation.imageUri }}
+                  style={{ width: window.width / 2, height: window.height / 2 }}
+                />
+              </Center>
+            </>
           }
         </View>
   
         <BottomBar screen={Screen.Miscellaneous} setScreen={setScreen}/>
+
+        <WorkoutReward gameState={gameState} setGameState={setGameState} currentLocation={currentLocation}/>
+
       </SafeAreaView>
     )
   }

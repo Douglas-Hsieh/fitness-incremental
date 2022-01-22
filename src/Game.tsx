@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { GameState } from "../assets/data/GameState";
 import Screen from "./enums/Screen";
 import { calculateTicksToUse, progressGenerators } from "./math";
@@ -12,8 +12,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { LastVisit } from "../assets/data/LastVisit";
 import useInterval from "./util/useInterval";
 import { MiscellaneousScreen } from "./screens/MiscellaneousScreen";
-import { WorkoutScreen } from "./screens/WorkoutScreen";
+import { endpoint, userId, WorkoutScreen } from "./screens/WorkoutScreen";
 import { FitnessLocationAdminScreen } from "./screens/FitnessLocationAdminScreen";
+import { Accuracy, LocationObject, requestForegroundPermissionsAsync, watchPositionAsync } from "expo-location";
 
 interface GameProps {
   screen: Screen;
@@ -26,6 +27,9 @@ interface GameProps {
 }
 
 export const Game = ({screen, setScreen, gameState, setGameState, lastVisit, requestAuthorizationFromGoogleFit}: GameProps) => {
+
+  const [hasForegroundLocationPermission, setHasForegroundLocationPermission] = useState<boolean>()
+  const [currentLocation, setCurrentLocation] = useState<LocationObject>();
 
   useEffect(() => {
     // User earned ticks from steps since last visit
@@ -57,30 +61,58 @@ export const Game = ({screen, setScreen, gameState, setGameState, lastVisit, req
     })
   }, [lastVisit])
 
-  // useInterval(() => {
-  //   // Generators progress and generate revenue using ticks
-  //   const ticksToUse = calculateTicksToUse(gameState.ticks)
-  //   if (ticksToUse <= 0) {
-  //     return
-  //   }
-  //   const {generatorStateById, revenue} = progressGenerators(gameState, ticksToUse)
+  useInterval(() => {
+    // Generators progress and generate revenue using ticks
+    const ticksToUse = calculateTicksToUse(gameState.ticks)
+    if (ticksToUse <= 0) {
+      return
+    }
+    const {generatorStateById, revenue} = progressGenerators(gameState, ticksToUse)
 
-  //   setGameState({
-  //     ...gameState,
-  //     ticks: gameState.ticks - ticksToUse,
-  //     generatorStateById: generatorStateById,
-  //     balance: gameState.balance + revenue,
-  //     lifetimeEarnings: gameState.lifetimeEarnings + revenue,
-  //   })
+    setGameState({
+      ...gameState,
+      ticks: gameState.ticks - ticksToUse,
+      generatorStateById: generatorStateById,
+      balance: gameState.balance + revenue,
+      lifetimeEarnings: gameState.lifetimeEarnings + revenue,
+    })
 
-  //   console.log('ticksToUse', ticksToUse)
-  //   console.log('revenue', revenue)
-  // }, 1000)
+    console.log('ticksToUse', ticksToUse)
+    console.log('revenue', revenue)
+  }, 1000)
 
   // Autosave game
   useEffect(() => {
     AsyncStorage.setItem('gameState', JSON.stringify(gameState))
   }, [gameState])
+
+  useEffect(() => {
+    // If user has no fitness location saved, ask api if one exists
+    if (!gameState.fitnessLocation) {
+      fetch(`${endpoint}/${userId}`)
+        .then(res => res.json())
+        .then(res => setGameState({
+          ...gameState,
+          fitnessLocation: res.data,
+        }))
+    }
+  }, [])
+
+  useEffect(() => {
+    // If user has fitness location, ask to track foreground location
+    if (!gameState.fitnessLocation) {
+      return
+    }
+    if (!hasForegroundLocationPermission) {
+      requestForegroundPermissionsAsync()
+        .then(response => { setHasForegroundLocationPermission(response.status === 'granted') })
+    } else {
+      watchPositionAsync({ accuracy: Accuracy.High, timeInterval: 30000 }, (location) => {
+        console.log('location', location)
+        setCurrentLocation(location)
+      })
+    }
+  }, [gameState.fitnessLocation, hasForegroundLocationPermission])
 
   switch(screen) {
     case Screen.Login:
@@ -136,7 +168,9 @@ export const Game = ({screen, setScreen, gameState, setGameState, lastVisit, req
       return (
         <WorkoutScreen
           setScreen={setScreen}
+          gameState={gameState}
           setGameState={setGameState}
+          currentLocation={currentLocation}
         />
       )
     case Screen.FitnessLocationAdmin:
