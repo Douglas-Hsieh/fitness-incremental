@@ -15,7 +15,7 @@ import Screen from "../enums/Screen";
 import { Set } from 'immutable'
 import { GeneratorUnlock, GENERATOR_UNLOCKS_BY_ID, getUnlockId } from "../../assets/data/GeneratorUnlocks";
 import { UnlockModal } from "../components/UnlockModal";
-import { RewardComponent } from "../components/RewardComponent";
+import { StepReward } from "../components/StepReward";
 
 interface HomeScreenProps {
   setScreen: (screen: Screen) => void;
@@ -150,8 +150,8 @@ export const HomeScreen = ({setScreen, gameState, setGameState}: HomeScreenProps
             unlock={newUnlock}
           />
         )}
-        
-        <RewardComponent gameState={gameState} setGameState={setGameState}/>
+
+        <StepReward gameState={gameState} setGameState={setGameState}/>
     </SafeAreaView>
 
   );

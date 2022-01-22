@@ -7,12 +7,12 @@ import RewardModalDetails from "../types/RewardModalDetails"
 import { Overlay } from "./Overlay"
 import { RewardModal } from "./RewardModal"
 
-interface RewardComponentProps {
+interface StepRewardProps {
   gameState: GameState;
   setGameState: (gameState: GameState) => void;
 }
 
-export const RewardComponent = ({gameState, setGameState}: RewardComponentProps) => {
+export const StepReward = ({gameState, setGameState}: StepRewardProps) => {
   const [showOverlay, setShowOverlay] = useState<boolean>(false)
   const [rewardModalDetails, setRewardModalDetails] = useState<RewardModalDetails>()
   const [showRewardModal, setShowRewardModal] = useState<boolean>(false)
