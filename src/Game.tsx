@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { GameState } from "../assets/data/GameState";
 import Screen from "./enums/Screen";
-import { calculateTicksToUse, progressGenerators } from "./math";
+import { calculateTicksToUse, progressGenerators } from "./math/math";
 import { HomeScreen } from "./screens/HomeScreen";
 import { LoginScreen } from "./screens/LoginScreen";
 import { PrestigeScreen } from "./screens/PrestigeScreen";

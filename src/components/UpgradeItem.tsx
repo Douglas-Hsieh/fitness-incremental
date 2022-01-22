@@ -3,7 +3,7 @@ import { View, TouchableOpacity, Image, Text } from "react-native";
 import EStyleSheet from "react-native-extended-stylesheet";
 import colors from "../../assets/colors/colors";
 import { GameState } from "../../assets/data/GameState";
-import { numberToHumanFormat } from "../math";
+import { numberToHumanFormat } from "../math/formatting";
 import { playSound, SoundFile } from "../util/sounds";
 
 export interface UpgradeItemProps {

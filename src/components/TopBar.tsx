@@ -3,7 +3,7 @@ import { Image, Text, TouchableOpacity, View } from "react-native";
 import EStyleSheet from "react-native-extended-stylesheet";
 import colors from "../../assets/colors/colors";
 import BuyAmount from "../enums/BuyAmount";
-import { numberToHumanFormat } from "../math";
+import { numberToHumanFormat } from "../math/formatting";
 import { playSound, SoundFile } from "../util/sounds";
 
 const AvatarImage = memo(() => (

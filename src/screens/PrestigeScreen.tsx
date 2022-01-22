@@ -11,7 +11,7 @@ import { ConfirmationModal } from '../components/ConfirmationModal'
 import { Description } from '../components/Description'
 import { Header } from '../components/Header'
 import Screen from '../enums/Screen'
-import { calculateEarnedPrestige } from '../math'
+import { calculateEarnedPrestige } from "../math/prestige"
 
 const PrestigeIcon = memo(() => (
   <Image

@@ -4,7 +4,8 @@ import AnimatedProgress from "react-native-reanimated-progress-bar"
 import colors from "../../assets/colors/colors"
 import { Generator } from "../../assets/data/Generators"
 import { GameState } from "../../assets/data/GameState"
-import { calculateGeneratorRevenue, numberToHumanFormat } from "../math"
+import { numberToHumanFormat } from "../math/formatting"
+import { calculateGeneratorRevenue } from "../math/revenue"
 
 interface GeneratorProgressBarProps {
   generator: Generator;
