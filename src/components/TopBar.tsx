@@ -10,8 +10,8 @@ const AvatarImage = memo(() => (
   <Image source={require('../../assets/images/male-avatar.png')} style={styles.avatarIcon}/>
 ));
 
-const FlameImage = memo(() => (
-  <Image source={require('../../assets/images/flame.png')} style={styles.ticksIcon}/>
+const TicksImage = memo(() => (
+  <Image source={require('../../assets/images/lightning.png')} style={styles.ticksIcon}/>
 ));
 
 const StepsImage = memo(() => (
@@ -54,7 +54,7 @@ export const TopBar = memo(({balance, ticks, buyAmount, setBuyAmount}: TopBarPro
       </View>
 
       <View style={styles.ticksWrapper}>
-        <FlameImage/>
+        <TicksImage/>
         <View style={styles.ticksCountWrapper}>
           <Text style={styles.ticksCountText}>{ticks}</Text>
         </View>

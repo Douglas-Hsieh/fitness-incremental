@@ -192,7 +192,7 @@ export const WorkoutScreen = ({setScreen, gameState, setGameState, currentLocati
           }
         </View>
   
-        <BottomBar screen={Screen.Miscellaneous} setScreen={setScreen}/>
+        <BottomBar screen={Screen.Workout} setScreen={setScreen}/>
 
         <WorkoutReward gameState={gameState} setGameState={setGameState} currentLocation={currentLocation}/>
 
