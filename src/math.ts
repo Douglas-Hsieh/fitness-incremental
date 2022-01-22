@@ -3,7 +3,7 @@ import { GameState } from "../assets/data/GameState"
 import { GeneratorState } from "../assets/data/GeneratorState"
 import Scale from "../assets/data/Scale"
 import { Map, Set } from 'immutable'
-import { GENERATOR_MULTIPLIER_UPGRADES_BY_ID } from "../assets/data/Upgrades"
+import { GENERATOR_MULTIPLIER_UPGRADE_BY_ID } from "../assets/data/Upgrades"
 import { GeneratorUnlock, GENERATOR_UNLOCKS, GENERATOR_UNLOCKS_BY_ID, getUnlockId } from "../assets/data/GeneratorUnlocks"
 import { TemporaryMultiplier } from "./types/TemporaryMultiplier"
 
@@ -64,7 +64,7 @@ const calculateMultipliersFromUpgrades = (
   
   const multipliersByGeneratorId = INITIAL_MULTIPLIERS_BY_GENERATOR_ID.withMutations(multByGenId => {
     upgradeIds.forEach(upgradeId => {
-      const upgrade = GENERATOR_MULTIPLIER_UPGRADES_BY_ID.get(upgradeId)!
+      const upgrade = GENERATOR_MULTIPLIER_UPGRADE_BY_ID.get(upgradeId)!
       const currentMultiplier = multByGenId.get(upgrade.generatorId)!
       multByGenId.set(upgrade.generatorId, currentMultiplier * upgrade.multiplier)
     })
