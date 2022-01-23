@@ -1,10 +1,10 @@
-import React from "react";
+import React, { useState } from "react";
 import { SafeAreaView, View, Image} from "react-native";
 import EStyleSheet from "react-native-extended-stylesheet";
-import { FlatList } from "react-native-gesture-handler";
+import { FlatList, TouchableOpacity } from "react-native-gesture-handler";
 import colors from "../../assets/colors/colors";
 import { EVERYONE_GENERATOR, GENERATORS } from "../../assets/data/Generators";
-import { GENERATOR_MULTIPLIER_UPGRADES } from "../../assets/data/Upgrades";
+import { GENERATOR_MULTIPLIER_CASH_UPGRADES, GENERATOR_MULTIPLIER_PRESTIGE_UPGRADES, getUpgradeId } from "../../assets/data/Upgrades";
 import { GameState } from "../../assets/data/GameState";
 import { BackgroundImage } from "../components/BackgroundImage";
 import { BottomBar } from "../components/BottomBar";
@@ -12,15 +12,22 @@ import { Description } from "../components/Description";
 import { Header } from "../components/Header";
 import Screen from "../enums/Screen";
 import { UpgradeItem, UpgradeItemProps } from "../components/UpgradeItem";
+import { Currency } from "../enums/Currency";
 
 interface UpgradesListProps {
   gameState: GameState;
   setGameState: (gameState: GameState) => void;
+  currency: Currency;
 }
 
-const UpgradesList = ({gameState, setGameState}: UpgradesListProps) => {
-  const remainingUpgrades = GENERATOR_MULTIPLIER_UPGRADES
-    .filter(upgrade => !gameState.upgradeIds.contains(upgrade.id))
+const UpgradesList = ({gameState, setGameState, currency}: UpgradesListProps) => {
+
+  const generatorMultiplierUpgrades = currency === Currency.Cash
+    ? GENERATOR_MULTIPLIER_CASH_UPGRADES
+    : GENERATOR_MULTIPLIER_PRESTIGE_UPGRADES
+
+  const remainingUpgrades = generatorMultiplierUpgrades
+    .filter(upgrade => !gameState.upgradeIds.contains(getUpgradeId(upgrade)))
     .sort((u1, u2) => u1.price - u2.price)
 
   const upgradeData = remainingUpgrades.map(upgrade => {
@@ -37,10 +44,11 @@ const UpgradesList = ({gameState, setGameState}: UpgradesListProps) => {
     }
 
     return {
-      upgradeId: upgrade.id,
+      upgradeId: getUpgradeId(upgrade),
       title: generatorName,
       description: `${generatorName} steps x3`,
       price: upgrade.price,
+      currency: upgrade.priceCurrency,
       image: image,
       gameState: gameState,
       setGameState: setGameState,
@@ -70,6 +78,8 @@ interface UpgradesScreenProps {
 export const UpgradesScreen = ({setScreen, gameState, setGameState}: UpgradesScreenProps) => {
   console.log('UpgradesScreen render')
 
+  const [currency, setCurrency] = useState<Currency>(Currency.Cash)
+
   return (
     <SafeAreaView style={styles.container}>
       <BackgroundImage/>
@@ -79,12 +89,23 @@ export const UpgradesScreen = ({setScreen, gameState, setGameState}: UpgradesScr
         <Header title={'Upgrades'}/>
 
         <View style={styles.upgradeIconList}>
-          <View style={styles.upgradeIconContainer}>
+          <TouchableOpacity style={[
+              styles.upgradeIconContainer,
+              currency === Currency.Cash ? styles.selected : {},
+            ]}
+            onPress={() => setCurrency(Currency.Cash)}
+          >
             <Image source={require('../../assets/images/steps.png')} style={styles.upgradeIcon}/>
-          </View>
-          <View style={styles.upgradeIconContainer}>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[
+              styles.upgradeIconContainer,
+              currency === Currency.Prestige ? styles.selected : {},
+            ]}
+            onPress={() => setCurrency(Currency.Prestige)}
+          >
             <Image source={require('../../assets/images/trainer.png')} style={styles.upgradeIcon}/>
-          </View>
+          </TouchableOpacity>
         </View>
 
         <Description
@@ -95,6 +116,7 @@ export const UpgradesScreen = ({setScreen, gameState, setGameState}: UpgradesScr
         <UpgradesList
           gameState={gameState}
           setGameState={setGameState}
+          currency={currency}
         />
       </View>
 
@@ -132,17 +154,21 @@ const styles = EStyleSheet.create({
     flexDirection: 'row',
   },
   upgradeIconContainer: {
-    height: 64,
-    width: 64,
-    backgroundColor: colors.gray4,
+    height: 80,
+    width: 80,
+    backgroundColor: colors.white,
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: 80,
     marginLeft: 10,
+    borderWidth: 1,
+  },
+  selected: {
+    backgroundColor: colors.gray4,
   },
   upgradeIcon: {
-    height: 45,
-    width: 45,
+    height: 50,
+    width: 50,
   },
 
   // Upgrades

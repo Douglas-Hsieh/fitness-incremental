@@ -15,6 +15,7 @@ const INITIAL_MULTIPLIERS_BY_GENERATOR_ID = Map<string, number>([
   ['9', 1],
   ['10', 1],
 ]);
+
 export const calculateMultipliersFromUpgrades = (
   upgradeIds: Set<string>
 ): Map<string, number> => {
@@ -22,13 +23,20 @@ export const calculateMultipliersFromUpgrades = (
   const multipliersByGeneratorId = INITIAL_MULTIPLIERS_BY_GENERATOR_ID.withMutations(multByGenId => {
     upgradeIds.forEach(upgradeId => {
       const upgrade = GENERATOR_MULTIPLIER_UPGRADE_BY_ID.get(upgradeId)!;
-      const currentMultiplier = multByGenId.get(upgrade.generatorId)!;
-      multByGenId.set(upgrade.generatorId, currentMultiplier * upgrade.multiplier);
+      if (upgrade.generatorId === '0') {
+        multByGenId.forEach((mult, genId) => {
+          multByGenId.set(genId, mult * upgrade.multiplier)
+        })
+      } else {
+        const mult = multByGenId.get(upgrade.generatorId)!;
+        multByGenId.set(upgrade.generatorId, mult * upgrade.multiplier);
+      }
     });
   });
 
   return multipliersByGeneratorId;
 };
+
 export const calculateMultipliersFromUnlocks = (
   unlockIds: Set<string>
 ) => {
@@ -52,6 +60,7 @@ export const calculateMultipliersFromUnlocks = (
 
   return multipliersByGeneratorId;
 };
+
 export const calculateTemporaryMultipliers = (temporaryMultipliers: Set<TemporaryMultiplier>) => {
   const now = new Date();
 

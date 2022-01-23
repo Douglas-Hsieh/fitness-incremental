@@ -11,6 +11,7 @@ import { ConfirmationModal } from '../components/ConfirmationModal'
 import { Description } from '../components/Description'
 import { Header } from '../components/Header'
 import Screen from '../enums/Screen'
+import { numberToHumanFormat } from '../math/formatting'
 import { calculateEarnedPrestige } from "../math/prestige"
 
 const PrestigeIcon = memo(() => (
@@ -49,7 +50,8 @@ export const PrestigeScreen = ({setScreen, gameState, setGameState}: PrestigeScr
     })
   }
 
-  const prestige = calculateEarnedPrestige(gameState.lifetimeEarnings, gameState.startingLifetimeEarnings).toFixed()
+  const [prestigeCoeff, prestigeScale] = numberToHumanFormat(gameState.prestige)
+  const [earnedPrestigeCoeff, earnedPrestigeScale] = numberToHumanFormat(calculateEarnedPrestige(gameState.lifetimeEarnings, gameState.startingLifetimeEarnings))
 
   return (
     <SafeAreaView style={styles.container}>
@@ -65,14 +67,14 @@ export const PrestigeScreen = ({setScreen, gameState, setGameState}: PrestigeScr
           <PrestigeIcon/>
           <View style={styles.prestigeStatusTextWrapper}>
             <Text style={styles.prestigeStatusTitle}>Personal Trainers Employed</Text>
-            <Text style={styles.prestigeStatusBody}>{gameState.prestige.toFixed()}</Text>
+            <Text style={styles.prestigeStatusBody}>{prestigeCoeff} {prestigeScale}</Text>
           </View>
           <PrestigeIcon/>
         </View>
 
         <View style={styles.restartWrapper}>
           <Text style={styles.restartTitle}>Trainers Hired on Restart</Text>
-          <Text style={styles.restartBody1}>{prestige}</Text>
+          <Text style={styles.restartBody1}>{earnedPrestigeCoeff} {earnedPrestigeScale}</Text>
           <Text style={styles.restartBody2}>2% Step Bonus Per Trainer!</Text>
           <Button text={'Hire & Restart'} onPress={() => setShowClaimPrestigeModal(true)}/>
         </View>
@@ -82,7 +84,7 @@ export const PrestigeScreen = ({setScreen, gameState, setGameState}: PrestigeScr
 
       <ConfirmationModal
         visible={showClaimPrestigeModal}
-        title={`You can hire ${prestige} trainers!`}
+        title={`You can hire ${earnedPrestigeCoeff} ${earnedPrestigeScale} trainers!`}
         body={"Hiring requires resetting your follower count, upgrades, and balance."}
         onConfirm={() => {
           resetGame()

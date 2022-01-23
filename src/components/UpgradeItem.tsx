@@ -3,6 +3,7 @@ import { View, TouchableOpacity, Image, Text } from "react-native";
 import EStyleSheet from "react-native-extended-stylesheet";
 import colors from "../../assets/colors/colors";
 import { GameState } from "../../assets/data/GameState";
+import { Currency } from "../enums/Currency";
 import { numberToHumanFormat } from "../math/formatting";
 import { playSound, SoundFile } from "../util/sounds";
 
@@ -11,24 +12,40 @@ export interface UpgradeItemProps {
   title: string;
   description: string;
   price: number;
+  currency: Currency;
   image: any;
   gameState: GameState;
   setGameState: (gameState: GameState) => void;
 }
 
-export const UpgradeItem = ({upgradeId, title, description, price, image, gameState, setGameState}: UpgradeItemProps) => {
+export const UpgradeItem = ({upgradeId, title, description, price, currency, image, gameState, setGameState}: UpgradeItemProps) => {
   const [coefficient, scale] = numberToHumanFormat(price, 0, 0);
-  const isDisabled = price > gameState.balance;
+  const isDisabled = currency === Currency.Cash
+    ? price > gameState.balance
+    : price > gameState.prestige
+  const currencyText = currency === Currency.Cash
+    ? 'steps'
+    : 'trainers'
 
   const buyUpgrade = () => {
     if (!isDisabled) {
       const upgradeIds = gameState.upgradeIds.add(upgradeId);
-      setGameState({
-        ...gameState,
-        balance: gameState.balance - price,
-        upgradeIds: upgradeIds,
-      })
+
+      if (currency === Currency.Cash) {
+        setGameState({
+          ...gameState,
+          balance: gameState.balance - price,
+          upgradeIds: upgradeIds,
+        })
+      } else {
+        setGameState({
+          ...gameState,
+          prestige: gameState.prestige - price,
+          upgradeIds: upgradeIds,
+        })
+      }
       playSound(SoundFile.CashRegister)
+
     }
   }
   
@@ -38,7 +55,7 @@ export const UpgradeItem = ({upgradeId, title, description, price, image, gameSt
       <View style={styles.upgradeTextWrapper}>
         <Text style={styles.upgradeTitle}>{title}</Text>
         <Text style={styles.upgradeDescription}>{description}</Text>
-        <Text style={styles.upgradePrice}>{coefficient} {scale} steps</Text>
+        <Text style={styles.upgradePrice}>{coefficient} {scale} {currencyText}</Text>
       </View>
       <TouchableOpacity style={[styles.buyUpgradeButton, isDisabled ? {backgroundColor: colors.gray4} : {}]} activeOpacity={.8} onPress={buyUpgrade} disabled={isDisabled}>
         <Text style={styles.buyUpgradeText}>Buy!</Text>

@@ -6,7 +6,7 @@ interface Upgrade {
   priceCurrency: Currency;
 }
 
-const getUpgradeId = (upgrade: Upgrade): string => {
+export const getUpgradeId = (upgrade: Upgrade): string => {
   // return `${upgrade.price}-${upgrade.priceCurrency}`
   return JSON.stringify(upgrade)
 }
@@ -22,7 +22,7 @@ export interface GeneratorCountUpgrade extends Upgrade {
   count: number;
 }
 
-// TODO: Implement
+// TODO: Implement Managers
 export interface GeneratorCostModifier extends Upgrade {
   generatorId: string;
   costModifier: number;
@@ -33,7 +33,7 @@ export interface PrestigeUpgrade extends Upgrade {
   effectiveness: number;
 }
 
-export const GENERATOR_MULTIPLIER_UPGRADES = [
+export const GENERATOR_MULTIPLIER_CASH_UPGRADES: GeneratorMultiplierUpgrade[] = [
   { price: 250e+3, priceCurrency: Currency.Cash, generatorId: '1', multiplier: 3 },
   { price: 500e+3, priceCurrency: Currency.Cash, generatorId: '2', multiplier: 3 },
   { price: 1e+6, priceCurrency: Currency.Cash, generatorId: '3', multiplier: 3 },
@@ -496,10 +496,129 @@ export const GENERATOR_MULTIPLIER_UPGRADES = [
   { price: 10e+285, priceCurrency: Currency.Cash, generatorId: '0', multiplier: 7.77 },
   { price: 1e+288, priceCurrency: Currency.Cash, generatorId: '0', multiplier: 77.77 },
 ]
-export const GENERATOR_MULTIPLIER_UPGRADE_BY_ID = Map<string, GeneratorMultiplierUpgrade>(
-  GENERATOR_MULTIPLIER_UPGRADES.map(upgrade => [getUpgradeId(upgrade), upgrade])
+export const GENERATOR_MULTIPLIER_CASH_UPGRADE_BY_ID = Map<string, GeneratorMultiplierUpgrade>(
+  GENERATOR_MULTIPLIER_CASH_UPGRADES.map(upgrade => [getUpgradeId(upgrade), upgrade])
 )
 
+export const GENERATOR_MULTIPLIER_PRESTIGE_UPGRADES: GeneratorMultiplierUpgrade[] = [
+  { price: 10e+3, priceCurrency: Currency.Prestige, generatorId: '0', multiplier: 3 },
+  { price: 1e+9, priceCurrency: Currency.Prestige, generatorId: '0', multiplier: 5 },
+  { price: 100e+9, priceCurrency: Currency.Prestige, generatorId: '0', multiplier: 9 },
+  { price: 1e+12, priceCurrency: Currency.Prestige, generatorId: '0', multiplier: 11 },
+  { price: 250e+12, priceCurrency: Currency.Prestige, generatorId: '2', multiplier: 3 },
+  { price: 750e+12, priceCurrency: Currency.Prestige, generatorId: '3', multiplier: 3 },
+  { price: 2e+15, priceCurrency: Currency.Prestige, generatorId: '4', multiplier: 3 },
+  { price: 5e+15, priceCurrency: Currency.Prestige, generatorId: '5', multiplier: 3 },
+  { price: 10e+15, priceCurrency: Currency.Prestige, generatorId: '6', multiplier: 3 },
+  { price: 25e+15, priceCurrency: Currency.Prestige, generatorId: '7', multiplier: 3 },
+  { price: 75e+15, priceCurrency: Currency.Prestige, generatorId: '8', multiplier: 3 },
+  { price: 200e+15, priceCurrency: Currency.Prestige, generatorId: '9', multiplier: 3 },
+  { price: 400e+15, priceCurrency: Currency.Prestige, generatorId: '10', multiplier: 3 },
+  { price: 1e+18, priceCurrency: Currency.Prestige, generatorId: '1', multiplier: 3 },
+  { price: 1e+21, priceCurrency: Currency.Prestige, generatorId: '0', multiplier: 15 },
+  { price: 10e+33, priceCurrency: Currency.Prestige, generatorId: '0', multiplier: 15 },
+  { price: 1e+36, priceCurrency: Currency.Prestige, generatorId: '0', multiplier: 3 },
+  { price: 10e+39, priceCurrency: Currency.Prestige, generatorId: '0', multiplier: 5 },
+  { price: 1e+42, priceCurrency: Currency.Prestige, generatorId: '0', multiplier: 5 },
+  { price: 100e+45, priceCurrency: Currency.Prestige, generatorId: '3', multiplier: 4 },
+  { price: 200e+45, priceCurrency: Currency.Prestige, generatorId: '4', multiplier: 6 },
+  { price: 700e+45, priceCurrency: Currency.Prestige, generatorId: '5', multiplier: 3 },
+  { price: 2e+48, priceCurrency: Currency.Prestige, generatorId: '6', multiplier: 3 },
+  { price: 25e+48, priceCurrency: Currency.Prestige, generatorId: '7', multiplier: 3 },
+  { price: 500e+51, priceCurrency: Currency.Prestige, generatorId: '8', multiplier: 3 },
+  { price: 20e+51, priceCurrency: Currency.Prestige, generatorId: '9', multiplier: 3 },
+  { price: 80e+51, priceCurrency: Currency.Prestige, generatorId: '10', multiplier: 3 },
+  { price: 150e+51, priceCurrency: Currency.Prestige, generatorId: '1', multiplier: 3 },
+  { price: 300e+51, priceCurrency: Currency.Prestige, generatorId: '2', multiplier: 3 },
+  { price: 1e+54, priceCurrency: Currency.Prestige, generatorId: '2', multiplier: 3 },
+  { price: 4e+54, priceCurrency: Currency.Prestige, generatorId: '3', multiplier: 3 },
+  { price: 9e+54, priceCurrency: Currency.Prestige, generatorId: '4', multiplier: 3 },
+  { price: 25e+54, priceCurrency: Currency.Prestige, generatorId: '5', multiplier: 3 },
+  { price: 75e+54, priceCurrency: Currency.Prestige, generatorId: '6', multiplier: 3 },
+  { price: 177e+54, priceCurrency: Currency.Prestige, generatorId: '7', multiplier: 3 },
+  { price: 300e+54, priceCurrency: Currency.Prestige, generatorId: '8', multiplier: 3 },
+  { price: 500e+54, priceCurrency: Currency.Prestige, generatorId: '9', multiplier: 3 },
+  { price: 800e+54, priceCurrency: Currency.Prestige, generatorId: '10', multiplier: 3 },
+  { price: 1e+57, priceCurrency: Currency.Prestige, generatorId: '1', multiplier: 3 },
+  { price: 100e+60, priceCurrency: Currency.Prestige, generatorId: '0', multiplier: 5 },
+  { price: 2e+63, priceCurrency: Currency.Prestige, generatorId: '2', multiplier: 3 },
+  { price: 2e+63, priceCurrency: Currency.Prestige, generatorId: '3', multiplier: 3 },
+  { price: 2e+63, priceCurrency: Currency.Prestige, generatorId: '4', multiplier: 3 },
+  { price: 2e+63, priceCurrency: Currency.Prestige, generatorId: '5', multiplier: 3 },
+  { price: 2e+63, priceCurrency: Currency.Prestige, generatorId: '6', multiplier: 3 },
+  { price: 2e+63, priceCurrency: Currency.Prestige, generatorId: '7', multiplier: 3 },
+  { price: 2e+63, priceCurrency: Currency.Prestige, generatorId: '8', multiplier: 3 },
+  { price: 2e+63, priceCurrency: Currency.Prestige, generatorId: '9', multiplier: 3 },
+  { price: 2e+63, priceCurrency: Currency.Prestige, generatorId: '10', multiplier: 3 },
+  { price: 2e+63, priceCurrency: Currency.Prestige, generatorId: '1', multiplier: 3 },
+  { price: 100e+63, priceCurrency: Currency.Prestige, generatorId: '0', multiplier: 7 },
+  { price: 1e+66, priceCurrency: Currency.Prestige, generatorId: '2', multiplier: 3 },
+  { price: 4e+66, priceCurrency: Currency.Prestige, generatorId: '3', multiplier: 3 },
+  { price: 13e+66, priceCurrency: Currency.Prestige, generatorId: '4', multiplier: 3 },
+  { price: 20e+66, priceCurrency: Currency.Prestige, generatorId: '5', multiplier: 3 },
+  { price: 29e+66, priceCurrency: Currency.Prestige, generatorId: '6', multiplier: 3 },
+  { price: 38e+66, priceCurrency: Currency.Prestige, generatorId: '7', multiplier: 3 },
+  { price: 52e+66, priceCurrency: Currency.Prestige, generatorId: '8', multiplier: 3 },
+  { price: 67e+66, priceCurrency: Currency.Prestige, generatorId: '9', multiplier: 3 },
+  { price: 72e+66, priceCurrency: Currency.Prestige, generatorId: '10', multiplier: 3 },
+  { price: 96e+66, priceCurrency: Currency.Prestige, generatorId: '1', multiplier: 3 },
+  { price: 777e+66, priceCurrency: Currency.Prestige, generatorId: '0', multiplier: 7.777777 },
+  { price: 1e+72, priceCurrency: Currency.Prestige, generatorId: '2', multiplier: 3 },
+  { price: 5e+72, priceCurrency: Currency.Prestige, generatorId: '3', multiplier: 3 },
+  { price: 22e+72, priceCurrency: Currency.Prestige, generatorId: '4', multiplier: 3 },
+  { price: 44e+72, priceCurrency: Currency.Prestige, generatorId: '5', multiplier: 3 },
+  { price: 111e+72, priceCurrency: Currency.Prestige, generatorId: '6', multiplier: 3 },
+  { price: 222e+72, priceCurrency: Currency.Prestige, generatorId: '7', multiplier: 3 },
+  { price: 333e+72, priceCurrency: Currency.Prestige, generatorId: '8', multiplier: 3 },
+  { price: 444e+72, priceCurrency: Currency.Prestige, generatorId: '9', multiplier: 3 },
+  { price: 555e+72, priceCurrency: Currency.Prestige, generatorId: '10', multiplier: 3 },
+  { price: 666e+72, priceCurrency: Currency.Prestige, generatorId: '1', multiplier: 3 },
+  { price: 11e+78, priceCurrency: Currency.Prestige, generatorId: '2', multiplier: 3 },
+  { price: 27e+78, priceCurrency: Currency.Prestige, generatorId: '3', multiplier: 3 },
+  { price: 43e+78, priceCurrency: Currency.Prestige, generatorId: '4', multiplier: 3 },
+  { price: 87e+78, priceCurrency: Currency.Prestige, generatorId: '5', multiplier: 3 },
+  { price: 190e+78, priceCurrency: Currency.Prestige, generatorId: '6', multiplier: 3 },
+  { price: 321e+78, priceCurrency: Currency.Prestige, generatorId: '7', multiplier: 3 },
+  { price: 495e+78, priceCurrency: Currency.Prestige, generatorId: '8', multiplier: 3 },
+  { price: 600e+78, priceCurrency: Currency.Prestige, generatorId: '9', multiplier: 3 },
+  { price: 725e+78, priceCurrency: Currency.Prestige, generatorId: '10', multiplier: 3 },
+  { price: 898e+78, priceCurrency: Currency.Prestige, generatorId: '1', multiplier: 3 },
+  { price: 3e+84, priceCurrency: Currency.Prestige, generatorId: '0', multiplier: 13.11 },
+  { price: 13e+87, priceCurrency: Currency.Prestige, generatorId: '0', multiplier: 5 },
+  { price: 3e+90, priceCurrency: Currency.Prestige, generatorId: '0', multiplier: 3 },
+  { price: 13e+93, priceCurrency: Currency.Prestige, generatorId: '0', multiplier: 4 },
+  { price: 24e+96, priceCurrency: Currency.Prestige, generatorId: '0', multiplier: 5 },
+  { price: 333e+108, priceCurrency: Currency.Prestige, generatorId: '0', multiplier: 3 },
+  { price: 1e+114, priceCurrency: Currency.Prestige, generatorId: '2', multiplier: 3 },
+  { price: 20e+114, priceCurrency: Currency.Prestige, generatorId: '3', multiplier: 3 },
+  { price: 50e+114, priceCurrency: Currency.Prestige, generatorId: '4', multiplier: 3 },
+  { price: 100e+114, priceCurrency: Currency.Prestige, generatorId: '5', multiplier: 3 },
+  { price: 200e+114, priceCurrency: Currency.Prestige, generatorId: '6', multiplier: 3 },
+  { price: 300e+114, priceCurrency: Currency.Prestige, generatorId: '7', multiplier: 3 },
+  { price: 400e+114, priceCurrency: Currency.Prestige, generatorId: '8', multiplier: 3 },
+  { price: 500e+114, priceCurrency: Currency.Prestige, generatorId: '9', multiplier: 3 },
+  { price: 750e+114, priceCurrency: Currency.Prestige, generatorId: '10', multiplier: 3 },
+  { price: 2e+117, priceCurrency: Currency.Prestige, generatorId: '1', multiplier: 3 },
+  { price: 1e+138, priceCurrency: Currency.Prestige, generatorId: '2', multiplier: 3 },
+  { price: 1e+138, priceCurrency: Currency.Prestige, generatorId: '3', multiplier: 3 },
+  { price: 1e+138, priceCurrency: Currency.Prestige, generatorId: '4', multiplier: 3 },
+  { price: 1e+138, priceCurrency: Currency.Prestige, generatorId: '5', multiplier: 3 },
+  { price: 1e+138, priceCurrency: Currency.Prestige, generatorId: '6', multiplier: 3 },
+  { price: 1e+138, priceCurrency: Currency.Prestige, generatorId: '7', multiplier: 3 },
+  { price: 1e+138, priceCurrency: Currency.Prestige, generatorId: '8', multiplier: 3 },
+  { price: 1e+138, priceCurrency: Currency.Prestige, generatorId: '9', multiplier: 3 },
+  { price: 1e+138, priceCurrency: Currency.Prestige, generatorId: '10', multiplier: 3 },
+  { price: 1e+138, priceCurrency: Currency.Prestige, generatorId: '1', multiplier: 3 },
+  { price: 2e+138, priceCurrency: Currency.Prestige, generatorId: '0', multiplier: 19 },
+]
+export const GENERATOR_MULTIPLIER_PRESTIGE_UPGRADE_BY_ID = Map<string, GeneratorMultiplierUpgrade>(
+  GENERATOR_MULTIPLIER_PRESTIGE_UPGRADES.map(upgrade => [getUpgradeId(upgrade), upgrade])
+)
+
+export const GENERATOR_MULTIPLIER_UPGRADE_BY_ID = GENERATOR_MULTIPLIER_CASH_UPGRADE_BY_ID
+  .merge(GENERATOR_MULTIPLIER_PRESTIGE_UPGRADE_BY_ID)
+
+// TODO: Managers
 export const GENERATOR_MODIFIER_COST_UPGRADES: GeneratorCostModifier[] = [
   { price: 10, priceCurrency: Currency.Prestige, generatorId: '1', costModifier: .9},
   { price: 100, priceCurrency: Currency.Prestige, generatorId: '2', costModifier: .9},
@@ -526,11 +645,21 @@ export const GENERATOR_MODIFIER_COST_UPGRADE_BY_ID = Map<string, GeneratorCostMo
   GENERATOR_MODIFIER_COST_UPGRADES.map(upgrade => [getUpgradeId(upgrade), upgrade])
 )
 
-export const PRESTIGE_UPGRADES: PrestigeUpgrade[] = [
+export const PRESTIGE_CASH_UPGRADES: PrestigeUpgrade[] = [
   { price: 100e+15, priceCurrency: Currency.Cash, effectiveness: 0.01 },
   { price: 1e+21, priceCurrency: Currency.Cash, effectiveness: 0.01 },
   { price: 10e+24, priceCurrency: Currency.Cash, effectiveness: 0.02 },
 ]
-export const PRESTIGE_UPGRADE_BY_ID: Map<string, PrestigeUpgrade> = Map<string, PrestigeUpgrade>(
-  PRESTIGE_UPGRADES.map(upgrade => [getUpgradeId(upgrade), upgrade])
+export const PRESTIGE_CASH_UPGRADE_BY_ID: Map<string, PrestigeUpgrade> = Map<string, PrestigeUpgrade>(
+  PRESTIGE_CASH_UPGRADES.map(upgrade => [getUpgradeId(upgrade), upgrade])
+)
+
+export const PRESTIGE_PRESTIGE_UPGRADES: PrestigeUpgrade[] = [
+  { price: 100e+3, priceCurrency: Currency.Prestige, effectiveness: 0.02 },
+  { price: 100e+6, priceCurrency: Currency.Prestige, effectiveness: 0.02 },
+  { price: 1e+33, priceCurrency: Currency.Prestige, effectiveness: 0.1 },
+  { price: 500e+51, priceCurrency: Currency.Prestige, effectiveness: 0.1 }, 
+]
+export const PRESTIGE_PRESTIGE_UPGRADE_BY_ID: Map<string, PrestigeUpgrade> = Map<string, PrestigeUpgrade>(
+  PRESTIGE_PRESTIGE_UPGRADES.map(upgrade => [getUpgradeId(upgrade), upgrade])
 )
