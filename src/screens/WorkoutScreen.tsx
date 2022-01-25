@@ -57,7 +57,7 @@ export const WorkoutScreen = ({setScreen, gameState, setGameState, currentLocati
   const [hasForegroundLocationPermission, setHasForegroundLocationPermission] = useState<boolean>();
   const [hasBackgroundLocationPermission, setHasBackgroundLocationPermission] = useState<boolean>(true);
 
-  const [isTakingPicture, setIsTakingPicture] = useState<boolean>(false)
+  const [isTakingPicture, setIsTakingPicture] = useState<boolean>(false);
   const [photoAndLocation, setPhotoAndLocation] = useState<PhotoAndLocation>();
 
   const requestAndSetCameraPermission = async () => {
@@ -103,6 +103,18 @@ export const WorkoutScreen = ({setScreen, gameState, setGameState, currentLocati
     }
   }
 
+  const getAndSetFitnessLocation = async () => {
+    await fetch(`${endpoint}/${userId}`)
+      .then(res => res.json())
+      .then(res => setGameState({
+        ...gameState,
+        fitnessLocation: res.data
+      }))
+      .catch(error => {
+        alert(error)
+      })
+  }
+
   const sendForVerification = async () => {
     if (!photoAndLocation) {
       return
@@ -121,9 +133,10 @@ export const WorkoutScreen = ({setScreen, gameState, setGameState, currentLocati
         coordinates: [longitude, latitude],
         isVerified: null,
       }),
-    }).catch(error => {
-      alert(error)
-    })
+    }).then(getAndSetFitnessLocation)
+      .catch(error => {
+        alert(error)
+      })
 
     setIsTakingPicture(false)
   }
@@ -132,6 +145,10 @@ export const WorkoutScreen = ({setScreen, gameState, setGameState, currentLocati
     setIsTakingPicture(false)
     setPhotoAndLocation(undefined)
   }
+
+  useEffect(() => {
+    getAndSetFitnessLocation()
+  }, [])
 
   if (!isTakingPicture) {
     return (
@@ -167,8 +184,8 @@ export const WorkoutScreen = ({setScreen, gameState, setGameState, currentLocati
           { fitnessLocation && fitnessLocation.isVerified === false &&
             <>
               <Description
-                title={'Review Failed :('}
-                body={'We were unable to determine that the photo you sent was a picture of the gym.\nPlease try again...'}
+                title={'Photo verification failed :('}
+                body={'We were unable to determine that the photo you sent was a picture of the gym.\n\nPlease try again...'}
               />
               <Center>
                 <Button text={'Take a Picture'} onPress={takePicture}/>
