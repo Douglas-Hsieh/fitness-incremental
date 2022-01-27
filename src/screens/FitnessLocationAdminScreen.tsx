@@ -5,10 +5,10 @@ import { BackgroundImage } from "../components/BackgroundImage";
 import { BottomBar } from "../components/BottomBar";
 import { Button } from "../components/Button";
 import { Header } from "../components/Header";
-import { SERVER_URL } from "../config";
 import Screen from "../enums/Screen";
 import { FitnessLocation } from "../../../fitness-incremental-shared/src/fitness-location.interface"
 import colors from "../../assets/colors/colors";
+import { getAllUnverifiedFitnessLocations, upsertFitnessLocation } from "../api/fitness-locations";
 
 interface FitnessLocationAdminScreen {
   setScreen: (screen: Screen) => void;
@@ -19,7 +19,7 @@ export const FitnessLocationAdminScreen = ({setScreen, setGameState}: FitnessLoc
   const [fitnessLocations, setFitnessLocations] = useState<FitnessLocation[]>([])
 
   const getAndSetFitnessLocations = async () => {
-    await fetch(`${SERVER_URL}/fitness-locations/isVerified/null`)
+    getAllUnverifiedFitnessLocations()
       .then(res => res.json())
       .then(res => {
         setFitnessLocations(res.data)
@@ -27,19 +27,13 @@ export const FitnessLocationAdminScreen = ({setScreen, setGameState}: FitnessLoc
   }
 
   const judgeFitnessLocation = async (userId: string, isVerified: boolean) => {
-    await fetch(`${SERVER_URL}/fitness-locations/${userId}`, {
-      method: 'PUT',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        isVerified: isVerified,
-      }),
+    upsertFitnessLocation({
+      userId: userId,
+      isVerified: isVerified,
     }).then(res => {
-      const remainingFitnessLocations = fitnessLocations.filter(fitnessLocation => fitnessLocation.userId !== userId)
-      setFitnessLocations(remainingFitnessLocations)
-    })
+        const remainingFitnessLocations = fitnessLocations.filter(fitnessLocation => fitnessLocation.userId !== userId)
+        setFitnessLocations(remainingFitnessLocations)
+      })
   }
 
   useEffect(() => {

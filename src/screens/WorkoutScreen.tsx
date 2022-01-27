@@ -10,19 +10,20 @@ import Screen from "../enums/Screen";
 import { Camera } from 'expo-camera';
 import { window } from '../util/Window'
 import { requestForegroundPermissionsAsync, getCurrentPositionAsync, LocationObject } from 'expo-location'
-import { SERVER_URL } from "../config";
 import { Feather } from "@expo/vector-icons";
 import Center from "../components/Center";
 import colors from "../../assets/colors/colors";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { manipulateAsync } from 'expo-image-manipulator'
 import { WorkoutReward } from "../components/WorkoutReward";
+import { getFitnessLocation, upsertFitnessLocation } from "../api/fitness-locations";
+import { FitnessLocation } from '../../../fitness-incremental-shared/src/fitness-location.interface'
 
 const base64ToImageUri = (base64: string) => {
   return 'data:image/jpeg;base64,' + base64
 }
 
-interface PhotoAndLocation {
+export interface PhotoAndLocation {
   compressedImageUri: string;
   imageUri: string;
   location: LocationObject;
@@ -48,7 +49,6 @@ interface WorkoutScreenProps {
 }
 
 export const userId = 'client'
-export const endpoint = `${SERVER_URL}/fitness-locations`
 
 export const WorkoutScreen = ({setScreen, gameState, setGameState, currentLocation}: WorkoutScreenProps) => {
   const { fitnessLocation, lastWorkoutRewardTime } = gameState
@@ -104,7 +104,7 @@ export const WorkoutScreen = ({setScreen, gameState, setGameState, currentLocati
   }
 
   const getAndSetFitnessLocation = async () => {
-    await fetch(`${endpoint}/${userId}`)
+    getFitnessLocation(userId)
       .then(res => res.json())
       .then(res => setGameState({
         ...gameState,
@@ -119,21 +119,16 @@ export const WorkoutScreen = ({setScreen, gameState, setGameState, currentLocati
     if (!photoAndLocation) {
       return
     }
-    const {latitude, longitude} = photoAndLocation.location.coords
 
-    await fetch(`${endpoint}/${userId}`, {
-      method: 'PUT',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        userId: userId,
-        imageUri: photoAndLocation.compressedImageUri,
-        coordinates: [longitude, latitude],
-        isVerified: null,
-      }),
-    }).then(getAndSetFitnessLocation)
+    const {longitude, latitude} = photoAndLocation.location.coords
+    const fitnessLocation: Partial<FitnessLocation> = {
+      userId: userId,
+      coordinates: [longitude, latitude],
+      imageUri: photoAndLocation.compressedImageUri,
+      isVerified: null,
+    }
+    upsertFitnessLocation(fitnessLocation)
+      .then(getAndSetFitnessLocation)
       .catch(error => {
         alert(error)
       })
