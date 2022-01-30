@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "449996184337",
+    "project_id": "fitness-incremental",
+    "storage_bucket": "fitness-incremental.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:449996184337:android:66b8089893314b78728ab0",
+        "android_client_info": {
+          "package_name": "com.randompermutation.fitnessincremental"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "449996184337-h3nmg0vln8jeh8u40o2p7bbm4r1oamds.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB0vCN4DFGfHnp7IV_pqg6dU6MByTIqrHw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "449996184337-h3nmg0vln8jeh8u40o2p7bbm4r1oamds.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
