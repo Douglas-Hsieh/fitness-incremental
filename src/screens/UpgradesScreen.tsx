@@ -76,7 +76,6 @@ interface UpgradesScreenProps {
 }
 
 export const UpgradesScreen = ({setScreen, gameState, setGameState}: UpgradesScreenProps) => {
-  console.log('UpgradesScreen render')
 
   const [currency, setCurrency] = useState<Currency>(Currency.Cash)
 

@@ -26,7 +26,6 @@ interface TopBarProps {
 }
 
 export const TopBar = memo(({balance, ticks, buyAmount, setBuyAmount}: TopBarProps) => {
-  console.log('TopBar render')
 
   const [coefficient, scale] = numberToHumanFormat(balance);
 

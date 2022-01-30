@@ -13,7 +13,6 @@ interface GeneratorProgressBarProps {
 }
 
 export const GeneratorProgressBar = ({generator, gameState}: GeneratorProgressBarProps) => {
-  // console.log('GeneratorProgressBar render')
 
   // Calculate progress
   const generatorState = gameState.generatorStateById.get(generator.id)!

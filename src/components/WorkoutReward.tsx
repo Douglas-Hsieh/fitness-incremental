@@ -81,6 +81,7 @@ export const WorkoutReward = ({gameState, setGameState, currentLocation}: Workou
       longitude: fitnessLocation.coordinates[0],
       latitude: fitnessLocation.coordinates[1],
     }
+
     const isNearFitnessLocation = haversine(fitnessLocationLatLng, currentLocation.coords, { unit: 'mile', threshold: 0.1})
 
     const EIGHT_HOURS_MS = 8 * 60 * 60 * 1000

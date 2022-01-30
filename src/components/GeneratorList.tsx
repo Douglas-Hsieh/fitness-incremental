@@ -14,7 +14,6 @@ import { UnlockProgressBar } from "./UnlockProgressBar";
 import { GeneratorProgressBar } from "./GeneratorProgressBar";
 
 const GeneratorIcon = memo((props: {image: any}) => {
-  console.log('GeneratorIcon render')
   return (
   <View style={styles.iconContainer1}>
     <View style={styles.iconContainer2}>

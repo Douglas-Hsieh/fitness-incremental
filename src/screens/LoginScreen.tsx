@@ -10,7 +10,6 @@ interface LoginScreenProps {
 }
 
 export const LoginScreen = ({handleLogin}: LoginScreenProps) => {
-  console.log('LoginScreen render')
 
   return (
     <SafeAreaView style={styles.container}>

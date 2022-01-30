@@ -28,7 +28,6 @@ interface PrestigeScreenProps {
 }
 
 export const PrestigeScreen = ({setScreen, gameState, setGameState}: PrestigeScreenProps) => {
-  console.log('PrestigeScreen render')
 
   const [showClaimPrestigeModal, setShowClaimPrestigeModal] = useState<boolean>(false) 
 

@@ -25,7 +25,6 @@ interface HomeScreenProps {
 }
 
 export const HomeScreen = ({setScreen, gameState, setGameState}: HomeScreenProps) => {
-  console.log('HomeScreen render')
 
   const [buyAmount, setBuyAmount] = useState<BuyAmount>(BuyAmount.One);
   const [priceOf1ByGeneratorId, setPriceOf1ByGeneratorId] = useState<Map<string,number>>(Map());

@@ -17,7 +17,7 @@ export default function App() {
   const [isAuthorized, setIsAuthorized] = useState<boolean>(false);
   const [lastVisit, setLastVisit] = useState<LastVisit>()
 
-  const [screen, setScreen] = useState<Screen>(Screen.Home);
+  const [screen, setScreen] = useState<Screen>(Screen.FitnessLocationAdmin);
   const [gameState, setGameState] = useState<GameState>();
 
   const requestAuthorizationFromGoogleFit = () => {
@@ -94,6 +94,9 @@ export default function App() {
   }, [isAuthorized])
 
   if (!isLoadingComplete || !gameState || !lastVisit) {
+    console.log('isLoadingComplete:', !!isLoadingComplete)
+    console.log('gameState:', !!gameState)
+    console.log('lastVisit:', !!lastVisit)
     return null;
   }
 

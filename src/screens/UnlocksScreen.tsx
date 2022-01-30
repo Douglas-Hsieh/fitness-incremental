@@ -92,7 +92,6 @@ interface UnlocksScreenProps {
 }
 
 export const UnlocksScreen = ({setScreen, gameState}: UnlocksScreenProps) => {
-  console.log('UnlocksScreen render')
 
   return (
     <SafeAreaView style={styles.container}>
