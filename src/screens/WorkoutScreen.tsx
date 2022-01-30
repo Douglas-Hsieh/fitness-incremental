@@ -16,8 +16,8 @@ import colors from "../../assets/colors/colors";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { manipulateAsync } from 'expo-image-manipulator'
 import { WorkoutReward } from "../components/WorkoutReward";
-import { getFitnessLocation, upsertFitnessLocation } from "../api/fitness-locations";
-import { FitnessLocation } from '../../../fitness-incremental-shared/src/fitness-location.interface'
+import { createFitnessLocation, getFitnessLocations, updateFitnessLocation } from "../api/fitness-locations";
+import { FitnessLocation } from '../../../fitness-incremental-shared/src/fitness-locations.interface'
 
 const base64ToImageUri = (base64: string) => {
   return 'data:image/jpeg;base64,' + base64
@@ -47,8 +47,6 @@ interface WorkoutScreenProps {
   setGameState: (gameState: GameState) => void;
   currentLocation: LocationObject | undefined;
 }
-
-export const userId = 'client'
 
 export const WorkoutScreen = ({setScreen, gameState, setGameState, currentLocation}: WorkoutScreenProps) => {
   const { fitnessLocation, lastWorkoutRewardTime } = gameState
@@ -88,12 +86,9 @@ export const WorkoutScreen = ({setScreen, gameState, setGameState, currentLocati
         base64: true,
       })
       const location = await getCurrentPositionAsync()
-      console.log('Object.keys(photo)', Object.keys(image))
-      console.log('location', location)
 
       // Compress photo
       const compressedImage = await manipulateAsync(base64ToImageUri(image.base64!), [], { base64: true, compress: 0 });
-      console.log('compressedImage.base64?.length', compressedImage.base64?.length)
 
       setPhotoAndLocation({
         imageUri: base64ToImageUri(image.base64!),
@@ -104,12 +99,14 @@ export const WorkoutScreen = ({setScreen, gameState, setGameState, currentLocati
   }
 
   const getAndSetFitnessLocation = async () => {
-    getFitnessLocation(userId)
-      .then(res => res.json())
-      .then(res => setGameState({
-        ...gameState,
-        fitnessLocation: res.data
-      }))
+    getFitnessLocations()
+      .then(fitnessLocations => {
+        if (fitnessLocations.length > 0)
+        setGameState({
+          ...gameState,
+          fitnessLocation: fitnessLocations[0],
+        }
+      )})
       .catch(error => {
         alert(error)
       })
@@ -122,16 +119,28 @@ export const WorkoutScreen = ({setScreen, gameState, setGameState, currentLocati
 
     const {longitude, latitude} = photoAndLocation.location.coords
     const fitnessLocation: Partial<FitnessLocation> = {
-      userId: userId,
       coordinates: [longitude, latitude],
       imageUri: photoAndLocation.compressedImageUri,
       isVerified: null,
     }
-    upsertFitnessLocation(fitnessLocation)
-      .then(getAndSetFitnessLocation)
-      .catch(error => {
-        alert(error)
+
+    if (gameState.fitnessLocation) {
+      updateFitnessLocation({
+        id: gameState.fitnessLocation.id,
+        ...fitnessLocation,
       })
+        .then(getAndSetFitnessLocation)
+        .catch(error => {
+          alert(error)
+        })
+    } else {
+      createFitnessLocation(fitnessLocation)
+        .then(getAndSetFitnessLocation)
+        .catch(error => {
+          alert(error)
+        })
+    }
+
 
     setIsTakingPicture(false)
   }

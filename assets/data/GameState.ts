@@ -1,9 +1,12 @@
 import { Map, Set } from 'immutable';
-import { FitnessLocation } from '../../../fitness-incremental-shared/src/fitness-location.interface';
+import { FitnessLocation } from '../../../fitness-incremental-shared/src/fitness-locations.interface';
 import { TemporaryMultiplier } from '../../src/types/TemporaryMultiplier';
 import { GeneratorState, INITIAL_GENERATOR_STATE_BY_ID } from './GeneratorState';
+import 'react-native-get-random-values';  // hacky: must be before uuid import
+import { User } from '../../../fitness-incremental-shared/src/users.interface';
 
 export class GameState {
+  user: User | undefined;
   balance: number;
   prestige: number;
   spentPrestige: number;  // since last reset
@@ -20,6 +23,7 @@ export class GameState {
   lastWorkoutRewardTime: Date;
 
   constructor (
+    user: User | undefined,
     balance: number,
     prestige: number,
     spentPrestige: number,
@@ -35,6 +39,7 @@ export class GameState {
     fitnessLocation: FitnessLocation | null,
     lastWorkoutRewardTime: Date,
   ) {
+    this.user = user
     this.balance = balance
     this.prestige = prestige
     this.spentPrestige = spentPrestige
@@ -53,8 +58,8 @@ export class GameState {
 
   static fromJson(gameStateString: string) {
     const obj = JSON.parse(gameStateString) as GameState
-    console.log('obj', obj)
     return new GameState(
+      obj.user,
       obj.balance,
       obj.prestige,
       obj.spentPrestige,
@@ -73,6 +78,7 @@ export class GameState {
   }
 }
 
+export const INITIAL_USER = undefined
 // export const INITIAL_BALANCE = 0
 export const INITIAL_BALANCE = 1e+50
 export const INITIAL_PRESTIGE = 0
@@ -83,6 +89,7 @@ const INITIAL_TICKS = 1e+5
 const INITIAL_LAST_WORKOUT_REWARD_TIME = new Date(0)
 
 export const INITIAL_GAME_STATE = new GameState(
+  INITIAL_USER,
   INITIAL_BALANCE,
   INITIAL_PRESTIGE,
   0,

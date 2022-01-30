@@ -6,9 +6,9 @@ import { BottomBar } from "../components/BottomBar";
 import { Button } from "../components/Button";
 import { Header } from "../components/Header";
 import Screen from "../enums/Screen";
-import { FitnessLocation } from "../../../fitness-incremental-shared/src/fitness-location.interface"
+import { FitnessLocation } from "../../../fitness-incremental-shared/src/fitness-locations.interface"
 import colors from "../../assets/colors/colors";
-import { getAllUnverifiedFitnessLocations, upsertFitnessLocation } from "../api/fitness-locations";
+import { getAllUnverifiedFitnessLocations, updateFitnessLocation } from "../api/fitness-locations";
 
 interface FitnessLocationAdminScreen {
   setScreen: (screen: Screen) => void;
@@ -20,18 +20,17 @@ export const FitnessLocationAdminScreen = ({setScreen, setGameState}: FitnessLoc
 
   const getAndSetFitnessLocations = async () => {
     getAllUnverifiedFitnessLocations()
-      .then(res => res.json())
-      .then(res => {
-        setFitnessLocations(res.data)
-      })
+      .then(fitnessLocations => setFitnessLocations(fitnessLocations))
+      .catch(error => alert(error))
+      ;
   }
 
-  const judgeFitnessLocation = async (userId: string, isVerified: boolean) => {
-    upsertFitnessLocation({
-      userId: userId,
+  const judgeFitnessLocation = async (fitnessLocation: FitnessLocation, isVerified: boolean) => {
+    updateFitnessLocation({
+      ...fitnessLocation,
       isVerified: isVerified,
     }).then(res => {
-        const remainingFitnessLocations = fitnessLocations.filter(fitnessLocation => fitnessLocation.userId !== userId)
+        const remainingFitnessLocations = fitnessLocations.filter(fl => fl.userId !== fitnessLocation.userId)
         setFitnessLocations(remainingFitnessLocations)
       })
   }
@@ -57,8 +56,8 @@ export const FitnessLocationAdminScreen = ({setScreen, setGameState}: FitnessLoc
               style={styles.image}
             />
             <View style={styles.buttonGroup}>
-              <Button onPress={() => {judgeFitnessLocation(fitnessLocation.userId, false)}} text={'Fail'} style={styles.failButton}/>
-              <Button onPress={() => {judgeFitnessLocation(fitnessLocation.userId, true)}} text={'Pass'} style={styles.passButton}/>
+              <Button onPress={() => {judgeFitnessLocation(fitnessLocation, false)}} text={'Fail'} style={styles.failButton}/>
+              <Button onPress={() => {judgeFitnessLocation(fitnessLocation, true)}} text={'Pass'} style={styles.passButton}/>
             </View>
           </View>
         ))}

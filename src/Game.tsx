@@ -12,9 +12,13 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { LastVisit } from "../assets/data/LastVisit";
 import useInterval from "./util/useInterval";
 import { MiscellaneousScreen } from "./screens/MiscellaneousScreen";
-import { endpoint, userId, WorkoutScreen } from "./screens/WorkoutScreen";
+import { WorkoutScreen } from "./screens/WorkoutScreen";
 import { FitnessLocationAdminScreen } from "./screens/FitnessLocationAdminScreen";
 import { Accuracy, LocationObject, requestForegroundPermissionsAsync, watchPositionAsync } from "expo-location";
+import { registerForPushNotificationsAsync } from "./push-notifications";
+import { getFitnessLocations } from "./api/fitness-locations";
+import { createUser, updateUser } from "./api/users";
+import { logIn } from "./api/auth";
 
 interface GameProps {
   screen: Screen;
@@ -28,8 +32,25 @@ interface GameProps {
 
 export const Game = ({screen, setScreen, gameState, setGameState, lastVisit, requestAuthorizationFromGoogleFit}: GameProps) => {
 
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
   const [hasForegroundLocationPermission, setHasForegroundLocationPermission] = useState<boolean>()
   const [currentLocation, setCurrentLocation] = useState<LocationObject>();
+
+  useEffect(() => {
+    const getAndSetUser = async () => {
+      if (!gameState.user) {
+        const user = await createUser();
+        setGameState({ ...gameState, user: user })
+      }
+    }
+    getAndSetUser()
+  }, [])
+
+  useEffect(() => {
+    if (gameState.user && !isLoggedIn) {
+      logIn(gameState.user.uuid).then(() => setIsLoggedIn(true))
+    }
+  }, [gameState.user, isLoggedIn])
 
   useEffect(() => {
     // User earned ticks from steps since last visit
@@ -87,16 +108,28 @@ export const Game = ({screen, setScreen, gameState, setGameState, lastVisit, req
   }, [gameState])
 
   useEffect(() => {
-    // If user has no fitness location saved, ask api if one exists
-    if (!gameState.fitnessLocation) {
-      fetch(`${endpoint}/${userId}`)
-        .then(res => res.json())
-        .then(res => setGameState({
-          ...gameState,
-          fitnessLocation: res.data,
-        }))
+    if (!isLoggedIn) {
+      return;
     }
-  }, [])
+
+    // If user has no fitness location saved, ask api if one exists
+    if (gameState.fitnessLocation) {
+      getFitnessLocations()
+        .then(fitnessLocations => {
+          if (fitnessLocations.length <= 0) {
+            return;
+          }
+          setGameState({
+            ...gameState,
+            fitnessLocation: fitnessLocations[0],
+          })
+        })
+    }
+
+    // Register for push notifications
+    registerForPushNotificationsAsync()
+      .then(token => updateUser({ id: gameState.user!.id, expoPushToken: token }))
+  }, [isLoggedIn])
 
   useEffect(() => {
     // If user has fitness location, ask to track foreground location
@@ -108,7 +141,6 @@ export const Game = ({screen, setScreen, gameState, setGameState, lastVisit, req
         .then(response => { setHasForegroundLocationPermission(response.status === 'granted') })
     } else {
       watchPositionAsync({ accuracy: Accuracy.High, timeInterval: 30000 }, (location) => {
-        console.log('location', location)
         setCurrentLocation(location)
       })
     }
