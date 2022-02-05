@@ -13,4 +13,6 @@ export const logIn = async (uuid: string) => {
       uuid: uuid,
     }),
   })
+    .then(res => res.json())
+    .then(res => res.data)
 }
