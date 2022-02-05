@@ -26,6 +26,7 @@
     "expo-permissions": "~13.1.0",
     "expo-splash-screen": "~0.14.1",
     "expo-status-bar": "~1.2.0",
+    "expo-task-manager": "~10.1.0",
     "haversine": "^1.1.1",
     "immutable": "^4.0.0",
     "react": "17.0.1",
