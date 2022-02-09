@@ -32,7 +32,7 @@ export const calculateGeneratorRevenue = (
 };
 
 export const calculateOneTickBaseRevenue = (
-  currencyGenerators: Generator[],
+  generators: Generator[],
   gameState: GameState
 ): number => {
   const { generatorStateById, upgradeIds, unlockIds, prestige } = gameState;
@@ -41,7 +41,7 @@ export const calculateOneTickBaseRevenue = (
   const unlockMultipliersByGeneratorId = calculateMultipliersFromUnlocks(unlockIds);
   const prestigeMultiplier = 1 + (prestige * 0.02);
 
-  return currencyGenerators.map(generator => {
+  return generators.map(generator => {
     const generatorState = generatorStateById.get(generator.id)!;
     const revenue = (generator.initialProductivity * generatorState.owned)
       * upgradeMultipliersByGeneratorId.get(generator.id)!

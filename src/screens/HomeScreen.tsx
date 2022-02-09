@@ -110,11 +110,6 @@ export const HomeScreen = ({setScreen, gameState, setGameState}: HomeScreenProps
     priceOfMaxByGeneratorId,
   ])
 
-  useEffect(() => {
-    console.log('Unlocks: ', JSON.stringify(gameState.unlockIds))
-
-  }, [JSON.stringify(gameState.unlockIds)])
-
   return (
     <SafeAreaView style={styles.container}>
 

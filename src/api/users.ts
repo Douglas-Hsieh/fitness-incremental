@@ -1,4 +1,4 @@
-import { User } from "../../../fitness-incremental-shared/src/users.interface"
+import { User } from "../shared/users.interface"
 import { SERVER_URL } from "../config"
 
 export const endpoint = `${SERVER_URL}/users`

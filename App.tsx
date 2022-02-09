@@ -3,13 +3,17 @@ import React, { useEffect, useState } from 'react';
 import GoogleFit from 'react-native-google-fit'
 import useCachedResources from './hooks/useCachedResources';
 import EStyleSheet from 'react-native-extended-stylesheet';
-import { GameState, INITIAL_GAME_STATE } from './assets/data/GameState';
+import { GameState } from './assets/data/GameState';
 import Screen from './src/enums/Screen';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Game } from './src/Game';
-import { getStepsBetween, GOOGLE_FIT_AUTHORIZATION_OPTIONS } from './src/google-fit/google-fit';
+import { GOOGLE_FIT_AUTHORIZATION_OPTIONS } from './src/google-fit/google-fit';
 import { LastVisit } from './assets/data/LastVisit';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { loadLastVisit } from './src/util/loadLastVisit';
+import { Text } from 'react-native';
+import { registerTasks, unregisterTasks } from './src/background-tasks';
+import Center from './src/components/Center';
 
 export default function App() {
   const isLoadingComplete = useCachedResources();
@@ -36,31 +40,6 @@ export default function App() {
       })
   }
 
-  const getAndSetLastVisit = async () => {
-    // Get time of user's last visit
-    const lastVisitTimeString = await AsyncStorage.getItem('lastVisitTime')
-    const now = new Date()
-    console.log('lastVisitTimeString', lastVisitTimeString)
-
-    if (lastVisitTimeString) {
-      const lastVisitTime = new Date(lastVisitTimeString)
-      const lastVisitSteps = await getStepsBetween(lastVisitTime, now)
-      setLastVisit({
-        time: lastVisitTime,
-        steps: lastVisitSteps,
-      })
-    } else {
-      // First visit
-      setLastVisit({
-        time: now,
-        steps: 0,
-      })
-    }
-
-    // Update time of last visit
-    await AsyncStorage.setItem('lastVisitTime', now.toISOString())
-  }
-
   useEffect(() => {
     EStyleSheet.build();
 
@@ -68,13 +47,9 @@ export default function App() {
       setIsAuthorized(GoogleFit.isAuthorized);
     })
 
-    const getAndSetGameState = async () => {
-      const gameStateString = await AsyncStorage.getItem('gameState')
-      const gameState = gameStateString ? GameState.fromJson(gameStateString) : INITIAL_GAME_STATE
-      console.log('gameState', gameState)
-      setGameState(gameState)
-    }
-    getAndSetGameState()
+    GameState.load().then(gameState => setGameState(gameState));
+
+    unregisterTasks().finally(registerTasks)
   }, [])
 
   useEffect(() => {
@@ -86,7 +61,11 @@ export default function App() {
       return
     }
     
-    getAndSetLastVisit()
+    loadLastVisit().then(lastVisit => {
+      setLastVisit(lastVisit)
+      const now = new Date()
+      AsyncStorage.setItem('lastVisitTime', now.toISOString())
+    })
 
     if (isAuthorized && screen === Screen.Login) {
       setScreen(Screen.WelcomeBack)
@@ -94,10 +73,11 @@ export default function App() {
   }, [isAuthorized])
 
   if (!isLoadingComplete || !gameState || !lastVisit) {
-    console.log('isLoadingComplete:', !!isLoadingComplete)
-    console.log('gameState:', !!gameState)
-    console.log('lastVisit:', !!lastVisit)
-    return null;
+    return (<Center>
+      <Text>isLoadingComplete: {!!isLoadingComplete}</Text>
+      <Text>gameState: {!!gameState}</Text>
+      <Text>lastVisit: {!!lastVisit}</Text>
+    </Center>);
   }
 
   return (

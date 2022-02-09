@@ -28,7 +28,7 @@ export const getStepsBetween = async (start: Date, end: Date) => {
 
   return await GoogleFit.getDailyStepCountSamples(opt)
     .then(stepsResponseList => {
-      console.log(`Steps between ${start.toISOString()} and ${end.toISOString()}`, stepsResponseList)
+      // console.log(`Steps between ${start.toISOString()} and ${end.toISOString()}`, stepsResponseList)
 
       const stepsResponse = stepsResponseList.find(stepsResponse => stepsResponse.source === SOURCE_ESTIMATED_STEPS);
 

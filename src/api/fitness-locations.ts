@@ -1,4 +1,4 @@
-import { FitnessLocation } from "../../../fitness-incremental-shared/src/fitness-locations.interface"
+import { FitnessLocation } from "../shared/fitness-locations.interface"
 import { SERVER_URL } from "../config"
 
 export const endpoint = `${SERVER_URL}/fitness-locations`

@@ -11,10 +11,11 @@ import Screen from "../enums/Screen";
 
 interface MiscellaneousScreenProps {
   setScreen: (screen: Screen) => void;
+  gameState: GameState;
   setGameState: (gameState: GameState) => void;
 }
 
-export const MiscellaneousScreen = ({setScreen, setGameState}: MiscellaneousScreenProps) => {
+export const MiscellaneousScreen = ({setScreen, gameState, setGameState}: MiscellaneousScreenProps) => {
   const [showDeleteDataModal, setShowDeleteDataModal] = useState<boolean>(false)
 
   const deleteData = () => {
@@ -27,6 +28,11 @@ export const MiscellaneousScreen = ({setScreen, setGameState}: MiscellaneousScre
 
       <View style={styles.screenWrapper}>
         <Header title={'Miscellaneous'}/>
+        { gameState.user && gameState.user.roles.includes('ROLE_ADMIN') &&
+          <Center>
+            <Button text={'Fitness Locations'} onPress={() => setScreen(Screen.FitnessLocationAdmin)}/>
+          </Center>
+        }
         <Center>
           <Button text={'Delete Data'} style={{backgroundColor: 'red'}} onPress={() => setShowDeleteDataModal(true)}/>
         </Center>

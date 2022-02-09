@@ -8,11 +8,10 @@ import { PrestigeScreen } from "./screens/PrestigeScreen";
 import { UnlocksScreen } from "./screens/UnlocksScreen";
 import { UpgradesScreen } from "./screens/UpgradesScreen";
 import { WelcomeBackScreen } from "./screens/WelcomeBackScreen";
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { LastVisit } from "../assets/data/LastVisit";
 import useInterval from "./util/useInterval";
 import { MiscellaneousScreen } from "./screens/MiscellaneousScreen";
-import { WorkoutScreen } from "./screens/WorkoutScreen";
+import { WorkoutScreen } from './screens/WorkoutScreen'
 import { FitnessLocationAdminScreen } from "./screens/FitnessLocationAdminScreen";
 import { Accuracy, LocationObject, requestForegroundPermissionsAsync, watchPositionAsync } from "expo-location";
 import { registerForPushNotificationsAsync } from "./push-notifications";
@@ -48,7 +47,11 @@ export const Game = ({screen, setScreen, gameState, setGameState, lastVisit, req
 
   useEffect(() => {
     if (gameState.user && !isLoggedIn) {
-      logIn(gameState.user.uuid).then(() => setIsLoggedIn(true))
+      logIn(gameState.user.uuid)
+        .then((user) => {
+          setGameState({ ...gameState, user: user })
+          setIsLoggedIn(true)
+        })
     }
   }, [gameState.user, isLoggedIn])
 
@@ -104,7 +107,7 @@ export const Game = ({screen, setScreen, gameState, setGameState, lastVisit, req
 
   // Autosave game
   useEffect(() => {
-    AsyncStorage.setItem('gameState', JSON.stringify(gameState))
+    GameState.save(gameState)
   }, [gameState])
 
   useEffect(() => {
@@ -113,7 +116,7 @@ export const Game = ({screen, setScreen, gameState, setGameState, lastVisit, req
     }
 
     // If user has no fitness location saved, ask api if one exists
-    if (gameState.fitnessLocation) {
+    if (!gameState.fitnessLocation) {
       getFitnessLocations()
         .then(fitnessLocations => {
           if (fitnessLocations.length <= 0) {
@@ -132,7 +135,6 @@ export const Game = ({screen, setScreen, gameState, setGameState, lastVisit, req
   }, [isLoggedIn])
 
   useEffect(() => {
-    // If user has fitness location, ask to track foreground location
     if (!gameState.fitnessLocation) {
       return
     }
@@ -193,6 +195,7 @@ export const Game = ({screen, setScreen, gameState, setGameState, lastVisit, req
       return (
         <MiscellaneousScreen
           setScreen={setScreen}
+          gameState={gameState}
           setGameState={setGameState}
         />
       )

@@ -9,7 +9,7 @@ import { Header } from "../components/Header";
 import Screen from "../enums/Screen";
 import { Camera } from 'expo-camera';
 import { window } from '../util/Window'
-import { requestForegroundPermissionsAsync, getCurrentPositionAsync, LocationObject } from 'expo-location'
+import { requestForegroundPermissionsAsync, getCurrentPositionAsync, LocationObject, requestBackgroundPermissionsAsync, startLocationUpdatesAsync, Accuracy, stopLocationUpdatesAsync } from 'expo-location'
 import { Feather } from "@expo/vector-icons";
 import Center from "../components/Center";
 import colors from "../../assets/colors/colors";
@@ -17,7 +17,8 @@ import { TouchableOpacity } from "react-native-gesture-handler";
 import { manipulateAsync } from 'expo-image-manipulator'
 import { WorkoutReward } from "../components/WorkoutReward";
 import { createFitnessLocation, getFitnessLocations, updateFitnessLocation } from "../api/fitness-locations";
-import { FitnessLocation } from '../../../fitness-incremental-shared/src/fitness-locations.interface'
+import { FitnessLocation } from "../shared/fitness-locations.interface";
+import { BackgroundTask } from "../types/BackgroundTask";
 
 const base64ToImageUri = (base64: string) => {
   return 'data:image/jpeg;base64,' + base64
@@ -68,10 +69,15 @@ export const WorkoutScreen = ({setScreen, gameState, setGameState, currentLocati
     setHasForegroundLocationPermission(foregroundResponse.status === 'granted')
   }
 
+  const requestAndSetBackgroundLocationPermission = async () => {
+    const backgroundResponse = await requestBackgroundPermissionsAsync()
+    setHasBackgroundLocationPermission(backgroundResponse.status === 'granted')
+  }
+
   const requestPermissions = (async () => {
     await requestAndSetCameraPermission()
     await requestAndSetForegroundLocationPermission()
-    // TODO: Background permissions
+    await requestAndSetBackgroundLocationPermission()
   })
 
   const takePicture = () => {
@@ -154,6 +160,23 @@ export const WorkoutScreen = ({setScreen, gameState, setGameState, currentLocati
     getAndSetFitnessLocation()
   }, [])
 
+  useEffect(() => {
+    console.log('hasBackgroundLocationPermission', hasBackgroundLocationPermission)
+    if (hasBackgroundLocationPermission) {
+      (async () => {
+        await stopLocationUpdatesAsync(BackgroundTask.LocationUpdate)
+        await startLocationUpdatesAsync(BackgroundTask.LocationUpdate, {
+          accuracy: Accuracy.Lowest,
+          foregroundService: {
+            notificationTitle: 'GPS',
+            notificationBody: 'enabled',
+            notificationColor: '#0000FF',
+          }
+        })
+      })()
+    }
+  }, [hasBackgroundLocationPermission])
+
   if (!isTakingPicture) {
     return (
       <SafeAreaView style={styles.container}>
@@ -223,7 +246,7 @@ export const WorkoutScreen = ({setScreen, gameState, setGameState, currentLocati
 
   return (
     <SafeAreaView style={styles.container}>
-      { !photoAndLocation && hasCameraPermission && hasForegroundLocationPermission && hasBackgroundLocationPermission && 
+      { !photoAndLocation && hasCameraPermission && hasForegroundLocationPermission && 
         <View style={styles.window}>
           <Camera
             style={styles.window}

@@ -6,7 +6,7 @@ import { BottomBar } from "../components/BottomBar";
 import { Button } from "../components/Button";
 import { Header } from "../components/Header";
 import Screen from "../enums/Screen";
-import { FitnessLocation } from "../../../fitness-incremental-shared/src/fitness-locations.interface"
+import { FitnessLocation } from "../shared/fitness-locations.interface"
 import colors from "../../assets/colors/colors";
 import { getAllUnverifiedFitnessLocations, updateFitnessLocation } from "../api/fitness-locations";
 

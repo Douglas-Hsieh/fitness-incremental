@@ -1,6 +1,6 @@
 import { LocationObject } from "expo-location"
 import React, { useState, useEffect } from "react"
-import { GameState, INITIAL_STEPS_UNTIL_NEXT_RANDOM_REWARD } from "../../assets/data/GameState"
+import { GameState } from "../../assets/data/GameState"
 import { GENERATORS } from "../../assets/data/Generators"
 import { numberToHumanFormat } from "../math/formatting"
 import { calculateOneTickBaseRevenue } from "../math/revenue"
@@ -8,7 +8,7 @@ import { generateRandomReward, Reward, generateInstantBonus, generateTemporaryMu
 import RewardModalDetails from "../types/RewardModalDetails"
 import { Overlay } from "./Overlay"
 import { RewardModal } from "./RewardModal"
-import haversine from 'haversine';
+import { canReceiveWorkoutReward } from "../math/workout-reward"
 
 interface WorkoutReward {
   gameState: GameState;
@@ -23,72 +23,12 @@ export const WorkoutReward = ({gameState, setGameState, currentLocation}: Workou
   const [showRewardModal, setShowRewardModal] = useState<boolean>(false)
 
   useEffect(() => {
-    if (gameState.stepsUntilNextRandomReward > 0) {
-      return
-    }
-
-    const reward = generateRandomReward()
-    let title: string, body: string
-
-    if (reward === Reward.Nothing) {
-      setGameState({
-        ...gameState,
-        stepsUntilNextRandomReward: INITIAL_STEPS_UNTIL_NEXT_RANDOM_REWARD,
-      })
-      title = 'Nothing :('
-      body = 'Better luck next time...'
-
-    } else if (reward === Reward.InstantBonus) {
-      const oneTickBaseRevenue = calculateOneTickBaseRevenue(GENERATORS, gameState)
-      const bonus = generateInstantBonus(oneTickBaseRevenue)
-      const [coefficient, scale] = numberToHumanFormat(bonus)
-      setGameState({
-        ...gameState,
-        stepsUntilNextRandomReward: INITIAL_STEPS_UNTIL_NEXT_RANDOM_REWARD,
-        balance: gameState.balance + bonus,
-        lifetimeEarnings: gameState.lifetimeEarnings + bonus,
-      })
-      title = 'Instant Bonus'
-      body = `You just gained ${coefficient} ${scale} steps!`
-
-    } else {
-      const temporaryMultiplier = generateTemporaryMultiplier()
-      setGameState({
-        ...gameState,
-        stepsUntilNextRandomReward: INITIAL_STEPS_UNTIL_NEXT_RANDOM_REWARD,
-        temporaryMultipliers: gameState.temporaryMultipliers.add(temporaryMultiplier),
-      })
-      title = 'Temporary Multiplier'
-      body = `You will produce x${temporaryMultiplier.multiplier} as much for 24 hours!`
-    }
-
-    setRewardModalDetails({
-      reward: reward,
-      title: title,
-      body: body,
-    })
-    setShowOverlay(true)
-    setShowRewardModal(true)
-
-  }, [gameState.stepsUntilNextRandomReward])
-
-  useEffect(() => {
     if (!fitnessLocation || !currentLocation) {
       return
     }
-
-    const fitnessLocationLatLng = {
-      longitude: fitnessLocation.coordinates[0],
-      latitude: fitnessLocation.coordinates[1],
-    }
-
-    const isNearFitnessLocation = haversine(fitnessLocationLatLng, currentLocation.coords, { unit: 'mile', threshold: 0.1})
-
-    const EIGHT_HOURS_MS = 8 * 60 * 60 * 1000
     const now = new Date()
-    const diffTime = Math.abs(now.getTime() - gameState.lastWorkoutRewardTime.getTime())
 
-    if (fitnessLocation.isVerified && isNearFitnessLocation && diffTime > EIGHT_HOURS_MS) {
+    if (canReceiveWorkoutReward(fitnessLocation, currentLocation, gameState.lastWorkoutRewardTime, now)) {
       const reward = generateRandomReward()
       let title: string, body: string
   

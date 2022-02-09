@@ -1,9 +1,10 @@
 import { Map, Set } from 'immutable';
-import { FitnessLocation } from '../../../fitness-incremental-shared/src/fitness-locations.interface';
+import { FitnessLocation } from '../../src/shared/fitness-locations.interface';
 import { TemporaryMultiplier } from '../../src/types/TemporaryMultiplier';
 import { GeneratorState, INITIAL_GENERATOR_STATE_BY_ID } from './GeneratorState';
 import 'react-native-get-random-values';  // hacky: must be before uuid import
-import { User } from '../../../fitness-incremental-shared/src/users.interface';
+import { User } from '../../src/shared/users.interface';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export class GameState {
   user: User | undefined;
@@ -21,6 +22,7 @@ export class GameState {
   temporaryMultipliers: Set<TemporaryMultiplier>;
   fitnessLocation: FitnessLocation | null;
   lastWorkoutRewardTime: Date;
+  lastPushNotificationTime: Date;
 
   constructor (
     user: User | undefined,
@@ -38,6 +40,7 @@ export class GameState {
     temporaryMultipliers: Set<TemporaryMultiplier>,
     fitnessLocation: FitnessLocation | null,
     lastWorkoutRewardTime: Date,
+    lastPushNotificationTime: Date,
   ) {
     this.user = user
     this.balance = balance
@@ -54,6 +57,7 @@ export class GameState {
     this.temporaryMultipliers = temporaryMultipliers
     this.fitnessLocation = fitnessLocation
     this.lastWorkoutRewardTime = lastWorkoutRewardTime
+    this.lastPushNotificationTime = lastPushNotificationTime
   }
 
   static fromJson(gameStateString: string) {
@@ -74,19 +78,28 @@ export class GameState {
       Set(obj.temporaryMultipliers),
       obj.fitnessLocation,
       obj.lastWorkoutRewardTime === undefined ? INITIAL_LAST_WORKOUT_REWARD_TIME : new Date(obj.lastWorkoutRewardTime),  // handling old saves
+      obj.lastPushNotificationTime === undefined ? INITIAL_LAST_PUSH_NOTIFICATION_TIME : new Date(obj.lastPushNotificationTime)
     )
+  }
+
+  static load = async () => {
+    const gameStateString = await AsyncStorage.getItem('gameState')
+    const gameState = gameStateString ? GameState.fromJson(gameStateString) : INITIAL_GAME_STATE
+    return gameState
+  }
+
+  static save = async (gameState: GameState) => {
+    AsyncStorage.setItem('gameState', JSON.stringify(gameState))
   }
 }
 
 export const INITIAL_USER = undefined
-// export const INITIAL_BALANCE = 0
 export const INITIAL_BALANCE = 1e+50
 export const INITIAL_PRESTIGE = 0
-// export const INITIAL_PRESTIGE = 1e+50
 export const INITIAL_STEPS_UNTIL_NEXT_RANDOM_REWARD = 5000
 const INITIAL_TICKS = 1e+5
-// const INITIAL_TICKS = 1000
 const INITIAL_LAST_WORKOUT_REWARD_TIME = new Date(0)
+const INITIAL_LAST_PUSH_NOTIFICATION_TIME = new Date(0)
 
 export const INITIAL_GAME_STATE = new GameState(
   INITIAL_USER,
@@ -104,4 +117,5 @@ export const INITIAL_GAME_STATE = new GameState(
   Set(),
   null,
   INITIAL_LAST_WORKOUT_REWARD_TIME,
+  INITIAL_LAST_PUSH_NOTIFICATION_TIME,
 )
