@@ -1,7 +1,8 @@
 import { User } from "../shared/users.interface"
-import { SERVER_URL } from "../config"
+import { API_URL } from "../config"
+import path from 'path'
 
-export const endpoint = `${SERVER_URL}/users`
+const endpoint = path.join(API_URL, 'users')
 
 export const getUser = async (userId: string): Promise<User> => {
   return fetch(`${endpoint}/${userId}`)

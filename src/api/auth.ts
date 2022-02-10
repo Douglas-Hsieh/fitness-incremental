@@ -1,6 +1,6 @@
-import { SERVER_URL } from "../config"
+import { API_URL } from "../config"
 
-const endpoint = `${SERVER_URL}`
+const endpoint = API_URL
 
 export const logIn = async (uuid: string) => {
   return await fetch(`${endpoint}/login`, {

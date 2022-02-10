@@ -5,12 +5,22 @@
   "build": {
     "development": {
       "developmentClient": true,
-      "distribution": "internal"
+      "distribution": "internal",
+      "env": {
+        "API_URL": "http://localhost:3000"
+      }
     },
     "preview": {
-      "distribution": "internal"
+      "distribution": "internal",
+      "env": {
+        "API_URL": "https://fitness-incremental-api-c3rpt.ondigitalocean.app"
+      }
     },
-    "production": {}
+    "production": {
+      "env": {
+        "API_URL": "https://fitness-incremental-api-c3rpt.ondigitalocean.app"
+      }
+    }
   },
   "submit": {
     "production": {}

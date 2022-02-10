@@ -1,7 +1,8 @@
 import { FitnessLocation } from "../shared/fitness-locations.interface"
-import { SERVER_URL } from "../config"
+import { API_URL } from "../config"
+import path from 'path'
 
-export const endpoint = `${SERVER_URL}/fitness-locations`
+const endpoint = path.join(API_URL, 'fitness-locations')
 
 export const getFitnessLocations = async (): Promise<FitnessLocation[]> => {
   return fetch(`${endpoint}`)
@@ -10,7 +11,7 @@ export const getFitnessLocations = async (): Promise<FitnessLocation[]> => {
 }
 
 export const getAllUnverifiedFitnessLocations = async () => {
-  return fetch(`${SERVER_URL}/fitness-locations/isVerified/null`)
+  return fetch(`${API_URL}/fitness-locations/isVerified/null`)
     .then(res => {
       if (!res.ok) {
         throw new Error('Are you an admin?')
