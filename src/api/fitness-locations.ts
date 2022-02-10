@@ -1,5 +1,5 @@
 import { FitnessLocation } from "../shared/fitness-locations.interface"
-import { API_URL } from "../config"
+import { API_URL } from "../config/config"
 import path from 'path'
 
 const endpoint = path.join(API_URL, 'fitness-locations')

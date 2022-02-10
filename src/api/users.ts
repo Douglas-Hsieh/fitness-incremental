@@ -1,5 +1,5 @@
 import { User } from "../shared/users.interface"
-import { API_URL } from "../config"
+import { API_URL } from "../config/config"
 import path from 'path'
 
 const endpoint = path.join(API_URL, 'users')

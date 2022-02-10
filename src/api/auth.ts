@@ -1,4 +1,4 @@
-import { API_URL } from "../config"
+import { API_URL } from "../config/config"
 
 const endpoint = API_URL
 
