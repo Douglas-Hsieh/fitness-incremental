@@ -9,7 +9,6 @@ import { AppState } from 'react-native';
 
 export const handleLocationUpdate = async ({ data: { locations }, error }) => {
   console.log(`Location Update Task: ${new Date(Date.now()).toISOString()}` );
-  console.log('AppState.currentState', AppState.currentState)
 
   if (AppState.currentState == 'active') {
     return
@@ -60,7 +59,6 @@ export const handleLocationUpdate = async ({ data: { locations }, error }) => {
 
 export const handleStepRewardNotificationTask = async () => {  
   console.log(`Step Reward Notification Task: ${new Date(Date.now()).toISOString()}`)
-  console.log('AppState.currentState', AppState.currentState)
   
   if (AppState.currentState == 'active') {
     return
@@ -105,7 +103,6 @@ export const handleStepRewardNotificationTask = async () => {
 
 export const handleWorkoutRewardNotificationTask = async () => {
   console.log(`Workout Reward Notification Task: ${new Date(Date.now()).toISOString()}`)
-  console.log('AppState.currentState', AppState.currentState)
 
   if (AppState.currentState == 'active') {
     return

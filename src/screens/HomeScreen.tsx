@@ -21,7 +21,7 @@ import { StepReward } from "../components/StepReward";
 interface HomeScreenProps {
   setScreen: (screen: Screen) => void;
   gameState: GameState;
-  setGameState: (gameState: GameState) => void;
+  setGameState: React.Dispatch<React.SetStateAction<GameState>>;
 }
 
 export const HomeScreen = ({setScreen, gameState, setGameState}: HomeScreenProps) => {
@@ -77,10 +77,10 @@ export const HomeScreen = ({setScreen, gameState, setGameState}: HomeScreenProps
     const oldUnlockIds = gameState.unlockIds
     const unlocks = calculateUnlocksFromGenerators(gameState.generatorStateById)
     const unlockIds = Set(unlocks.map(unlock => getUnlockId(unlock)))
-    setGameState({
-      ...gameState,
+    setGameState(prevGameState => ({
+      ...prevGameState,
       unlockIds: unlockIds,
-    })
+    }))
 
     const newUnlockIds = Set([...unlockIds].filter(unlockId => !oldUnlockIds.has(unlockId)))
     if (newUnlockIds.size > 0) {

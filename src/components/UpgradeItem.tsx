@@ -15,7 +15,7 @@ export interface UpgradeItemProps {
   currency: Currency;
   image: any;
   gameState: GameState;
-  setGameState: (gameState: GameState) => void;
+  setGameState: React.Dispatch<React.SetStateAction<GameState>>;
 }
 
 export const UpgradeItem = ({upgradeId, title, description, price, currency, image, gameState, setGameState}: UpgradeItemProps) => {
@@ -32,17 +32,17 @@ export const UpgradeItem = ({upgradeId, title, description, price, currency, ima
       const upgradeIds = gameState.upgradeIds.add(upgradeId);
 
       if (currency === Currency.Cash) {
-        setGameState({
-          ...gameState,
+        setGameState(prevGameState => ({
+          ...prevGameState,
           balance: gameState.balance - price,
           upgradeIds: upgradeIds,
-        })
+        }))
       } else {
-        setGameState({
-          ...gameState,
+        setGameState(prevGameState => ({
+          ...prevGameState,
           prestige: gameState.prestige - price,
           upgradeIds: upgradeIds,
-        })
+        }))
       }
       playSound(SoundFile.CashRegister)
 

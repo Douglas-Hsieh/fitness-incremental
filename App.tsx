@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import GoogleFit from 'react-native-google-fit'
 import useCachedResources from './hooks/useCachedResources';
 import EStyleSheet from 'react-native-extended-stylesheet';
-import { GameState } from './assets/data/GameState';
+import { GameState, INITIAL_GAME_STATE } from './assets/data/GameState';
 import Screen from './src/enums/Screen';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Game } from './src/Game';
@@ -22,7 +22,7 @@ export default function App() {
   const [lastVisit, setLastVisit] = useState<LastVisit>()
 
   const [screen, setScreen] = useState<Screen>(Screen.WelcomeBack);
-  const [gameState, setGameState] = useState<GameState>();
+  const [gameState, setGameState] = useState<GameState>(INITIAL_GAME_STATE);
 
   const requestAuthorizationFromGoogleFit = () => {
     GoogleFit.authorize(GOOGLE_FIT_AUTHORIZATION_OPTIONS)
@@ -72,11 +72,12 @@ export default function App() {
     }
   }, [isAuthorized])
 
-  if (!isLoadingComplete || !gameState || !lastVisit) {
+  if (!isLoadingComplete || !gameState || !setGameState || !lastVisit) {
     return (<Center>
-      <Text>isLoadingComplete: {!!isLoadingComplete}</Text>
-      <Text>gameState: {!!gameState}</Text>
-      <Text>lastVisit: {!!lastVisit}</Text>
+      <Text>isLoadingComplete: {(!!isLoadingComplete).toString()}</Text>
+      <Text>gameState: {(!!gameState).toString()}</Text>
+      <Text>setGameState: {(!!setGameState).toString()}</Text>
+      <Text>lastVisit: {(!!lastVisit).toString()}</Text>
     </Center>);
   }
 

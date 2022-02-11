@@ -12,7 +12,7 @@ import { getAllUnverifiedFitnessLocations, updateFitnessLocation } from "../api/
 
 interface FitnessLocationAdminScreen {
   setScreen: (screen: Screen) => void;
-  setGameState: (gameState: GameState) => void;
+  setGameState: React.Dispatch<React.SetStateAction<GameState>>;
 }
 
 export const FitnessLocationAdminScreen = ({setScreen, setGameState}: FitnessLocationAdminScreen) => {

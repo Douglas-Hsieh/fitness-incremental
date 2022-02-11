@@ -12,7 +12,7 @@ import Screen from "../enums/Screen";
 interface MiscellaneousScreenProps {
   setScreen: (screen: Screen) => void;
   gameState: GameState;
-  setGameState: (gameState: GameState) => void;
+  setGameState: React.Dispatch<React.SetStateAction<GameState>>;
 }
 
 export const MiscellaneousScreen = ({setScreen, gameState, setGameState}: MiscellaneousScreenProps) => {

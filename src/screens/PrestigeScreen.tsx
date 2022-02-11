@@ -24,7 +24,7 @@ const PrestigeIcon = memo(() => (
 interface PrestigeScreenProps {
   setScreen: (screen: Screen) => void;
   gameState: GameState;
-  setGameState: (gameState: GameState) => void;
+  setGameState: React.Dispatch<React.SetStateAction<GameState>>;
 }
 
 export const PrestigeScreen = ({setScreen, gameState, setGameState}: PrestigeScreenProps) => {
@@ -37,8 +37,8 @@ export const PrestigeScreen = ({setScreen, gameState, setGameState}: PrestigeScr
     const prestigeAfterReset = gameState.prestige + earnedPrestige
 
     // https://adventure-capitalist.fandom.com/wiki/Angel_Investors
-    setGameState({
-      ...gameState,
+    setGameState(prevGameState => ({
+      ...prevGameState,
       balance: INITIAL_BALANCE,
       prestige: prestigeAfterReset,
       spentPrestige: 0,
@@ -46,7 +46,7 @@ export const PrestigeScreen = ({setScreen, gameState, setGameState}: PrestigeScr
       generatorStateById: INITIAL_GENERATOR_STATE_BY_ID,
       upgradeIds: Set(),
       unlockIds: Set(),
-    })
+    }))
   }
 
   const [prestigeCoeff, prestigeScale] = numberToHumanFormat(gameState.prestige)

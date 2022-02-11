@@ -26,7 +26,7 @@ const GeneratorIcon = memo((props: {image: any}) => {
 
 interface BuyGeneratorButtonProps {
   gameState: GameState;
-  setGameState: (gameState: GameState) => void;
+  setGameState: React.Dispatch<React.SetStateAction<GameState>>;
   generator: Generator;
   generatorState: GeneratorState;
   amount: number;
@@ -46,11 +46,11 @@ const BuyGeneratorButton = ({gameState, setGameState, generator, amount, price, 
       const newGeneratorState = Object.assign({}, generatorState, {owned: generatorState.owned + amount})
       const generatorStateById = gameState.generatorStateById.set(generator.id, newGeneratorState);
 
-      setGameState({
-        ...gameState,
+      setGameState(prevGameState => ({
+        ...prevGameState,
         balance: gameState.balance - price,
         generatorStateById: generatorStateById,
-      })
+      }))
 
       playSound(SoundFile.MenuSelectionClick)
     }
@@ -76,7 +76,7 @@ const BuyGeneratorButton = ({gameState, setGameState, generator, amount, price, 
 
 interface GeneratorListProps {
   gameState: GameState;
-  setGameState: (gameState: GameState) => void;
+  setGameState: React.Dispatch<React.SetStateAction<GameState>>;
   priceByGeneratorId: Map<string, number>;
   maxBuyByGeneratorId: Map<string, number>;
   buyAmount: BuyAmount;

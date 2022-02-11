@@ -45,7 +45,7 @@ const ExitCameraIcon = ({onPress}: ExitCameraIconProps) => (
 interface WorkoutScreenProps {
   setScreen: (screen: Screen) => void;
   gameState: GameState;
-  setGameState: (gameState: GameState) => void;
+  setGameState: React.Dispatch<React.SetStateAction<GameState>>;
   currentLocation: LocationObject | undefined;
 }
 
@@ -108,10 +108,7 @@ export const WorkoutScreen = ({setScreen, gameState, setGameState, currentLocati
     getFitnessLocations()
       .then(fitnessLocations => {
         if (fitnessLocations.length > 0)
-        setGameState({
-          ...gameState,
-          fitnessLocation: fitnessLocations[0],
-        }
+        setGameState(prevGameState => ({ ...prevGameState,fitnessLocation: fitnessLocations[0], })
       )})
       .catch(error => {
         alert(error)

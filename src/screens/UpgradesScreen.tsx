@@ -16,7 +16,7 @@ import { Currency } from "../enums/Currency";
 
 interface UpgradesListProps {
   gameState: GameState;
-  setGameState: (gameState: GameState) => void;
+  setGameState: React.Dispatch<React.SetStateAction<GameState>>;
   currency: Currency;
 }
 
@@ -72,7 +72,7 @@ const UpgradesList = ({gameState, setGameState, currency}: UpgradesListProps) =>
 interface UpgradesScreenProps {
   setScreen: (screen: Screen) => void;
   gameState: GameState;
-  setGameState: (gameState: GameState) => void;
+  setGameState: React.Dispatch<React.SetStateAction<GameState>>;
 }
 
 export const UpgradesScreen = ({setScreen, gameState, setGameState}: UpgradesScreenProps) => {

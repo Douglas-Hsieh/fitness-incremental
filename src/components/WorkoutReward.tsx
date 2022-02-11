@@ -12,7 +12,7 @@ import { canReceiveWorkoutReward } from "../math/workout-reward"
 
 interface WorkoutReward {
   gameState: GameState;
-  setGameState: (gameState: GameState) => void;
+  setGameState: React.Dispatch<React.SetStateAction<GameState>>;
   currentLocation: LocationObject | undefined;
 }
 
@@ -33,10 +33,10 @@ export const WorkoutReward = ({gameState, setGameState, currentLocation}: Workou
       let title: string, body: string
   
       if (reward === Reward.Nothing) {
-        setGameState({
-          ...gameState,
+        setGameState(prevGameState => ({
+          ...prevGameState,
           lastWorkoutRewardTime: now,
-        })
+        }))
         title = 'Nothing :('
         body = 'Better luck next time...'
   
@@ -44,22 +44,22 @@ export const WorkoutReward = ({gameState, setGameState, currentLocation}: Workou
         const oneTickBaseRevenue = calculateOneTickBaseRevenue(GENERATORS, gameState)
         const bonus = generateInstantBonus(oneTickBaseRevenue)
         const [coefficient, scale] = numberToHumanFormat(bonus)
-        setGameState({
-          ...gameState,
+        setGameState(prevGameState => ({
+          ...prevGameState,
           lastWorkoutRewardTime: now,
           balance: gameState.balance + bonus,
           lifetimeEarnings: gameState.lifetimeEarnings + bonus,
-        })
+        }))
         title = 'Instant Bonus'
         body = `You just gained ${coefficient} ${scale} steps!`
   
       } else {
         const temporaryMultiplier = generateTemporaryMultiplier()
-        setGameState({
-          ...gameState,
+        setGameState(prevGameState => ({
+          ...prevGameState,
           lastWorkoutRewardTime: now,
           temporaryMultipliers: gameState.temporaryMultipliers.add(temporaryMultiplier),
-        })
+        }))
         title = 'Temporary Multiplier'
         body = `You will produce x${temporaryMultiplier.multiplier} as much for 24 hours!`
       }

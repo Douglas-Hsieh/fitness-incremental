@@ -23,7 +23,7 @@ interface GameProps {
   screen: Screen;
   setScreen: (screen: Screen) => void;
   gameState: GameState;
-  setGameState: (gameState: GameState) => void;
+  setGameState: React.Dispatch<React.SetStateAction<GameState>>;
   lastVisit: LastVisit;
   isAuthorized: boolean;
   requestAuthorizationFromGoogleFit: () => void;
@@ -39,7 +39,7 @@ export const Game = ({screen, setScreen, gameState, setGameState, lastVisit, req
     const getAndSetUser = async () => {
       if (!gameState.user) {
         const user = await createUser();
-        setGameState({ ...gameState, user: user })
+        setGameState(prevGameState => ({ ...prevGameState, user: user, }))
       }
     }
     getAndSetUser()
@@ -49,7 +49,7 @@ export const Game = ({screen, setScreen, gameState, setGameState, lastVisit, req
     if (gameState.user && !isLoggedIn) {
       logIn(gameState.user.uuid)
         .then((user) => {
-          setGameState({ ...gameState, user: user })
+          setGameState(prevGameState => ({ ...prevGameState, user: user, }))
           setIsLoggedIn(true)
         })
     }
@@ -75,15 +75,15 @@ export const Game = ({screen, setScreen, gameState, setGameState, lastVisit, req
     console.log('ticksToUse since last visit', ticksToUseTotal)
     console.log('revenue since last visit', revenue)
 
-    setGameState({
-      ...gameState,
+    setGameState(prevGameState => ({
+      ...prevGameState,
       stepsUntilNextRandomReward: gameState.stepsUntilNextRandomReward - lastVisit.steps,
       ticks: gameState.ticks + ticks - ticksToUseTotal,
       generatorStateById: generatorStateById,
       balance: gameState.balance + revenue,
       lifetimeEarnings: gameState.lifetimeEarnings + revenue,
-    })
-  }, [lastVisit])
+    }))
+  }, [])
 
   useInterval(() => {
     // Generators progress and generate revenue using ticks
@@ -93,13 +93,13 @@ export const Game = ({screen, setScreen, gameState, setGameState, lastVisit, req
     }
     const {generatorStateById, revenue} = progressGenerators(gameState, ticksToUse)
 
-    setGameState({
-      ...gameState,
+    setGameState(prevGameState => ({
+      ...prevGameState,
       ticks: gameState.ticks - ticksToUse,
       generatorStateById: generatorStateById,
       balance: gameState.balance + revenue,
       lifetimeEarnings: gameState.lifetimeEarnings + revenue,
-    })
+    }))
 
     console.log('ticksToUse', ticksToUse)
     console.log('revenue', revenue)
@@ -122,10 +122,7 @@ export const Game = ({screen, setScreen, gameState, setGameState, lastVisit, req
           if (fitnessLocations.length <= 0) {
             return;
           }
-          setGameState({
-            ...gameState,
-            fitnessLocation: fitnessLocations[0],
-          })
+          setGameState(prevGameState => ({ ...prevGameState, fitnessLocation: fitnessLocations[0], }))
         })
     }
 
