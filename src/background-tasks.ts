@@ -79,6 +79,11 @@ export const handleStepRewardNotificationTask = async () => {
     return
   }
 
+  // Between 5-6PM local time
+  if (!(new Date().getHours() == 17)) {
+    return
+  }
+
   Notifications.scheduleNotificationAsync({
     content: {
       title: "You just took 5000 steps!",
@@ -124,6 +129,11 @@ export const handleWorkoutRewardNotificationTask = async () => {
     return
   }
 
+  // Between 5-6PM local time
+  if (!(new Date().getHours() == 17)) {
+    return
+  }
+
   Notifications.scheduleNotificationAsync({
     content: {
       title: "Workout and get rewarded!",
@@ -160,6 +170,11 @@ export const handleHighBalanceNotificationTask = async () => {
 
   const oneDayBefore = new Date(Date.now() - 86400000)
   if (oneDayBefore < lastPushNotificationTime) {
+    return
+  }
+
+  // Between 5-6PM local time
+  if (!(new Date().getHours() == 17)) {
     return
   }
 
