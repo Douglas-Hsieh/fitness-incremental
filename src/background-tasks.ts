@@ -5,8 +5,16 @@ import { canReceiveWorkoutReward } from "./math/workout-reward";
 import { GameState } from "../assets/data/GameState";
 import { BackgroundTask } from './types/BackgroundTask';
 import * as TaskManager from 'expo-task-manager';
+import { AppState } from 'react-native';
 
 export const handleLocationUpdate = async ({ data: { locations }, error }) => {
+  console.log(`Location Update Task: ${new Date(Date.now()).toISOString()}` );
+  console.log('AppState.currentState', AppState.currentState)
+
+  if (AppState.currentState == 'active') {
+    return
+  }
+
   if (error) {
     console.error(error);
     return;
@@ -14,25 +22,35 @@ export const handleLocationUpdate = async ({ data: { locations }, error }) => {
 
   const [location] = locations;
   try {
-    console.log(`Location Update Task: ${new Date(Date.now()).toISOString()}` );
-
     const gameState = await GameState.load()
-    const { fitnessLocation, lastWorkoutRewardTime } = gameState
+    const { fitnessLocation, lastWorkoutRewardTime, lastPushNotificationTime } = gameState
     if (!fitnessLocation || !fitnessLocation.isVerified) {
       return
     }
 
-    if (canReceiveWorkoutReward(fitnessLocation, location, lastWorkoutRewardTime, new Date())) {
-      Notifications.scheduleNotificationAsync({
-        content: {
-          title: "You made it to the gym!",
-          body: "Claim your workout reward",
-        },
-        trigger: {
-          seconds: 5,
-        }
-      })
+    const oneDayBefore = new Date(Date.now() - 86400000)
+    if (oneDayBefore < lastPushNotificationTime) {
+      return
     }
+
+    if (canReceiveWorkoutReward(fitnessLocation, location, lastWorkoutRewardTime, new Date())) {
+      return
+    }
+
+    Notifications.scheduleNotificationAsync({
+      content: {
+        title: "You made it to the gym!",
+        body: "Claim your workout reward",
+      },
+      trigger: {
+        seconds: 5,
+      }
+    }).then(() => {
+      GameState.save({
+        ...gameState,
+        lastPushNotificationTime: new Date(),
+      })
+    })
 
   } catch (err) {
     console.error(err);
@@ -40,59 +58,108 @@ export const handleLocationUpdate = async ({ data: { locations }, error }) => {
   
 }
 
-export const handleStepRewardNotificationTask = async () => {
+export const handleStepRewardNotificationTask = async () => {  
   console.log(`Step Reward Notification Task: ${new Date(Date.now()).toISOString()}`)
+  console.log('AppState.currentState', AppState.currentState)
+  
+  if (AppState.currentState == 'active') {
+    return
+  }
 
   const gameState = await GameState.load()
   const lastVisit = await loadLastVisit()
   
-  const stepsUntilNextRandomReward = gameState.stepsUntilNextRandomReward - lastVisit.steps
-  if (stepsUntilNextRandomReward <= 0) {
-    Notifications.scheduleNotificationAsync({
-      content: {
-        title: "You just took 5000 steps!",
-        body: "You've been given a random reward",
-      },
-      trigger: {
-        seconds: 5,
-      }
-    })
+  const oneDayBefore = new Date(Date.now() - 86400000)
+  if (oneDayBefore < gameState.lastPushNotificationTime) {
+    return
   }
+
+  const stepsUntilNextRandomReward = gameState.stepsUntilNextRandomReward - lastVisit.steps
+  if (stepsUntilNextRandomReward > 0) {
+    return
+  }
+
+  Notifications.scheduleNotificationAsync({
+    content: {
+      title: "You just took 5000 steps!",
+      body: "You've been given a random reward",
+    },
+    trigger: {
+      seconds: 5,
+    }
+  }).then(() => {
+    GameState.save({
+      ...gameState,
+      lastPushNotificationTime: new Date(),
+    })
+  })
+
 
   return BackgroundFetch.BackgroundFetchResult.NewData
 }
 
 export const handleWorkoutRewardNotificationTask = async () => {
   console.log(`Workout Reward Notification Task: ${new Date(Date.now()).toISOString()}`)
+  console.log('AppState.currentState', AppState.currentState)
 
-  const gameState = await GameState.load()
-  const twoDaysBefore = new Date(Date.now() - 2 * 86400000)
-
-  if (!gameState.fitnessLocation) {
+  if (AppState.currentState == 'active') {
     return
   }
 
-  if (gameState.lastWorkoutRewardTime < twoDaysBefore) {
-    // More than 48 hours since visiting fitness location
-    Notifications.scheduleNotificationAsync({
-      content: {
-        title: "Workout and get rewarded!",
-        body: "Visit your fitness center today for the chance of receiving a random reward!"
-      },
-      trigger: {
-        seconds: 5,
-      }
-    })
+  const gameState = await GameState.load()
+
+  const { fitnessLocation, lastPushNotificationTime, lastWorkoutRewardTime} = await GameState.load()
+  const twoDaysBefore = new Date(Date.now() - 2 * 86400000)
+
+  if (!fitnessLocation) {
+    return
   }
+
+  const oneDayBefore = new Date(Date.now() - 86400000)
+  if (oneDayBefore < lastPushNotificationTime) {
+    return
+  }
+
+  if (twoDaysBefore < lastWorkoutRewardTime) {
+    return
+  }
+
+  Notifications.scheduleNotificationAsync({
+    content: {
+      title: "Workout and get rewarded!",
+      body: "Visit your fitness center today for the chance of receiving a random reward!"
+    },
+    trigger: {
+      seconds: 5,
+    }
+  }).then(() => {
+    GameState.save({
+      ...gameState,
+      lastPushNotificationTime: new Date(),
+    })
+  })
 
   return BackgroundFetch.BackgroundFetchResult.NewData
 }
 
 export const handleHighBalanceNotificationTask = async () => {
   console.log(`High Balance Notification Task: ${new Date(Date.now()).toISOString()}`)
+  console.log('AppState.currentState', AppState.currentState)
+  
+  if (AppState.currentState == 'active') {
+    return
+  }
+  
+  const gameState = await GameState.load()
 
+  const { lastPushNotificationTime } = await GameState.load()
   const lastVisit = await loadLastVisit()
   if (lastVisit.steps < 10000) {
+    return
+  }
+
+  const oneDayBefore = new Date(Date.now() - 86400000)
+  if (oneDayBefore < lastPushNotificationTime) {
     return
   }
 
@@ -104,6 +171,11 @@ export const handleHighBalanceNotificationTask = async () => {
     trigger: {
       seconds: 5,
     }
+  }).then(() => {
+    GameState.save({
+      ...gameState,
+      lastPushNotificationTime: new Date(),
+    })
   })
 
   return BackgroundFetch.BackgroundFetchResult.NewData
@@ -124,18 +196,19 @@ export const unregisterTasks = async () => {
 
 export const registerTasks = async () => {
   console.log('registerTasks')
+  const minimumInterval = 10  // seconds
   BackgroundFetch.registerTaskAsync(BackgroundTask.StepRewardNotification, {
-    minimumInterval: 5,  // seconds
+    minimumInterval: minimumInterval,
     stopOnTerminate: false,  // android only
     startOnBoot: true,  // android only
   })
   BackgroundFetch.registerTaskAsync(BackgroundTask.WorkoutRewardNotification, {
-    minimumInterval: 5,  // seconds
+    minimumInterval: minimumInterval,
     stopOnTerminate: false,  // android only
     startOnBoot: true,  // android only
   })
   BackgroundFetch.registerTaskAsync(BackgroundTask.HighBalanceNotification, {
-    minimumInterval: 5,  // seconds
+    minimumInterval: minimumInterval,
     stopOnTerminate: false,  // android only
     startOnBoot: true,  // android only
   })
