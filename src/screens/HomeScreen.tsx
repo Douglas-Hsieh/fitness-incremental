@@ -21,11 +21,12 @@ interface HomeScreenProps {
   setScreen: (screen: Screen) => void;
   gameState: GameState;
   setGameState: React.Dispatch<React.SetStateAction<GameState>>;
+  buyAmount: BuyAmount;
+  setBuyAmount: React.Dispatch<React.SetStateAction<BuyAmount>>;
 }
 
-export const HomeScreen = ({setScreen, gameState, setGameState}: HomeScreenProps) => {
+export const HomeScreen = ({setScreen, gameState, setGameState, buyAmount, setBuyAmount}: HomeScreenProps) => {
 
-  const [buyAmount, setBuyAmount] = useState<BuyAmount>(BuyAmount.One);
   const [priceOf1ByGeneratorId, setPriceOf1ByGeneratorId] = useState<Map<string,number>>(Map());
   const [priceOf10ByGeneratorId, setPriceOf10ByGeneratorId] = useState<Map<string,number>>(Map());
   const [priceOf100ByGeneratorId, setPriceOf100ByGeneratorId] = useState<Map<string,number>>(Map());

@@ -18,6 +18,7 @@ import { registerForPushNotificationsAsync } from "./push-notifications";
 import { getFitnessLocations } from "./api/fitness-locations";
 import { createUser, updateUser } from "./api/users";
 import { logIn } from "./api/auth";
+import BuyAmount from "./enums/BuyAmount";
 
 interface GameProps {
   screen: Screen;
@@ -34,6 +35,7 @@ export const Game = ({screen, setScreen, gameState, setGameState, lastVisit, req
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
   const [hasForegroundLocationPermission, setHasForegroundLocationPermission] = useState<boolean>()
   const [currentLocation, setCurrentLocation] = useState<LocationObject>();
+  const [buyAmount, setBuyAmount] = useState<BuyAmount>(BuyAmount.One);
 
   useEffect(() => {
     const getAndSetUser = async () => {
@@ -163,6 +165,8 @@ export const Game = ({screen, setScreen, gameState, setGameState, lastVisit, req
           setScreen={setScreen}
           gameState={gameState}
           setGameState={setGameState}
+          buyAmount={buyAmount}
+          setBuyAmount={setBuyAmount}
         />
       )
     case Screen.Upgrades:
