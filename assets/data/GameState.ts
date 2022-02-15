@@ -2,7 +2,6 @@ import { Map, Set } from 'immutable';
 import { FitnessLocation } from '../../src/shared/fitness-locations.interface';
 import { TemporaryMultiplier } from '../../src/types/TemporaryMultiplier';
 import { GeneratorState, INITIAL_GENERATOR_STATE_BY_ID } from './GeneratorState';
-import 'react-native-get-random-values';  // hacky: must be before uuid import
 import { User } from '../../src/shared/users.interface';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
