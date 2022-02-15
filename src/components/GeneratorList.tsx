@@ -32,9 +32,10 @@ interface BuyGeneratorButtonProps {
   amount: number;
   price: number;
   isDisabled: boolean;
+  isLarge: boolean;
 }
 
-const BuyGeneratorButton = ({gameState, setGameState, generator, amount, price, isDisabled}: BuyGeneratorButtonProps) => {
+const BuyGeneratorButton = ({gameState, setGameState, generator, amount, price, isDisabled, isLarge}: BuyGeneratorButtonProps) => {
   const [coefficient, scale] = numberToHumanFormat(price)
   const generatorState = gameState.generatorStateById.get(generator.id)!;
 
@@ -58,7 +59,10 @@ const BuyGeneratorButton = ({gameState, setGameState, generator, amount, price, 
 
   return (
     <TouchableOpacity activeOpacity={.8} disabled={isDisabled} onPress={buyGenerator} touchSoundDisabled={true}>
-      <View style={styles.buyGeneratorButton1}>
+      <View style={[
+        styles.buyGeneratorButton1,
+        isLarge ? { height: styles.buyGeneratorButton1.height * 1.5 } : {},
+      ]}>
         <View style={[styles.buyGeneratorButton2, isDisabled ? {backgroundColor: colors.gray4} : {}]}>
           <View style={styles.buyGeneratorBuyAmountWrapper}>
             <Text style={styles.buyGeneratorBuyText}>Buy</Text>
@@ -107,6 +111,8 @@ export const GeneratorList = ({
         amount = buyAmount.valueOf();
       }
 
+      const ownsSome = generatorState.owned > 0
+
       return (
         <View key={generator.id} style={styles.generatorWrapper}>
           <View style={styles.generatorLeftWrapper}>
@@ -114,7 +120,7 @@ export const GeneratorList = ({
             <UnlockProgressBar generator={generator} generatorState={generatorState}/>
           </View>
           <View style={styles.generatorRightWrapper}>
-            { generatorState.owned > 0 &&
+            { ownsSome &&
               <GeneratorProgressBar generator={generator} gameState={gameState}/>
             }
             <BuyGeneratorButton
@@ -125,6 +131,7 @@ export const GeneratorList = ({
               price={price}
               amount={amount}
               isDisabled={isDisabled}
+              isLarge={!ownsSome}
             />
           </View>
         </View>

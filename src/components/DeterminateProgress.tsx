@@ -31,12 +31,12 @@ export const DeterminateProgress = ({progress}: DeterminateProgressProps) => {
   useEffect(() => {
     if (progress < prevProgress.progress) {
       translateX.value = withSequence(
-        withTiming(endX, { duration: 250, easing: Easing.linear}),
+        withTiming(endX, { duration: 500, easing: Easing.linear}),
         withTiming(startX, { duration: 0 }),
-        withTiming(startX * (1 - progress), { duration: 250 })
+        withTiming(startX * (1 - progress), { duration: 500 })
       )
     } else {
-      translateX.value = withTiming(startX * (1 - progress), { duration: 500, easing: Easing.linear })
+      translateX.value = withTiming(startX * (1 - progress), { duration: 1000, easing: Easing.linear })
     }
     prevProgress.progress = progress
   }, [progress])
