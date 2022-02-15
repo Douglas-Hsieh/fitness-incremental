@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { SafeAreaView, StyleSheet, View } from "react-native";
-import { GameState, INITIAL_GAME_STATE } from "../../assets/data/GameState";
+import { DEBUG_GAME_STATE, GameState, INITIAL_GAME_STATE } from "../../assets/data/GameState";
 import { BackgroundImage } from "../components/BackgroundImage";
 import { BottomBar } from "../components/BottomBar";
 import { Button } from "../components/Button";
@@ -22,6 +22,21 @@ export const MiscellaneousScreen = ({setScreen, gameState, setGameState}: Miscel
     setGameState(INITIAL_GAME_STATE)
   }
 
+  const toggleSpeed = () => {
+    setGameState(prevGameState => ({
+      ...prevGameState,
+      speed: prevGameState.speed === 1 ? 100 : 1,
+    }))
+  }
+
+  const debug = () => {
+    setGameState({
+      ...DEBUG_GAME_STATE,
+      user: gameState.user,
+      fitnessLocation: gameState.fitnessLocation,
+    })
+  }
+
   return (
     <SafeAreaView style={styles.container}>
       <BackgroundImage/>
@@ -31,6 +46,8 @@ export const MiscellaneousScreen = ({setScreen, gameState, setGameState}: Miscel
         { gameState.user && gameState.user.roles.includes('ROLE_ADMIN') &&
           <Center>
             <Button text={'Fitness Locations'} onPress={() => setScreen(Screen.FitnessLocationAdmin)}/>
+            <Button text={`Speed x${gameState.speed}`} onPress={toggleSpeed}/>
+            <Button text={'Debug GameState'} onPress={debug}/>
           </Center>
         }
         <Center>

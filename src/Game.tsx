@@ -66,7 +66,7 @@ export const Game = ({screen, setScreen, gameState, setGameState, lastVisit, req
     let ticksRemaining = gameState.ticks
     let ticksToUseTotal = 0
     for (let i = 0; i < secondsLastVisit; ++i) {
-      const ticksToUse = calculateTicksToUse(ticksRemaining)
+      const ticksToUse = calculateTicksToUse(ticksRemaining, gameState.speed)
       ticksRemaining -= ticksToUse
       ticksToUseTotal += ticksToUse
     }
@@ -87,7 +87,7 @@ export const Game = ({screen, setScreen, gameState, setGameState, lastVisit, req
 
   useInterval(() => {
     // Generators progress and generate revenue using ticks
-    const ticksToUse = calculateTicksToUse(gameState.ticks)
+    const ticksToUse = calculateTicksToUse(gameState.ticks, gameState.speed)
     if (ticksToUse <= 0) {
       return
     }

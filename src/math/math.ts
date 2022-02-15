@@ -2,22 +2,24 @@ import { GENERATORS_BY_ID } from "../../assets/data/Generators"
 import { GameState } from "../../assets/data/GameState"
 import { calculateGeneratorRevenue } from "./revenue"
 
-export const calculateTicksToUse = (ticksRemaining: number): number => {
+export const calculateTicksToUse = (ticksRemaining: number, speed: number): number => {
+  let ticksToUse
   if (ticksRemaining <= 0) {
-    return 0
+    ticksToUse = 0
   } else if (ticksRemaining < 25000) {
-    return .25
+    ticksToUse = .25
   } else if (ticksRemaining < 50000) {
-    return .5
+    ticksToUse = .5
   } else if (ticksRemaining < 100000) {
-    return 1
+    ticksToUse = 1
   } else if (ticksRemaining < 150000) {
-    return 2
+    ticksToUse = 2
   } else if (ticksRemaining < 200000) {
-    return 3
+    ticksToUse = 3
   } else {
-    return 4
+    ticksToUse = 4
   }
+  return ticksToUse * speed
 }
 
 export const progressGenerators = (
