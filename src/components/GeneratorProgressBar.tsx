@@ -1,11 +1,13 @@
 import React from "react"
-import { StyleSheet, Text } from "react-native"
-import AnimatedProgress from "react-native-reanimated-progress-bar"
-import colors from "../../assets/colors/colors"
+import { Text } from "react-native"
 import { Generator } from "../../assets/data/Generators"
 import { GameState } from "../../assets/data/GameState"
 import { numberToHumanFormat } from "../math/formatting"
-import { calculateGeneratorRevenue } from "../math/revenue"
+import { calculateGeneratorProductivity, calculateGeneratorRevenue } from "../math/revenue"
+import EStyleSheet from "react-native-extended-stylesheet"
+import { IndeterminateProgress } from "./IndeterminateProgress"
+import { DeterminateProgress } from "./DeterminateProgress"
+import { calculateTicksToUse } from "../math/math"
 
 interface GeneratorProgressBarProps {
   generator: Generator;
@@ -17,24 +19,32 @@ export const GeneratorProgressBar = ({generator, gameState}: GeneratorProgressBa
   // Calculate progress
   const generatorState = gameState.generatorStateById.get(generator.id)!
   const progress = generatorState.ticks / generator.initialTicks
-  const revenue = calculateGeneratorRevenue(generator, gameState)
-  const [coefficient, scale] = numberToHumanFormat(revenue)
-  const text = `${coefficient} ${scale}`
 
-  return (
-    <>
-      <AnimatedProgress
-        fill={colors.green3}
-        current={progress}
-        total={1}
-        style={styles.animatedProgress}
-      />
-      <Text style={styles.text}>{text}</Text>
-    </>
-  )
+  const ticksToUse = calculateTicksToUse(gameState.ticks, gameState.speed)
+  if (ticksToUse > generator.initialTicks) {
+    const productivity = calculateGeneratorProductivity(generator, gameState)
+    const [coefficient, scale] = numberToHumanFormat(productivity)
+    const text = `${coefficient} ${scale} / sec`
+    return (
+      <>
+        <IndeterminateProgress/>
+        <Text style={styles.text}>{text}</Text>
+      </>
+    )
+  } else {
+    const revenue = calculateGeneratorRevenue(generator, gameState)
+    const [coefficient, scale] = numberToHumanFormat(revenue)
+    const text = `${coefficient} ${scale}`
+    return (
+      <>
+        <DeterminateProgress progress={progress}/>
+        <Text style={styles.text}>{text}</Text>
+      </>
+    )
+  }
 }
 
-const styles = StyleSheet.create({
+const styles = EStyleSheet.create({
   animatedProgress: {
     flex: .75,
     width: '100%',

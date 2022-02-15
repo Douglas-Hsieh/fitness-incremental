@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, SafeAreaView } from "react-native";
-import EStyleSheet from "react-native-extended-stylesheet";
+import { View, SafeAreaView, StyleSheet } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 import { GENERATORS } from "../../assets/data/Generators";
 import { GameState } from "../../assets/data/GameState";
@@ -152,7 +151,7 @@ export const HomeScreen = ({setScreen, gameState, setGameState}: HomeScreenProps
   );
 }
 
-const styles = EStyleSheet.create({
+const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
