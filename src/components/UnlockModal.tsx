@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { Image, StyleSheet, Text, View } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import Animated, { useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
 import colors from '../../assets/colors/colors';
@@ -41,12 +41,14 @@ export const UnlockModal = ({unlock}: UnlockModalProps) => {
     }, 5000)
   }, [])
 
-  let title, body
+  let title, body, image
   if (unlock.targetGeneratorId === '0') {
     title = 'Everyone'
+    image = require('../../assets/images/everyone.png')
   } else {
     const generator = GENERATORS_BY_ID.get(unlock.targetGeneratorId)!
     title = generator.name
+    image = generator.image
   }
   body = `x${unlock.multiplier}`
 
@@ -57,8 +59,11 @@ export const UnlockModal = ({unlock}: UnlockModalProps) => {
         style={[styles.modal, animatedStyle]}
       >
         <TouchableOpacity style={styles.touchable} onPress={() => showModal(false)}>
-          <Animated.Text style={styles.titleText}>{title}</Animated.Text>
-          <Animated.Text style={styles.bodyText}>{body}</Animated.Text>
+          <Image source={image} style={styles.icon}/>
+          <View style={styles.textContainer}>
+            <Text style={styles.titleText}>{title}</Text>
+            <Text style={styles.bodyText}>{body}</Text>
+          </View>
         </TouchableOpacity>
       </Animated.View>
     </View>
@@ -86,6 +91,11 @@ const styles = StyleSheet.create({
   touchable: {
     width: modalWidth,
     height: modalHeight,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-around',
+  },
+  textContainer: {
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -97,4 +107,8 @@ const styles = StyleSheet.create({
     color: colors.black,
     fontFamily: 'oleo-script',
   },
+  icon: {
+    width: modalHeight * .8,
+    height: modalHeight * .8,
+  }
 })
