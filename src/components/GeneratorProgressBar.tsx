@@ -1,6 +1,6 @@
 import React from "react"
 import { Text } from "react-native"
-import { Generator } from "../../assets/data/Generators"
+import { Generator, GENERATORS_BY_ID } from "../../assets/data/Generators"
 import { GameState } from "../../assets/data/GameState"
 import { numberToHumanFormat } from "../math/formatting"
 import { calculateGeneratorProductivity, calculateGeneratorRevenue } from "../math/revenue"
@@ -12,16 +12,17 @@ import { calculateTicksToUse } from "../math/math"
 interface GeneratorProgressBarProps {
   generator: Generator;
   gameState: GameState;
+  ticksNeeded: number;
 }
 
-export const GeneratorProgressBar = ({generator, gameState}: GeneratorProgressBarProps) => {
+export const GeneratorProgressBar = ({generator, gameState, ticksNeeded}: GeneratorProgressBarProps) => {
 
   // Calculate progress
   const generatorState = gameState.generatorStateById.get(generator.id)!
-  const progress = generatorState.ticks / generator.initialTicks
+  const progress = generatorState.ticks / ticksNeeded
 
   const ticksToUse = calculateTicksToUse(gameState.ticks, gameState.speed)
-  if (ticksToUse > generator.initialTicks) {
+  if (ticksToUse > ticksNeeded) {
     const productivity = calculateGeneratorProductivity(generator, gameState)
     const [coefficient, scale] = numberToHumanFormat(productivity)
     const text = `${coefficient} ${scale} / sec`

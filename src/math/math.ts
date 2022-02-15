@@ -1,6 +1,7 @@
 import { GENERATORS_BY_ID } from "../../assets/data/Generators"
 import { GameState } from "../../assets/data/GameState"
 import { calculateGeneratorRevenue } from "./revenue"
+import { calculateTicksNeededByGeneratorId } from "./multipliers"
 
 export const calculateTicksToUse = (ticksRemaining: number, speed: number): number => {
   let ticksToUse
@@ -27,6 +28,8 @@ export const progressGenerators = (
   ticksToUse: number,
 ) => {
   let revenue = 0
+  const ticksNeededByGeneratorId = calculateTicksNeededByGeneratorId(GENERATORS_BY_ID, gameState.unlockIds)
+
   const generatorStateById = gameState.generatorStateById.withMutations(genStateById => {
     Array.from(genStateById.entries())
       .forEach(([id, genState]) => {
@@ -36,12 +39,13 @@ export const progressGenerators = (
 
         const generator = GENERATORS_BY_ID.get(id)!
         const newTicks = genState.ticks + ticksToUse
+        const ticksNeeded = ticksNeededByGeneratorId.get(generator.id)!
 
-        if (newTicks >= generator.initialTicks) {
-          const timesProduced = Math.floor(newTicks / generator.initialTicks)
+        if (newTicks >= ticksNeeded) {
+          const timesProduced = Math.floor(newTicks / ticksNeeded)
           genStateById.set(id, {
             ...genState,
-            ticks: newTicks % generator.initialTicks,
+            ticks: newTicks % ticksNeeded,
           })
           revenue += timesProduced * calculateGeneratorRevenue(generator, gameState)
         } else {

@@ -50,7 +50,7 @@ export const UnlockModal = ({unlock}: UnlockModalProps) => {
     title = generator.name
     image = generator.image
   }
-  body = `x${unlock.multiplier}`
+  body = `x${unlock.value} ${unlock.reward}`
 
 
   return (

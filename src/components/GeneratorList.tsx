@@ -2,7 +2,7 @@ import React, { memo } from "react";
 import { View, TouchableOpacity, Text, Image } from "react-native";
 import EStyleSheet from "react-native-extended-stylesheet";
 import colors from "../../assets/colors/colors";
-import { Generator, GENERATORS } from "../../assets/data/Generators";
+import { Generator, GENERATORS, GENERATORS_BY_ID } from "../../assets/data/Generators";
 import { GameState } from "../../assets/data/GameState";
 import { GeneratorState } from "../../assets/data/GeneratorState";
 import BuyAmount from "../enums/BuyAmount";
@@ -12,6 +12,7 @@ import { Map } from 'immutable';
 import { playSound, SoundFile } from "../util/sounds";
 import { UnlockProgressBar } from "./UnlockProgressBar";
 import { GeneratorProgressBar } from "./GeneratorProgressBar";
+import { calculateTicksNeededByGeneratorId } from "../math/multipliers";
 
 const GeneratorIcon = memo((props: {image: any}) => {
   return (
@@ -113,6 +114,9 @@ export const GeneratorList = ({
 
       const ownsSome = generatorState.owned > 0
 
+      const ticksNeededByGeneratorId = calculateTicksNeededByGeneratorId(GENERATORS_BY_ID, gameState.unlockIds)
+      const ticksNeeded = ticksNeededByGeneratorId.get(generator.id)!
+
       return (
         <View key={generator.id} style={styles.generatorWrapper}>
           <View style={styles.generatorLeftWrapper}>
@@ -121,7 +125,7 @@ export const GeneratorList = ({
           </View>
           <View style={styles.generatorRightWrapper}>
             { ownsSome &&
-              <GeneratorProgressBar generator={generator} gameState={gameState}/>
+              <GeneratorProgressBar generator={generator} gameState={gameState} ticksNeeded={ticksNeeded}/>
             }
             <BuyGeneratorButton
               gameState={gameState}

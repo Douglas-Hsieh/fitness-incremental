@@ -7,7 +7,7 @@ import colors from "../../assets/colors/colors"
 import { GENERATORS_BY_ID } from "../../assets/data/Generators"
 import { GameState } from "../../assets/data/GameState"
 import { GeneratorState } from "../../assets/data/GeneratorState"
-import { GeneratorUnlock, getNextUnlock } from "../../assets/data/GeneratorUnlocks"
+import { GeneratorUnlock, getNextUnlock, UnlockReward } from "../../assets/data/GeneratorUnlocks"
 import { BackgroundImage } from "../components/BackgroundImage"
 import { BottomBar } from "../components/BottomBar"
 import { Description } from "../components/Description"
@@ -59,7 +59,8 @@ const UnlockCardList = ({generatorStateById}: UnlockCardListProps) => {
             image={image}
             generatorName={generatorName}
             count={unlock.count}
-            multiplier={unlock.multiplier}
+            value={unlock.value}
+            reward={unlock.reward}
           />
         )
       })}
@@ -72,16 +73,17 @@ interface UnlockCardProps {
   image: any;
   generatorName: string;
   count: number;
-  multiplier: number;
+  value: number;
+  reward: UnlockReward;
 }
 
-const UnlockCard = ({image, generatorName, count, multiplier}: UnlockCardProps) => (
+const UnlockCard = ({image, generatorName, count, value, reward}: UnlockCardProps) => (
   <View style={styles.cardContainer1}>
     <View style={styles.cardContainer2}>
       <Image source={image} style={styles.icon}/>
-      <Text style={styles.countText}>{count}</Text> 
+      <Text style={styles.countText}>{count}</Text>
       <Text style={styles.generatorNameText}>{generatorName}</Text>
-      <Text style={styles.multiplierText}>x{multiplier}</Text> 
+      <Text style={styles.valueText}>x{value} {reward}</Text>
     </View>
   </View>
 )
@@ -171,7 +173,7 @@ const styles = EStyleSheet.create({
     fontFamily: 'oleo-script',
     fontSize: '.8rem',
   },
-  multiplierText: {
+  valueText: {
     fontFamily: 'oleo-script',
     fontSize: '1rem',
   }

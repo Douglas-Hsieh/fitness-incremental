@@ -1,9 +1,23 @@
 import { Map, Set } from 'immutable';
 import { GENERATOR_MULTIPLIER_UPGRADE_BY_ID } from "../../assets/data/Upgrades";
-import { GENERATOR_UNLOCKS_BY_ID } from "../../assets/data/GeneratorUnlocks";
+import { GENERATOR_UNLOCKS_BY_ID, UnlockReward } from "../../assets/data/GeneratorUnlocks";
 import { TemporaryMultiplier } from "../types/TemporaryMultiplier";
+import { Generator } from '../../assets/data/Generators';
 
 const INITIAL_MULTIPLIERS_BY_GENERATOR_ID = Map<string, number>([
+  ['1', 1],
+  ['2', 1],
+  ['3', 1],
+  ['4', 1],
+  ['5', 1],
+  ['6', 1],
+  ['7', 1],
+  ['8', 1],
+  ['9', 1],
+  ['10', 1],
+]);
+
+const INITIAL_SPEED_BY_GENERATOR_ID = Map<string, number>([
   ['1', 1],
   ['2', 1],
   ['3', 1],
@@ -41,24 +55,28 @@ export const calculateMultipliersFromUnlocks = (
   unlockIds: Set<string>
 ) => {
 
-  const multipliersByGeneratorId = INITIAL_MULTIPLIERS_BY_GENERATOR_ID.withMutations(multByGenId => {
+  const multiplierByGeneratorId = INITIAL_MULTIPLIERS_BY_GENERATOR_ID.withMutations(multByGenId => {
     unlockIds.forEach(unlockId => {
       const unlock = GENERATOR_UNLOCKS_BY_ID.get(unlockId)!;
+
+      if (unlock.reward !== UnlockReward.Multiplier) {
+        return
+      }
 
       const allGenerators = unlock.targetGeneratorId === '0';
       if (allGenerators) {
         for (const generatorId of multByGenId.keys()) {
           const multiplier = multByGenId.get(generatorId)!;
-          multByGenId.set(generatorId, multiplier * unlock.multiplier);
+          multByGenId.set(generatorId, multiplier * unlock.value);
         }
       } else {
         const multiplier = multByGenId.get(unlock.targetGeneratorId)!;
-        multByGenId.set(unlock.targetGeneratorId, multiplier * unlock.multiplier);
+        multByGenId.set(unlock.targetGeneratorId, multiplier * unlock.value);
       }
     });
   });
 
-  return multipliersByGeneratorId;
+  return multiplierByGeneratorId;
 };
 
 export const calculateTemporaryMultipliers = (temporaryMultipliers: Set<TemporaryMultiplier>) => {
@@ -70,3 +88,39 @@ export const calculateTemporaryMultipliers = (temporaryMultipliers: Set<Temporar
     .reduce((mult1, mult2) => mult1 + mult2, 0);
   return cumulativeMultiplier === 0 ? 1 : cumulativeMultiplier;
 };
+
+const calculateSpeedsFromUnlocks = (
+  unlockIds: Set<string>
+) => {
+  const speedByGeneratorId = INITIAL_SPEED_BY_GENERATOR_ID.withMutations(speedByGenId => {
+    unlockIds.forEach(unlockId => {
+      const unlock = GENERATOR_UNLOCKS_BY_ID.get(unlockId)!;
+
+      if (unlock.reward !== UnlockReward.Speed) {
+        return
+      }
+
+      const allGenerators = unlock.targetGeneratorId === '0';
+      if (allGenerators) {
+        for (const generatorId of speedByGenId.keys()) {
+          const speed = speedByGenId.get(generatorId)!;
+          speedByGenId.set(generatorId, speed * unlock.value);
+        }
+      } else {
+        const speed = speedByGenId.get(unlock.targetGeneratorId)!;
+        speedByGenId.set(unlock.targetGeneratorId, speed * unlock.value);
+      }
+    });
+  });
+
+  return speedByGeneratorId;
+}
+
+export const calculateTicksNeededByGeneratorId = (
+  generatorById: Map<string, Generator>,
+  unlockIds: Set<string>
+) => {
+  const speedByGeneratorId = calculateSpeedsFromUnlocks(unlockIds)
+  const ticksNeededByGeneratorId = generatorById.map(generator => generator.initialTicks / speedByGeneratorId.get(generator.id)!)
+  return ticksNeededByGeneratorId
+}

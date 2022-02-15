@@ -1,6 +1,6 @@
-import { Generator } from "../../assets/data/Generators";
+import { Generator, GENERATORS_BY_ID } from "../../assets/data/Generators";
 import { GameState } from "../../assets/data/GameState";
-import { calculateMultipliersFromUpgrades, calculateMultipliersFromUnlocks, calculateTemporaryMultipliers } from "./multipliers";
+import { calculateMultipliersFromUpgrades, calculateMultipliersFromUnlocks, calculateTemporaryMultipliers, calculateTicksNeededByGeneratorId } from "./multipliers";
 import { calculateTicksToUse } from "./math";
 
 export const calculateGeneratorBaseRevenue = (
@@ -38,7 +38,9 @@ export const calculateGeneratorProductivity = (
 ) => {
   const generatorRevenue = calculateGeneratorRevenue(generator, gameState)
   const ticksToUse = calculateTicksToUse(gameState.ticks, gameState.speed)
-  return generatorRevenue * (ticksToUse / generator.initialTicks)
+  const ticksNeededByGeneratorId = calculateTicksNeededByGeneratorId(GENERATORS_BY_ID, gameState.unlockIds)
+  const ticksNeeded = ticksNeededByGeneratorId.get(generator.id)!
+  return generatorRevenue * (ticksToUse / ticksNeeded)
 }
 
 export const calculateOneTickBaseRevenue = (
