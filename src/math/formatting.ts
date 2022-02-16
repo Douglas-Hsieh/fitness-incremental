@@ -11,6 +11,10 @@ export const numberToHumanFormat = (number: number, smallNumberFractionDigits: n
   const roundedDownDigits = (scale % 3);
   const roundedDownScale = scale - roundedDownDigits; // 4 - 1 == 3
 
+  if (roundedDownScale < 0) {
+    return ['0', '']
+  }
+
   if (roundedDownScale === 0 || roundedDownScale === 3) {
     const coeffString = number.toFixed(smallNumberFractionDigits)
     const coeffStringWithCommas = coeffString.replace(/\B(?=(\d{3})+(?!\d))/g, ",")  // add commas

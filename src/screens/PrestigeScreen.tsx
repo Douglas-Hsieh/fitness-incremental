@@ -29,28 +29,38 @@ interface PrestigeScreenProps {
 
 export const PrestigeScreen = ({setScreen, gameState, setGameState}: PrestigeScreenProps) => {
 
-  const [showClaimPrestigeModal, setShowClaimPrestigeModal] = useState<boolean>(false) 
+  const {prestige, spentPrestige, lifetimeEarningsSinceBeginning, lifetimeEarningsSinceLastReset} = gameState
 
+  const [showClaimPrestigeModal, setShowClaimPrestigeModal] = useState<boolean>(false)
+  
+  const earnedPrestige = calculateEarnedPrestige(lifetimeEarningsSinceBeginning, lifetimeEarningsSinceLastReset)
+  const [earnedPrestigeCoeff, earnedPrestigeScale] = numberToHumanFormat(earnedPrestige, 0, 3)
+
+  const [prestigeCoeff, prestigeScale] = numberToHumanFormat(prestige, 0, 3)
+  const [spentPrestigeCoeff, spentPrestigeScale] = numberToHumanFormat(spentPrestige, 0, 3)
+  const [earningsSinceBeginningCoeff, earningsSinceBeginningScale] = numberToHumanFormat(lifetimeEarningsSinceBeginning)
+  const [earningsSinceLastResetCoeff, earningsSinceLastResetScale] = numberToHumanFormat(lifetimeEarningsSinceLastReset)
+  
+  /** 
+   * https://adventure-capitalist.fandom.com/wiki/Angel_Investors
+   * Starting Lifetime Earnings is what your lifetime earnings were after your most recent reset
+   * and each time you reset it is set to (400 Billion/9) • (Current angels + Sacrificed angels)^2
+   */
   const resetGame = () => {
+    const prestigeAfterReset = prestige + earnedPrestige
+    const lifetimeEarningsSinceLastReset = (4e+11 / 9) * Math.pow(prestigeAfterReset + spentPrestige, 2)
 
-    const earnedPrestige = calculateEarnedPrestige(gameState.lifetimeEarningsSinceBeginning, gameState.lifetimeEarningsSinceLastReset)
-    const prestigeAfterReset = gameState.prestige + earnedPrestige
-
-    // https://adventure-capitalist.fandom.com/wiki/Angel_Investors
     setGameState(prevGameState => ({
       ...prevGameState,
       balance: INITIAL_BALANCE,
       prestige: prestigeAfterReset,
       spentPrestige: 0,
-      lifetimeEarningsSinceLastReset: (4e+11 / 9) * Math.pow(prestigeAfterReset + gameState.spentPrestige, 2),
+      lifetimeEarningsSinceLastReset: lifetimeEarningsSinceLastReset,
       generatorStateById: INITIAL_GENERATOR_STATE_BY_ID,
       upgradeIds: Set(),
       unlockIds: Set(),
     }))
   }
-
-  const [prestigeCoeff, prestigeScale] = numberToHumanFormat(gameState.prestige)
-  const [earnedPrestigeCoeff, earnedPrestigeScale] = numberToHumanFormat(calculateEarnedPrestige(gameState.lifetimeEarningsSinceBeginning, gameState.lifetimeEarningsSinceLastReset))
 
   return (
     <SafeAreaView style={styles.container}>
@@ -75,6 +85,9 @@ export const PrestigeScreen = ({setScreen, gameState, setGameState}: PrestigeScr
           <Text style={styles.restartTitle}>Trainers Hired on Restart</Text>
           <Text style={styles.restartBody1}>{earnedPrestigeCoeff} {earnedPrestigeScale}</Text>
           <Text style={styles.restartBody2}>2% Step Bonus Per Trainer!</Text>
+          {/* <Text>Spent Prestige: {spentPrestigeCoeff} {spentPrestigeScale}</Text>
+          <Text>Lifetime Earnings Since Beginning: {earningsSinceBeginningCoeff} {earningsSinceBeginningScale}</Text>
+          <Text>Lifetime Earnings Since Last Reset: {earningsSinceLastResetCoeff} {earningsSinceLastResetScale}</Text> */}
           <Button text={'Hire & Restart'} onPress={() => setShowClaimPrestigeModal(true)}/>
         </View>
 

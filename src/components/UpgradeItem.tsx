@@ -41,6 +41,7 @@ export const UpgradeItem = ({upgradeId, title, description, price, currency, ima
         setGameState(prevGameState => ({
           ...prevGameState,
           prestige: gameState.prestige - price,
+          spentPrestige: gameState.spentPrestige + price,
           upgradeIds: upgradeIds,
         }))
       }

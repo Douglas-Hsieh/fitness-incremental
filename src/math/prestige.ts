@@ -1,6 +1,10 @@
 
 export const calculateEarnedPrestige = (lifetimeEarningsSinceBeginning: number, lifetimeEarningsSinceLastReset: number): number => {
-  console.log('lifetimeEarningsSinceBeginning', lifetimeEarningsSinceBeginning);
-  console.log('lifetimeEarningsSinceLastReset', lifetimeEarningsSinceLastReset);
-  return Math.pow(lifetimeEarningsSinceBeginning / (4e+11 / 9), .5) - Math.pow(lifetimeEarningsSinceLastReset / (4e+11 / 9), .5);
+  if (lifetimeEarningsSinceBeginning < lifetimeEarningsSinceLastReset) {
+    return 0
+  }
+
+  const k = 4e+11 / 9
+  const prestige = Math.pow(lifetimeEarningsSinceBeginning / k, .5) - Math.pow(lifetimeEarningsSinceLastReset / k, .5);
+  return Math.floor(prestige)
 };
