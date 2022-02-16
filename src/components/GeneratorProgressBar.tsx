@@ -1,13 +1,12 @@
 import React from "react"
 import { Text } from "react-native"
-import { Generator, GENERATORS_BY_ID } from "../../assets/data/Generators"
+import { Generator } from "../../assets/data/Generators"
 import { GameState } from "../../assets/data/GameState"
 import { numberToHumanFormat } from "../math/formatting"
-import { calculateGeneratorProductivity, calculateGeneratorRevenue } from "../math/revenue"
+import { calculateGeneratorProductivity, calculateGeneratorRevenue, calculateTicksToUse } from "../math/revenue"
 import EStyleSheet from "react-native-extended-stylesheet"
 import { IndeterminateProgress } from "./IndeterminateProgress"
 import { DeterminateProgress } from "./DeterminateProgress"
-import { calculateTicksToUse } from "../math/math"
 
 interface GeneratorProgressBarProps {
   generator: Generator;

@@ -33,7 +33,7 @@ export const PrestigeScreen = ({setScreen, gameState, setGameState}: PrestigeScr
 
   const resetGame = () => {
 
-    const earnedPrestige = calculateEarnedPrestige(gameState.lifetimeEarnings, gameState.startingLifetimeEarnings)
+    const earnedPrestige = calculateEarnedPrestige(gameState.lifetimeEarningsSinceBeginning, gameState.lifetimeEarningsSinceLastReset)
     const prestigeAfterReset = gameState.prestige + earnedPrestige
 
     // https://adventure-capitalist.fandom.com/wiki/Angel_Investors
@@ -42,7 +42,7 @@ export const PrestigeScreen = ({setScreen, gameState, setGameState}: PrestigeScr
       balance: INITIAL_BALANCE,
       prestige: prestigeAfterReset,
       spentPrestige: 0,
-      startingLifetimeEarnings: (4e+11 / 9) * Math.pow(prestigeAfterReset + gameState.spentPrestige, 2),
+      lifetimeEarningsSinceLastReset: (4e+11 / 9) * Math.pow(prestigeAfterReset + gameState.spentPrestige, 2),
       generatorStateById: INITIAL_GENERATOR_STATE_BY_ID,
       upgradeIds: Set(),
       unlockIds: Set(),
@@ -50,7 +50,7 @@ export const PrestigeScreen = ({setScreen, gameState, setGameState}: PrestigeScr
   }
 
   const [prestigeCoeff, prestigeScale] = numberToHumanFormat(gameState.prestige)
-  const [earnedPrestigeCoeff, earnedPrestigeScale] = numberToHumanFormat(calculateEarnedPrestige(gameState.lifetimeEarnings, gameState.startingLifetimeEarnings))
+  const [earnedPrestigeCoeff, earnedPrestigeScale] = numberToHumanFormat(calculateEarnedPrestige(gameState.lifetimeEarningsSinceBeginning, gameState.lifetimeEarningsSinceLastReset))
 
   return (
     <SafeAreaView style={styles.container}>

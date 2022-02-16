@@ -10,8 +10,8 @@ export class GameState {
   balance: number;
   prestige: number;
   spentPrestige: number;  // since last reset
-  startingLifetimeEarnings: number;  // since last reset
-  lifetimeEarnings: number;  // since beginning
+  lifetimeEarningsSinceLastReset: number;  // since last reset
+  lifetimeEarningsSinceBeginning: number;  // since beginning
   generatorStateById: Map<string, GeneratorState>;
   upgradeIds: Set<string>;
   unlockIds: Set<string>;
@@ -29,8 +29,8 @@ export class GameState {
     balance: number,
     prestige: number,
     spentPrestige: number,
-    startingLifetimeEarnings: number,
-    lifetimeEarnings: number,
+    lifetimeEarningsSinceLastReset: number,
+    lifetimeEarningsSinceBeginning: number,
     generatorStateById: Map<string, GeneratorState>,
     upgradeIds: Set<string>,
     unlockIds: Set<string>,
@@ -47,8 +47,8 @@ export class GameState {
     this.balance = balance
     this.prestige = prestige
     this.spentPrestige = spentPrestige
-    this.startingLifetimeEarnings = startingLifetimeEarnings
-    this.lifetimeEarnings = lifetimeEarnings
+    this.lifetimeEarningsSinceLastReset = lifetimeEarningsSinceLastReset
+    this.lifetimeEarningsSinceBeginning = lifetimeEarningsSinceBeginning
     this.generatorStateById = generatorStateById
     this.upgradeIds = upgradeIds
     this.unlockIds = unlockIds
@@ -69,8 +69,8 @@ export class GameState {
       obj.balance,
       obj.prestige,
       obj.spentPrestige,
-      obj.startingLifetimeEarnings,
-      obj.lifetimeEarnings,
+      obj.lifetimeEarningsSinceLastReset,
+      obj.lifetimeEarningsSinceBeginning,
       Map(obj.generatorStateById),
       Set(obj.upgradeIds),
       Set(obj.unlockIds),

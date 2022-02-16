@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { GameState } from "../assets/data/GameState";
 import Screen from "./enums/Screen";
-import { calculateTicksToUse, progressGenerators } from "./math/math";
 import { HomeScreen } from "./screens/HomeScreen";
 import { LoginScreen } from "./screens/LoginScreen";
 import { PrestigeScreen } from "./screens/PrestigeScreen";
@@ -19,6 +18,7 @@ import { getFitnessLocations } from "./api/fitness-locations";
 import { createUser, updateUser } from "./api/users";
 import { logIn } from "./api/auth";
 import BuyAmount from "./enums/BuyAmount";
+import { calculateTicksToUse, progressGenerators } from "./math/revenue";
 
 interface GameProps {
   screen: Screen;
@@ -83,7 +83,7 @@ export const Game = ({screen, setScreen, gameState, setGameState, lastVisit, req
       ticks: gameState.ticks + ticks - ticksToUseTotal,
       generatorStateById: generatorStateById,
       balance: gameState.balance + revenue,
-      lifetimeEarnings: gameState.lifetimeEarnings + revenue,
+      lifetimeEarningsSinceBeginning: gameState.lifetimeEarningsSinceBeginning + revenue,
     }))
   }, [])
 
@@ -100,7 +100,7 @@ export const Game = ({screen, setScreen, gameState, setGameState, lastVisit, req
       ticks: gameState.ticks - ticksToUse,
       generatorStateById: generatorStateById,
       balance: gameState.balance + revenue,
-      lifetimeEarnings: gameState.lifetimeEarnings + revenue,
+      lifetimeEarningsSinceBeginning: gameState.lifetimeEarningsSinceBeginning + revenue,
     }))
 
     console.log('ticksToUse', ticksToUse)
@@ -121,10 +121,11 @@ export const Game = ({screen, setScreen, gameState, setGameState, lastVisit, req
     if (!gameState.fitnessLocation) {
       getFitnessLocations()
         .then(fitnessLocations => {
-          if (fitnessLocations.length <= 0) {
+          const myFitnessLocations = fitnessLocations.filter(fitnessLocation => fitnessLocation.userId === gameState.user!.id)
+          if (myFitnessLocations.length <= 0) {
             return;
           }
-          setGameState(prevGameState => ({ ...prevGameState, fitnessLocation: fitnessLocations[0], }))
+          setGameState(prevGameState => ({ ...prevGameState, fitnessLocation: myFitnessLocations[0], }))
         })
     }
 

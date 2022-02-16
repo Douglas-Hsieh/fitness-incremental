@@ -107,8 +107,9 @@ export const WorkoutScreen = ({setScreen, gameState, setGameState, currentLocati
   const getAndSetFitnessLocation = async () => {
     getFitnessLocations()
       .then(fitnessLocations => {
-        if (fitnessLocations.length > 0)
-        setGameState(prevGameState => ({ ...prevGameState,fitnessLocation: fitnessLocations[0], })
+        const myFitnessLocations = fitnessLocations.filter(fitnessLocation => fitnessLocation.userId === gameState.user!.id)
+        if (myFitnessLocations.length > 0)
+        setGameState(prevGameState => ({ ...prevGameState, fitnessLocation: myFitnessLocations[0], })
       )})
       .catch(error => {
         alert(error)
