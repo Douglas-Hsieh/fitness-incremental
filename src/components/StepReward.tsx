@@ -42,7 +42,7 @@ export const StepReward = ({gameState, setGameState}: StepRewardProps) => {
         ...prevGameState,
         stepsUntilNextRandomReward: INITIAL_STEPS_UNTIL_NEXT_RANDOM_REWARD,
         balance: gameState.balance + bonus,
-        lifetimeEarningsSinceBeginning: gameState.lifetimeEarningsSinceBeginning + bonus,
+        sessionEarnings: gameState.sessionEarnings + bonus,
       }))
       title = 'Instant Bonus'
       body = `You just gained ${coefficient} ${scale} steps!`

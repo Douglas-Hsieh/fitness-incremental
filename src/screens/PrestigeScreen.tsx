@@ -12,7 +12,7 @@ import { Description } from '../components/Description'
 import { Header } from '../components/Header'
 import Screen from '../enums/Screen'
 import { numberToHumanFormat } from '../math/formatting'
-import { calculateEarnedPrestige } from "../math/prestige"
+import { calculateEarnedPrestige, K } from "../math/prestige"
 
 const PrestigeIcon = memo(() => (
   <Image
@@ -29,17 +29,17 @@ interface PrestigeScreenProps {
 
 export const PrestigeScreen = ({setScreen, gameState, setGameState}: PrestigeScreenProps) => {
 
-  const {prestige, spentPrestige, lifetimeEarningsSinceBeginning, lifetimeEarningsSinceLastReset} = gameState
+  const {prestige, spentPrestige, sessionEarnings: sessionEarnings, lastSessionEarnings} = gameState
 
   const [showClaimPrestigeModal, setShowClaimPrestigeModal] = useState<boolean>(false)
   
-  const earnedPrestige = calculateEarnedPrestige(lifetimeEarningsSinceBeginning, lifetimeEarningsSinceLastReset)
+  const earnedPrestige = calculateEarnedPrestige(sessionEarnings, lastSessionEarnings)
   const [earnedPrestigeCoeff, earnedPrestigeScale] = numberToHumanFormat(earnedPrestige, 0, 3)
 
   const [prestigeCoeff, prestigeScale] = numberToHumanFormat(prestige, 0, 3)
   const [spentPrestigeCoeff, spentPrestigeScale] = numberToHumanFormat(spentPrestige, 0, 3)
-  const [earningsSinceBeginningCoeff, earningsSinceBeginningScale] = numberToHumanFormat(lifetimeEarningsSinceBeginning)
-  const [earningsSinceLastResetCoeff, earningsSinceLastResetScale] = numberToHumanFormat(lifetimeEarningsSinceLastReset)
+  const [sessionEarningsCoeff, sessionEarningsScale] = numberToHumanFormat(sessionEarnings)
+  const [lastSessionEarningsCoeff, lastSessionEarningsScale] = numberToHumanFormat(lastSessionEarnings)
   
   /** 
    * https://adventure-capitalist.fandom.com/wiki/Angel_Investors
@@ -47,19 +47,28 @@ export const PrestigeScreen = ({setScreen, gameState, setGameState}: PrestigeScr
    * and each time you reset it is set to (400 Billion/9) • (Current angels + Sacrificed angels)^2
    */
   const resetGame = () => {
-    const prestigeAfterReset = prestige + earnedPrestige
-    const lifetimeEarningsSinceLastReset = (4e+11 / 9) * Math.pow(prestigeAfterReset + spentPrestige, 2)
+    setGameState(prevGameState => {
+      
+      const earnedPrestige = calculateEarnedPrestige(
+        prevGameState.sessionEarnings,
+        prevGameState.lastSessionEarnings
+      )
 
-    setGameState(prevGameState => ({
-      ...prevGameState,
-      balance: INITIAL_BALANCE,
-      prestige: prestigeAfterReset,
-      spentPrestige: 0,
-      lifetimeEarningsSinceLastReset: lifetimeEarningsSinceLastReset,
-      generatorStateById: INITIAL_GENERATOR_STATE_BY_ID,
-      upgradeIds: Set(),
-      unlockIds: Set(),
-    }))
+      const prestigeAfterReset = prevGameState.prestige + earnedPrestige
+      const lastSessionEarnings = K * Math.pow(prestigeAfterReset + prevGameState.spentPrestige, 2)
+
+      return {
+        ...prevGameState,
+        balance: INITIAL_BALANCE,
+        prestige: prestigeAfterReset,
+        spentPrestige: 0,
+        lastSessionEarnings: lastSessionEarnings,
+        sessionEarnings: 0,
+        generatorStateById: INITIAL_GENERATOR_STATE_BY_ID,
+        upgradeIds: Set(),
+        unlockIds: Set(),
+      }
+    })
   }
 
   return (
@@ -86,8 +95,8 @@ export const PrestigeScreen = ({setScreen, gameState, setGameState}: PrestigeScr
           <Text style={styles.restartBody1}>{earnedPrestigeCoeff} {earnedPrestigeScale}</Text>
           <Text style={styles.restartBody2}>2% Step Bonus Per Trainer!</Text>
           {/* <Text>Spent Prestige: {spentPrestigeCoeff} {spentPrestigeScale}</Text>
-          <Text>Lifetime Earnings Since Beginning: {earningsSinceBeginningCoeff} {earningsSinceBeginningScale}</Text>
-          <Text>Lifetime Earnings Since Last Reset: {earningsSinceLastResetCoeff} {earningsSinceLastResetScale}</Text> */}
+          <Text>Session Earnings: {sessionEarningsCoeff} {sessionEarningsScale}</Text>
+          <Text>Last Session Earnings: {lastSessionEarningsCoeff} {lastSessionEarningsScale}</Text> */}
           <Button text={'Hire & Restart'} onPress={() => setShowClaimPrestigeModal(true)}/>
         </View>
 

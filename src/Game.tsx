@@ -83,7 +83,7 @@ export const Game = ({screen, setScreen, gameState, setGameState, lastVisit, req
       ticks: gameState.ticks + ticks - ticksToUseTotal,
       generatorStateById: generatorStateById,
       balance: gameState.balance + revenue,
-      lifetimeEarningsSinceBeginning: gameState.lifetimeEarningsSinceBeginning + revenue,
+      sessionEarnings: gameState.sessionEarnings + revenue,
     }))
   }, [])
 
@@ -100,7 +100,7 @@ export const Game = ({screen, setScreen, gameState, setGameState, lastVisit, req
       ticks: gameState.ticks - ticksToUse,
       generatorStateById: generatorStateById,
       balance: gameState.balance + revenue,
-      lifetimeEarningsSinceBeginning: gameState.lifetimeEarningsSinceBeginning + revenue,
+      sessionEarnings: gameState.sessionEarnings + revenue,
     }))
 
     console.log('ticksToUse', ticksToUse)

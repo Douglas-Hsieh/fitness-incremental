@@ -48,7 +48,7 @@ export const WorkoutReward = ({gameState, setGameState, currentLocation}: Workou
           ...prevGameState,
           lastWorkoutRewardTime: now,
           balance: gameState.balance + bonus,
-          lifetimeEarningsSinceBeginning: gameState.lifetimeEarningsSinceBeginning + bonus,
+          sessionEarnings: gameState.sessionEarnings + bonus,
         }))
         title = 'Instant Bonus'
         body = `You just gained ${coefficient} ${scale} steps!`

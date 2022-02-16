@@ -4,14 +4,15 @@ import { TemporaryMultiplier } from '../../src/types/TemporaryMultiplier';
 import { GeneratorState, INITIAL_GENERATOR_STATE_BY_ID } from './GeneratorState';
 import { User } from '../../src/shared/users.interface';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { K } from '../../src/math/prestige';
 
 export class GameState {
   user: User | undefined;
   balance: number;
   prestige: number;
   spentPrestige: number;  // since last reset
-  lifetimeEarningsSinceLastReset: number;  // since last reset
-  lifetimeEarningsSinceBeginning: number;  // since beginning
+  lastSessionEarnings: number;
+  sessionEarnings: number;
   generatorStateById: Map<string, GeneratorState>;
   upgradeIds: Set<string>;
   unlockIds: Set<string>;
@@ -29,8 +30,8 @@ export class GameState {
     balance: number,
     prestige: number,
     spentPrestige: number,
-    lifetimeEarningsSinceLastReset: number,
-    lifetimeEarningsSinceBeginning: number,
+    lastSessionEarnings: number,
+    sessionEarnings: number,
     generatorStateById: Map<string, GeneratorState>,
     upgradeIds: Set<string>,
     unlockIds: Set<string>,
@@ -47,8 +48,8 @@ export class GameState {
     this.balance = balance
     this.prestige = prestige
     this.spentPrestige = spentPrestige
-    this.lifetimeEarningsSinceLastReset = lifetimeEarningsSinceLastReset
-    this.lifetimeEarningsSinceBeginning = lifetimeEarningsSinceBeginning
+    this.lastSessionEarnings = lastSessionEarnings
+    this.sessionEarnings = sessionEarnings
     this.generatorStateById = generatorStateById
     this.upgradeIds = upgradeIds
     this.unlockIds = unlockIds
@@ -69,8 +70,8 @@ export class GameState {
       obj.balance,
       obj.prestige,
       obj.spentPrestige,
-      obj.lifetimeEarningsSinceLastReset,
-      obj.lifetimeEarningsSinceBeginning,
+      obj.lastSessionEarnings,
+      obj.sessionEarnings,
       Map(obj.generatorStateById),
       Set(obj.upgradeIds),
       Set(obj.unlockIds),
@@ -126,7 +127,8 @@ export const INITIAL_GAME_STATE = new GameState(
 )
 
 const DEBUG_BALANCE = 0
-const DEBUG_PRESTIGE = 0
+const DEBUG_PRESTIGE = 1e+7
+const DEBUG_LAST_SESSION_EARNINGS = K * Math.pow(DEBUG_PRESTIGE, 2)
 const DEBUG_TICKS = 1e+100
 
 export const DEBUG_GAME_STATE = new GameState(
@@ -134,7 +136,7 @@ export const DEBUG_GAME_STATE = new GameState(
   DEBUG_BALANCE,
   DEBUG_PRESTIGE,
   0,
-  0,
+  DEBUG_LAST_SESSION_EARNINGS,
   0,
   INITIAL_GENERATOR_STATE_BY_ID,
   Set(),
