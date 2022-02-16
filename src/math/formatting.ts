@@ -12,9 +12,11 @@ export const numberToHumanFormat = (number: number, smallNumberFractionDigits: n
   const roundedDownScale = scale - roundedDownDigits; // 4 - 1 == 3
 
   if (roundedDownScale === 0 || roundedDownScale === 3) {
-    return [number.toFixed(smallNumberFractionDigits), ''];
+    const coeffString = number.toFixed(smallNumberFractionDigits)
+    const coeffStringWithCommas = coeffString.replace(/\B(?=(\d{3})+(?!\d))/g, ",")  // add commas
+    return [coeffStringWithCommas, '']  // ['123,456', '']
   }
 
-  // ['1.2345', 'thousand']
+  // ['1.2345', 'million']
   return [(coefficient * Math.pow(10, roundedDownDigits)).toFixed(fractionDigits), Scale.get(roundedDownScale)!];
 };
