@@ -44,7 +44,7 @@ export const UnlockModal = ({unlock}: UnlockModalProps) => {
   let title, body, image
   if (unlock.targetGeneratorId === '0') {
     title = 'Everyone'
-    image = require('../../assets/images/everyone.png')
+    image = require('../../assets/images/cities.png')
   } else {
     const generator = GENERATORS_BY_ID.get(unlock.targetGeneratorId)!
     title = generator.name

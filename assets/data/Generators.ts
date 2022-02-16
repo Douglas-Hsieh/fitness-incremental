@@ -100,7 +100,7 @@ export const GENERATORS_BY_ID: Map<string, Generator> = Map([
     initialTicks: 6144,
     initialRevenue: 1074954240,
     initialProductivity: 174960,
-    image: require('../images/everyone.png'),
+    image: require('../images/group-of-people.png'),
   }],
   ["10", {
     id: "10",

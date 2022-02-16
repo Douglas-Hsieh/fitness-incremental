@@ -44,7 +44,7 @@ const UnlockCardList = ({generatorStateById}: UnlockCardListProps) => {
 
         if (unlock.generatorId === '0') {
           key = 0,
-          image = require('../../assets/images/everyone.png')
+          image = require('../../assets/images/cities.png')
           generatorName = 'Everyone'
         } else {
           const generator = GENERATORS_BY_ID.get(unlock.generatorId)!
