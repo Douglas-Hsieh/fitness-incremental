@@ -1,5 +1,5 @@
 import React, { memo } from 'react'
-import { SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { Image, SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import colors from '../../assets/colors/colors'
 import { BackgroundImage } from "../components/BackgroundImage"
 import Screen from '../enums/Screen'
@@ -35,7 +35,9 @@ export const WelcomeBackScreen = ({setScreen, lastVisitSteps}: WelcomeBackScreen
 
       <View style={styles.stepsWrapper}>
         <Text style={styles.stepsText}>Your actions have given your followers</Text>
-        <Text style={[styles.stepsText, {color: colors.green3}]}>{lastVisitTicks} motivation</Text>
+        <Text style={[styles.stepsText, {color: colors.green3}]}>
+          {lastVisitTicks} <Image source={require('../../assets/images/lightning.png')} style={styles.icon}/>
+        </Text>
       </View>
 
       <TouchableOpacity style={styles.continueButton} onPress={() => setScreen(Screen.Home)}>
@@ -101,6 +103,9 @@ const styles = StyleSheet.create({
     fontFamily: 'oleo-script',
     textAlign: 'center',
     color: colors.white,
-  }
-
+  },
+  icon: {
+    width: 25,
+    height: 25,
+  },
 })
