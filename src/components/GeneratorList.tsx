@@ -1,4 +1,4 @@
-import React, { memo } from "react";
+import React from "react";
 import { View, TouchableOpacity, Text, Image } from "react-native";
 import EStyleSheet from "react-native-extended-stylesheet";
 import colors from "../../assets/colors/colors";
@@ -13,17 +13,7 @@ import { playSound, SoundFile } from "../util/sounds";
 import { UnlockProgressBar } from "./UnlockProgressBar";
 import { GeneratorProgressBar } from "./GeneratorProgressBar";
 import { calculateTicksNeededByGeneratorId } from "../math/multipliers";
-
-const GeneratorIcon = memo((props: {image: any}) => {
-  return (
-  <View style={styles.iconContainer1}>
-    <View style={styles.iconContainer2}>
-      <View style={styles.iconContainer3}>
-        <Image source={props.image} style={styles.icon}/>
-      </View>
-    </View>
-  </View>
-)})
+import { GeneratorIcon } from "./GeneratorIcon";
 
 interface BuyGeneratorButtonProps {
   gameState: GameState;
@@ -120,7 +110,7 @@ export const GeneratorList = ({
       return (
         <View key={generator.id} style={styles.generatorWrapper}>
           <View style={styles.generatorLeftWrapper}>
-            <GeneratorIcon image={generator.image}/>
+            <GeneratorIcon image={generator.image} hasOverlay={!ownsSome}/>
             <UnlockProgressBar generator={generator} generatorState={generatorState}/>
           </View>
           <View style={styles.generatorRightWrapper}>
@@ -161,36 +151,6 @@ const styles = EStyleSheet.create({
   generatorRightWrapper: {
     flexDirection: 'column',
     marginLeft: 10,
-  },
-
-  // Icon
-  iconContainer1: {
-    height: 80,
-    width: 80,
-    backgroundColor: colors.blue3,
-    borderRadius: 60,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  iconContainer2: {
-    height: '90%',
-    width: '90%',
-    backgroundColor: colors.blue1,
-    borderRadius: 60,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  iconContainer3: {
-    height: '90%',
-    width: '90%',
-    backgroundColor: colors.blue2,
-    borderRadius: 60,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  icon: {
-    height: '80%',
-    width: '80%',
   },
 
   // Buy Button
