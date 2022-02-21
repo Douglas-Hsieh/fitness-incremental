@@ -1,13 +1,13 @@
 import * as Notifications from 'expo-notifications'
 import * as BackgroundFetch from 'expo-background-fetch';
-import { loadLastVisit } from "./util/loadLastVisit";
 import { canReceiveWorkoutReward } from "./math/workout-reward";
 import { GameState } from "../assets/data/GameState";
 import { BackgroundTask } from './types/BackgroundTask';
 import * as TaskManager from 'expo-task-manager';
 import { AppState } from 'react-native';
+import { getStepsBetween } from './google-fit/google-fit';
 
-export const handleLocationUpdate = async ({ data: { locations }, error }) => {
+export const handleLocationUpdate: TaskManager.TaskManagerTaskExecutor = async ({ data: { locations }, error }) => {
   console.log(`Location Update Task: ${new Date(Date.now()).toISOString()}` );
 
   if (AppState.currentState == 'active') {
@@ -65,14 +65,19 @@ export const handleStepRewardNotificationTask = async () => {
   }
 
   const gameState = await GameState.load()
-  const lastVisit = await loadLastVisit()
-  
+  const lastVisit = gameState.visitHistory.last()
+  if (!lastVisit) {
+    return
+  }
+  const now = new Date()
+  const steps = await getStepsBetween(lastVisit.time, now)
+
   const oneDayBefore = new Date(Date.now() - 86400000)
   if (oneDayBefore < gameState.lastPushNotificationTime) {
     return
   }
 
-  const stepsUntilNextRandomReward = gameState.stepsUntilNextRandomReward - lastVisit.steps
+  const stepsUntilNextRandomReward = gameState.stepsUntilNextRandomReward - steps
   if (stepsUntilNextRandomReward > 0) {
     return
   }
@@ -160,8 +165,13 @@ export const handleHighBalanceNotificationTask = async () => {
   const gameState = await GameState.load()
 
   const { lastPushNotificationTime } = await GameState.load()
-  const lastVisit = await loadLastVisit()
-  if (lastVisit.steps < 10000) {
+  const lastVisit = gameState.visitHistory.last()
+  if (!lastVisit) {
+    return
+  }
+  const now = new Date()
+  const steps = await getStepsBetween(lastVisit.time, now)
+  if (steps < 10000) {
     return
   }
 
@@ -204,11 +214,12 @@ export const unregisterTasks = async () => {
     BackgroundFetch.unregisterTaskAsync(BackgroundTask.WorkoutRewardNotification),
     BackgroundFetch.unregisterTaskAsync(BackgroundTask.HighBalanceNotification),
   ])
+    .then((results) => results.forEach((result) => console.log(result.status)));
 }
 
 export const registerTasks = async () => {
   console.log('registerTasks')
-  const minimumInterval = 10  // seconds
+  const minimumInterval = 5 * 60  // seconds
   BackgroundFetch.registerTaskAsync(BackgroundTask.StepRewardNotification, {
     minimumInterval: minimumInterval,
     stopOnTerminate: false,  // android only

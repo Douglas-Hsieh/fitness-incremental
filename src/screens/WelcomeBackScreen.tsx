@@ -1,6 +1,8 @@
 import React, { memo } from 'react'
 import { Image, SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import colors from '../../assets/colors/colors'
+import { TICKS_PER_STEP } from '../../assets/data/Constants'
+import { GameState } from '../../assets/data/GameState'
 import { BackgroundImage } from "../components/BackgroundImage"
 import Screen from '../enums/Screen'
 
@@ -12,12 +14,20 @@ const WelcomeBackHeader = memo(() => (
 
 interface WelcomeBackScreenProps {
   setScreen: (screen: Screen) => void;
-  lastVisitSteps: number;
+  gameState: GameState;
 }
 
-export const WelcomeBackScreen = ({setScreen, lastVisitSteps}: WelcomeBackScreenProps) => {
+export const WelcomeBackScreen = ({setScreen, gameState}: WelcomeBackScreenProps) => {
 
-  const lastVisitTicks = 20 * lastVisitSteps
+  const { visitHistory } = gameState
+  const lastVisit = visitHistory.last()
+
+  let lastVisitSteps = 0
+  let lastVisitTicks = 0
+  if (lastVisit) {
+    lastVisitSteps = lastVisit.steps
+    lastVisitTicks = TICKS_PER_STEP * lastVisit.steps
+  }
 
   return (
     <SafeAreaView style={styles.container}>

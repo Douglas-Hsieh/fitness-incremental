@@ -1,10 +1,11 @@
-import { Map, Set } from 'immutable';
+import { Map, Set, List } from 'immutable';
 import { FitnessLocation } from '../../src/shared/fitness-locations.interface';
 import { TemporaryMultiplier } from '../../src/types/TemporaryMultiplier';
 import { GeneratorState, INITIAL_GENERATOR_STATE_BY_ID } from './GeneratorState';
 import { User } from '../../src/shared/users.interface';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { K } from '../../src/math/prestige';
+import { Visit } from './Visit';
 
 export class GameState {
   user: User | undefined;
@@ -24,6 +25,7 @@ export class GameState {
   lastWorkoutRewardTime: Date;
   lastPushNotificationTime: Date;
   speed: number;  // Tick usage multiplier
+  visitHistory: List<Visit>;
 
   constructor (
     user: User | undefined,
@@ -43,6 +45,7 @@ export class GameState {
     lastWorkoutRewardTime: Date,
     lastPushNotificationTime: Date,
     speed: number,
+    visitHistory: List<Visit>,
   ) {
     this.user = user
     this.balance = balance
@@ -61,6 +64,7 @@ export class GameState {
     this.lastWorkoutRewardTime = lastWorkoutRewardTime
     this.lastPushNotificationTime = lastPushNotificationTime
     this.speed = speed
+    this.visitHistory = visitHistory
   }
 
   static fromJson(gameStateString: string) {
@@ -83,6 +87,7 @@ export class GameState {
       obj.lastWorkoutRewardTime === undefined ? INITIAL_LAST_WORKOUT_REWARD_TIME : new Date(obj.lastWorkoutRewardTime),  // handling old saves
       obj.lastPushNotificationTime === undefined ? INITIAL_LAST_PUSH_NOTIFICATION_TIME : new Date(obj.lastPushNotificationTime),
       obj.speed === undefined ? INITIAL_SPEED : obj.speed,
+      obj.visitHistory === undefined ? INITIAL_VISIT_HISTORY : List(obj.visitHistory).map(visit => Visit.fromJson(visit)),
     )
   }
 
@@ -105,6 +110,7 @@ const INITIAL_TICKS = 0
 const INITIAL_LAST_WORKOUT_REWARD_TIME = new Date(0)
 const INITIAL_LAST_PUSH_NOTIFICATION_TIME = new Date(0)
 const INITIAL_SPEED = 1
+const INITIAL_VISIT_HISTORY: List<Visit> = List()
 
 export const INITIAL_GAME_STATE = new GameState(
   INITIAL_USER,
@@ -124,6 +130,7 @@ export const INITIAL_GAME_STATE = new GameState(
   INITIAL_LAST_WORKOUT_REWARD_TIME,
   INITIAL_LAST_PUSH_NOTIFICATION_TIME,
   INITIAL_SPEED,
+  INITIAL_VISIT_HISTORY,
 )
 
 const DEBUG_BALANCE = 0
@@ -149,4 +156,5 @@ export const DEBUG_GAME_STATE = new GameState(
   INITIAL_LAST_WORKOUT_REWARD_TIME,
   INITIAL_LAST_PUSH_NOTIFICATION_TIME,
   INITIAL_SPEED,
+  INITIAL_VISIT_HISTORY,
 )
