@@ -1,6 +1,7 @@
 import { Generator, GENERATORS_BY_ID } from "../../assets/data/Generators";
 import { GameState } from "../../assets/data/GameState";
 import { calculateMultipliersFromUpgrades, calculateMultipliersFromUnlocks, calculateTemporaryMultipliers, calculateTicksNeededByGeneratorId } from "./multipliers";
+import { Visit } from "../../assets/data/Visit";
 
 export const calculateGeneratorBaseRevenue = (
   generator: Generator,
@@ -81,6 +82,19 @@ export const calculateTicksToUse = (ticksRemaining: number, speed: number): numb
   }
   return ticksToUse * speed
 }
+
+export function calculateTicksUsedSinceLastVisit(now: Date, lastVisit: Visit, gameState: GameState) {
+  const secondsLastVisit = (now.getTime() - lastVisit.time.getTime()) / 1000;
+  let ticksRemaining = gameState.ticks;
+  let ticksToUseTotal = 0;
+  for (let i = 0; i < secondsLastVisit; ++i) {
+    const ticksToUse = calculateTicksToUse(ticksRemaining, gameState.speed);
+    ticksRemaining -= ticksToUse;
+    ticksToUseTotal += ticksToUse;
+  }
+  return ticksToUseTotal;
+}
+
 
 export const progressGenerators = (
   gameState: GameState,
