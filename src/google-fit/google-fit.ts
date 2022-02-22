@@ -35,11 +35,10 @@ export const getStepsBetween = async (start: Date, end: Date) => {
         throw new Error(`No steps response found for source ${SOURCE_ESTIMATED_STEPS}`)
       }
 
-      if (stepsResponse.steps.length === 0) {
-        return 0
+      let steps = 0
+      if (stepsResponse.steps.length > 0) {
+        steps = stepsResponse.steps.map(daySteps => daySteps.value).reduce((s1, s2) => s1 + s2)
       }
-
-      const steps = stepsResponse.steps.map(daySteps => daySteps.value).reduce((s1, s2) => s1 + s2)
       console.log(`Steps between ${opt.startDate} and ${opt.endDate}:`, steps)
 
       return steps

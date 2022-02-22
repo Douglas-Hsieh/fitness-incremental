@@ -38,37 +38,7 @@ export const Game = ({screen, setScreen, gameState, setGameState, requestAuthori
   const [hasForegroundLocationPermission, setHasForegroundLocationPermission] = useState<boolean>()
   const [currentLocation, setCurrentLocation] = useState<LocationObject>();
   const [buyAmount, setBuyAmount] = useState<BuyAmount>(BuyAmount.One);
-
-  const addVisit = () => {
-    const { visitHistory } = gameState
-    if (visitHistory.isEmpty()) {
-      return Promise.resolve(0)
-    }
-    const lastVisit = visitHistory.last()!
-    const now = new Date()
-
-    return getStepsBetween(lastVisit.time, now)
-      .then(steps => {
-        const ticksEarned = TICKS_PER_STEP * steps
-        setGameState(prevGameState => ({
-          ...prevGameState,
-          stepsUntilNextRandomReward: gameState.stepsUntilNextRandomReward - steps,
-          ticks: prevGameState.ticks + ticksEarned,
-          visitHistory: visitHistory.push(new Visit(now, steps)),
-        }))
-        return steps
-      })
-  }
-
-  const handleAppStateChange = (nextAppState: AppStateStatus) => {
-    if (nextAppState === 'active') {
-      addVisit().then(steps => {
-        if (steps > 0) {
-          setScreen(Screen.WelcomeBack)
-        }
-      })
-    }
-  }
+  const [visitTime, setVisitTime] = useState<Date>()
 
   useEffect(() => {
     const getAndSetUser = async () => {
@@ -127,13 +97,6 @@ export const Game = ({screen, setScreen, gameState, setGameState, requestAuthori
       })
   }, [])
 
-  useEffect(() => {
-    AppState.addEventListener('change', handleAppStateChange)
-    return () => {
-      AppState.removeEventListener('change', handleAppStateChange)
-    }
-  }, [])
-
   useInterval(() => {
     // Generators progress and generate revenue using ticks
     const ticksToUse = calculateTicksToUse(gameState.ticks, gameState.speed)
@@ -151,7 +114,6 @@ export const Game = ({screen, setScreen, gameState, setGameState, requestAuthori
     console.log('ticksToUse', ticksToUse)
     console.log('revenue', revenue)
   }, 1000)
-
 
   useEffect(() => {
     if (!isLoggedIn) {
@@ -189,6 +151,53 @@ export const Game = ({screen, setScreen, gameState, setGameState, requestAuthori
     }
   }, [gameState.fitnessLocation, hasForegroundLocationPermission])
 
+
+  /** When app enters foreground, handle new visit */
+  useEffect(() => {
+    AppState.addEventListener('change', handleAppStateChange)
+    return () => {
+      AppState.removeEventListener('change', handleAppStateChange)
+    }
+  }, [])
+
+  const handleAppStateChange = (nextAppState: AppStateStatus) => {
+    if (nextAppState === 'active') {
+      setVisitTime(new Date())
+    }
+  }
+
+  const handleNewVisit = async () => {
+    if (gameState.visitHistory.isEmpty()) {
+      return
+    }
+    const lastVisit = gameState.visitHistory.last()!
+    const now = new Date()
+    const steps = await getStepsBetween(lastVisit.time, now)
+    const ticksEarned = TICKS_PER_STEP * steps
+
+    if (steps <= 0) {
+      return
+    }
+    setGameState(prevGameState => {
+      const newVisitHistory = prevGameState.visitHistory.push(new Visit(now, steps))
+      return {
+        ...prevGameState,
+        stepsUntilNextRandomReward: gameState.stepsUntilNextRandomReward - steps,
+        ticks: prevGameState.ticks + ticksEarned,
+        visitHistory: newVisitHistory,
+      }
+    })
+    setScreen(Screen.WelcomeBack)
+  }
+
+  useEffect(() => {
+    if (!visitTime) {
+      return
+    }
+    handleNewVisit()
+  }, [visitTime])
+
+  
   switch(screen) {
     case Screen.Login:
       return (
