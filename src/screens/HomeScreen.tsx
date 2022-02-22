@@ -23,9 +23,10 @@ interface HomeScreenProps {
   setGameState: React.Dispatch<React.SetStateAction<GameState>>;
   buyAmount: BuyAmount;
   setBuyAmount: React.Dispatch<React.SetStateAction<BuyAmount>>;
+  temporaryMultiplier: number;
 }
 
-export const HomeScreen = ({setScreen, gameState, setGameState, buyAmount, setBuyAmount}: HomeScreenProps) => {
+export const HomeScreen = ({setScreen, gameState, setGameState, buyAmount, setBuyAmount, temporaryMultiplier}: HomeScreenProps) => {
 
   const [priceOf1ByGeneratorId, setPriceOf1ByGeneratorId] = useState<Map<string,number>>(Map());
   const [priceOf10ByGeneratorId, setPriceOf10ByGeneratorId] = useState<Map<string,number>>(Map());
@@ -35,7 +36,6 @@ export const HomeScreen = ({setScreen, gameState, setGameState, buyAmount, setBu
   const [priceByGeneratorId, setPriceByGeneratorId] = useState<Map<string,number>>(Map());
 
   const [newUnlocks, setNewUnlocks] = useState<Set<GeneratorUnlock>>(Set())
-
 
   useEffect(() => {
     console.log('Calculate max buy for each generator')
@@ -126,6 +126,7 @@ export const HomeScreen = ({setScreen, gameState, setGameState, buyAmount, setBu
             priceByGeneratorId={priceByGeneratorId}
             maxBuyByGeneratorId={maxBuyByGeneratorId}
             buyAmount={buyAmount}
+            temporaryMultiplier={temporaryMultiplier}
           />
           <View style={{height: 150}}/>
         </ScrollView>
@@ -135,6 +136,7 @@ export const HomeScreen = ({setScreen, gameState, setGameState, buyAmount, setBu
           ticks={gameState.ticks}
           buyAmount={buyAmount}
           setBuyAmount={setBuyAmount}
+          temporaryMultiplier={temporaryMultiplier}
         />
         <View style={{flex: 1}}/>
         <BottomBar screen={Screen.Home} setScreen={setScreen}/>

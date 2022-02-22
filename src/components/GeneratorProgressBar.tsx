@@ -12,9 +12,10 @@ interface GeneratorProgressBarProps {
   generator: Generator;
   gameState: GameState;
   ticksNeeded: number;
+  isGold: boolean;
 }
 
-export const GeneratorProgressBar = ({generator, gameState, ticksNeeded}: GeneratorProgressBarProps) => {
+export const GeneratorProgressBar = ({generator, gameState, ticksNeeded, isGold}: GeneratorProgressBarProps) => {
 
   // Calculate progress
   const generatorState = gameState.generatorStateById.get(generator.id)!
@@ -27,7 +28,7 @@ export const GeneratorProgressBar = ({generator, gameState, ticksNeeded}: Genera
     const text = `${coefficient} ${scale} / sec`
     return (
       <>
-        <IndeterminateProgress/>
+        <IndeterminateProgress isGold={isGold}/>
         <Text style={styles.text}>{text}</Text>
       </>
     )
@@ -37,7 +38,7 @@ export const GeneratorProgressBar = ({generator, gameState, ticksNeeded}: Genera
     const text = `${coefficient} ${scale}`
     return (
       <>
-        <DeterminateProgress progress={progress}/>
+        <DeterminateProgress progress={progress} isGold={isGold}/>
         <Text style={styles.text}>{text}</Text>
       </>
     )

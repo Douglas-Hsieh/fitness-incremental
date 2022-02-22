@@ -22,6 +22,7 @@ import { getStepsBetween } from "./google-fit/google-fit";
 import { TICKS_PER_STEP } from "../assets/data/Constants";
 import { AppState, AppStateStatus } from "react-native";
 import { Visit } from "../assets/data/Visit";
+import { calculateTemporaryMultipliers } from "./math/multipliers";
 
 interface GameProps {
   screen: Screen;
@@ -38,7 +39,8 @@ export const Game = ({screen, setScreen, gameState, setGameState, requestAuthori
   const [hasForegroundLocationPermission, setHasForegroundLocationPermission] = useState<boolean>()
   const [currentLocation, setCurrentLocation] = useState<LocationObject>();
   const [buyAmount, setBuyAmount] = useState<BuyAmount>(BuyAmount.One);
-  const [visitTime, setVisitTime] = useState<Date>()
+  const [visitTime, setVisitTime] = useState<Date>();
+  const [temporaryMultiplier, setTemporaryMultiplier] = useState<number>(1);
 
   useEffect(() => {
     const getAndSetUser = async () => {
@@ -197,7 +199,11 @@ export const Game = ({screen, setScreen, gameState, setGameState, requestAuthori
     handleNewVisit()
   }, [visitTime])
 
-  
+  useInterval(() => {
+    const temporaryMultiplier = calculateTemporaryMultipliers(gameState.temporaryMultipliers)
+    setTemporaryMultiplier(temporaryMultiplier)
+  }, 1000)
+
   switch(screen) {
     case Screen.Login:
       return (
@@ -218,6 +224,7 @@ export const Game = ({screen, setScreen, gameState, setGameState, requestAuthori
           setGameState={setGameState}
           buyAmount={buyAmount}
           setBuyAmount={setBuyAmount}
+          temporaryMultiplier={temporaryMultiplier}
         />
       )
     case Screen.Upgrades:

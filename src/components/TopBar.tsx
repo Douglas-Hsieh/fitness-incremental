@@ -18,14 +18,19 @@ const StepsImage = memo(() => (
   <Image source={require('../../assets/images/steps.png')} style={styles.stepsIcon}/>
 ));
 
+const TemporaryMultiplierImage = memo(() => (
+  <Image source={require('../../assets/images/hourglass.png')} style={styles.temporaryMultiplierIcon}/>
+))
+
 interface TopBarProps {
   balance: number,
   ticks: number,
   buyAmount: BuyAmount,
   setBuyAmount: (buyAmount: BuyAmount) => void,
+  temporaryMultiplier: number;
 }
 
-export const TopBar = memo(({balance, ticks, buyAmount, setBuyAmount}: TopBarProps) => {
+export const TopBar = memo(({balance, ticks, buyAmount, setBuyAmount, temporaryMultiplier}: TopBarProps) => {
 
   const [coefficient, scale] = numberToHumanFormat(balance);
 
@@ -44,21 +49,28 @@ export const TopBar = memo(({balance, ticks, buyAmount, setBuyAmount}: TopBarPro
       <AvatarImage/>
 
       <View style={styles.resourcesWrapper}>
-      <View style={styles.stepsWrapper}>
-        <StepsImage/>
-        <View style={styles.stepsCountWrapper}>
-          <Text style={styles.stepsCountText}>{coefficient}</Text>
-          <Text style={styles.stepsScaleText}>{scale}</Text>
+        <View style={styles.stepsWrapper}>
+          <StepsImage/>
+          <View style={styles.stepsCountWrapper}>
+            <Text style={styles.stepsCountText}>{coefficient}</Text>
+            <Text style={styles.stepsScaleText}>{scale}</Text>
+          </View>
+        </View>
+
+        <View style={styles.ticksWrapper}>
+          <TicksImage/>
+          <View style={styles.ticksCountWrapper}>
+            <Text style={styles.ticksCountText}>{ticks}</Text>
+          </View>
         </View>
       </View>
 
-      <View style={styles.ticksWrapper}>
-        <TicksImage/>
-        <View style={styles.ticksCountWrapper}>
-          <Text style={styles.ticksCountText}>{ticks}</Text>
+      { temporaryMultiplier !== 1 &&
+        <View style={styles.temporaryMultiplierWrapper}>
+          <Text style={styles.temporaryMultiplierText}>x{temporaryMultiplier}</Text>
+          <TemporaryMultiplierImage/>
         </View>
-      </View>
-      </View>
+      }
 
       <TouchableOpacity style={styles.buyAmountButton} activeOpacity={.8} onPress={toggleBuyAmount} touchSoundDisabled={true}>
         <Text style={styles.buyAmountBuyText}>Buy</Text>
@@ -89,7 +101,6 @@ const styles = EStyleSheet.create({
     },
 
     resourcesWrapper: {
-      marginLeft: '-20%',
       flexDirection: 'column',
     },
 
@@ -126,6 +137,18 @@ const styles = EStyleSheet.create({
       alignItems: 'center',
     },
     ticksCountText: {
+      fontSize: '1.1rem',
+    },
+
+    temporaryMultiplierIcon: {
+      width: 20,
+      height: 20,
+    },
+    temporaryMultiplierWrapper: {
+      flexDirection: 'row',
+      alignItems: 'center',
+    },
+    temporaryMultiplierText: {
       fontSize: '1.1rem',
     },
 

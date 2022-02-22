@@ -75,6 +75,7 @@ interface GeneratorListProps {
   priceByGeneratorId: Map<string, number>;
   maxBuyByGeneratorId: Map<string, number>;
   buyAmount: BuyAmount;
+  temporaryMultiplier: number;
 }
 
 export const GeneratorList = ({
@@ -83,6 +84,7 @@ export const GeneratorList = ({
   priceByGeneratorId,
   maxBuyByGeneratorId,
   buyAmount,
+  temporaryMultiplier,
 }: GeneratorListProps) => (
   <View style={styles.generatorListWrapper}>
     {GENERATORS.map(generator => {
@@ -107,6 +109,8 @@ export const GeneratorList = ({
       const ticksNeededByGeneratorId = calculateTicksNeededByGeneratorId(GENERATORS_BY_ID, gameState.unlockIds)
       const ticksNeeded = ticksNeededByGeneratorId.get(generator.id)!
 
+      const isGold = temporaryMultiplier > 1
+
       return (
         <View key={generator.id} style={styles.generatorWrapper}>
           <View style={styles.generatorLeftWrapper}>
@@ -115,7 +119,7 @@ export const GeneratorList = ({
           </View>
           <View style={styles.generatorRightWrapper}>
             { ownsSome &&
-              <GeneratorProgressBar generator={generator} gameState={gameState} ticksNeeded={ticksNeeded}/>
+              <GeneratorProgressBar generator={generator} gameState={gameState} ticksNeeded={ticksNeeded} isGold={isGold}/>
             }
             <BuyGeneratorButton
               gameState={gameState}

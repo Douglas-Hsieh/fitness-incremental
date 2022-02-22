@@ -7,11 +7,13 @@ import { LayoutChangeEvent, StyleSheet, View } from 'react-native';
 const AnimatedRect = Animated.createAnimatedComponent(Rect)
 
 interface DeterminateProgressProps {
-  progress: number,
+  progress: number;
+  isGold: boolean;
 }
 
-export const DeterminateProgress = ({progress}: DeterminateProgressProps) => {
+export const DeterminateProgress = ({progress, isGold}: DeterminateProgressProps) => {
 
+  const [colorUsed, setColorUsed] = useState<string>(colors.green3)
   const [startX, setStartX] = useState<number>(-200)
   const endX = 0
 
@@ -21,25 +23,33 @@ export const DeterminateProgress = ({progress}: DeterminateProgressProps) => {
     return {
       transform: [
         { translateX: translateX.value },
-      ]
+      ],
+      backgroundColor: colorUsed,
     }
   })
 
   const prevProgress = useRef({ progress }).current
 
-
   useEffect(() => {
     if (progress < prevProgress.progress) {
       translateX.value = withSequence(
-        withTiming(endX, { duration: 500, easing: Easing.linear}),
+        withTiming(endX, { duration: 250, easing: Easing.linear}),
         withTiming(startX, { duration: 0 }),
-        withTiming(startX * (1 - progress), { duration: 500 })
+        withTiming(startX * (1 - progress), { duration: 250 })
       )
     } else {
-      translateX.value = withTiming(startX * (1 - progress), { duration: 1000, easing: Easing.linear })
+      translateX.value = withTiming(startX * (1 - progress), { duration: 500, easing: Easing.linear })
     }
     prevProgress.progress = progress
   }, [progress])
+
+  useEffect(() => {
+    if (isGold) {
+      setColorUsed(colors.gold)
+    } else {
+      setColorUsed(colors.green3)
+    }
+  }, [isGold])
 
   const onLayout = (event: LayoutChangeEvent) => {
     const {width} = event.nativeEvent.layout;
@@ -73,6 +83,5 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     height: 50,
     width: '100%',
-    backgroundColor: colors.green3,
   }
 })
