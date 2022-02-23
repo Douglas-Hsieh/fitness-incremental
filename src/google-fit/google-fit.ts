@@ -44,3 +44,27 @@ export const getStepsBetween = async (start: Date, end: Date) => {
       return steps
     })
 }
+
+export const getDailyStepsBetween = async (start: Date, end: Date) => {
+
+  start.setHours(0, 0, 0, 0)
+  end.setHours(23,59,59,999);
+
+  const opt = {
+    startDate: start.toISOString(),
+    endDate: end.toISOString(),
+    bucketUnit: BucketUnit.DAY,
+    bucketInterval: 1,
+  };
+
+  return await GoogleFit.getDailyStepCountSamples(opt)
+    .then(stepsResponseList => {
+      const stepsResponse = stepsResponseList.find(stepsResponse => stepsResponse.source === SOURCE_ESTIMATED_STEPS);
+
+      if (stepsResponse === undefined) {
+        throw new Error(`No steps response found for source ${SOURCE_ESTIMATED_STEPS}`)
+      }
+
+      return stepsResponse.steps
+    })
+}
