@@ -43,7 +43,7 @@ const ExitCameraIcon = ({onPress}: ExitCameraIconProps) => (
 )
 
 interface WorkoutScreenProps {
-  setScreen: (screen: Screen) => void;
+  setScreen: React.Dispatch<React.SetStateAction<Screen>>;
   gameState: GameState;
   setGameState: React.Dispatch<React.SetStateAction<GameState>>;
   currentLocation: LocationObject | undefined;

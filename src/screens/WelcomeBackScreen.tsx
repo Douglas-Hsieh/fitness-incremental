@@ -13,7 +13,7 @@ const WelcomeBackHeader = memo(() => (
 ))
 
 interface WelcomeBackScreenProps {
-  setScreen: (screen: Screen) => void;
+  setScreen: React.Dispatch<React.SetStateAction<Screen>>;
   gameState: GameState;
 }
 

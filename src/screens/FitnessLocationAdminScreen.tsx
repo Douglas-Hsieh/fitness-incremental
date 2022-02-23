@@ -11,7 +11,7 @@ import colors from "../../assets/colors/colors";
 import { getAllUnverifiedFitnessLocations, updateFitnessLocation } from "../api/fitness-locations";
 
 interface FitnessLocationAdminScreen {
-  setScreen: (screen: Screen) => void;
+  setScreen: React.Dispatch<React.SetStateAction<Screen>>;
   setGameState: React.Dispatch<React.SetStateAction<GameState>>;
 }
 

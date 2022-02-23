@@ -26,7 +26,7 @@ import { calculateTemporaryMultipliers } from "./math/multipliers";
 
 interface GameProps {
   screen: Screen;
-  setScreen: (screen: Screen) => void;
+  setScreen: React.Dispatch<React.SetStateAction<Screen>>;
   gameState: GameState;
   setGameState: React.Dispatch<React.SetStateAction<GameState>>;
   isAuthorized: boolean;

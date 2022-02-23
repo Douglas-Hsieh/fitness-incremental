@@ -70,7 +70,7 @@ const UpgradesList = ({gameState, setGameState, currency}: UpgradesListProps) =>
 }
 
 interface UpgradesScreenProps {
-  setScreen: (screen: Screen) => void;
+  setScreen: React.Dispatch<React.SetStateAction<Screen>>;
   gameState: GameState;
   setGameState: React.Dispatch<React.SetStateAction<GameState>>;
 }

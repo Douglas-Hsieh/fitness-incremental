@@ -18,7 +18,7 @@ import { UnlockModal } from "../components/UnlockModal";
 import { StepReward } from "../components/StepReward";
 
 interface HomeScreenProps {
-  setScreen: (screen: Screen) => void;
+  setScreen: React.Dispatch<React.SetStateAction<Screen>>;
   gameState: GameState;
   setGameState: React.Dispatch<React.SetStateAction<GameState>>;
   buyAmount: BuyAmount;

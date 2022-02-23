@@ -6,7 +6,7 @@ import Screen from "../enums/Screen"
 
 interface MenuProps {
   setIsMenuShown: (isMenuShown: boolean) => void;
-  setScreen: (screen: Screen) => void;
+  setScreen: React.Dispatch<React.SetStateAction<Screen>>;
 }
 
 export const Menu = memo(({setIsMenuShown, setScreen}: MenuProps) => (

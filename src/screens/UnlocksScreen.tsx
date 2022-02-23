@@ -89,7 +89,7 @@ const UnlockCard = ({image, generatorName, count, value, reward}: UnlockCardProp
 )
 
 interface UnlocksScreenProps {
-  setScreen: (screen: Screen) => void;
+  setScreen: React.Dispatch<React.SetStateAction<Screen>>;
   gameState: GameState;
 }
 

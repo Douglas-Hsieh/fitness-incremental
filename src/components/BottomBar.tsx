@@ -7,7 +7,7 @@ import Screen from "../enums/Screen"
 
 interface BottomBarProps {
   screen: Screen;
-  setScreen: (screen: Screen) => void;
+  setScreen: React.Dispatch<React.SetStateAction<Screen>>;
 }
 
 export const BottomBar = memo(({ screen, setScreen }: BottomBarProps) => (

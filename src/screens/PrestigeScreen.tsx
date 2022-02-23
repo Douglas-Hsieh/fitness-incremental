@@ -22,7 +22,7 @@ const PrestigeIcon = memo(() => (
 ))
 
 interface PrestigeScreenProps {
-  setScreen: (screen: Screen) => void;
+  setScreen: React.Dispatch<React.SetStateAction<Screen>>;
   gameState: GameState;
   setGameState: React.Dispatch<React.SetStateAction<GameState>>;
 }

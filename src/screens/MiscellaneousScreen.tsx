@@ -10,7 +10,7 @@ import { Header } from "../components/Header";
 import Screen from "../enums/Screen";
 
 interface MiscellaneousScreenProps {
-  setScreen: (screen: Screen) => void;
+  setScreen: React.Dispatch<React.SetStateAction<Screen>>;
   gameState: GameState;
   setGameState: React.Dispatch<React.SetStateAction<GameState>>;
 }
