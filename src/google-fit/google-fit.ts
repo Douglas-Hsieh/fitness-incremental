@@ -47,12 +47,15 @@ export const getStepsBetween = async (start: Date, end: Date) => {
 
 export const getDailyStepsBetween = async (start: Date, end: Date) => {
 
-  start.setHours(0, 0, 0, 0)
-  end.setHours(23,59,59,999);
+  const startDate = new Date(start)
+  const endDate = new Date(end)
+
+  startDate.setHours(0, 0, 0, 0)
+  endDate.setHours(23,59,59,999);
 
   const opt = {
-    startDate: start.toISOString(),
-    endDate: end.toISOString(),
+    startDate: startDate.toISOString(),
+    endDate: endDate.toISOString(),
     bucketUnit: BucketUnit.DAY,
     bucketInterval: 1,
   };

@@ -15,7 +15,7 @@ import Screen from "../enums/Screen";
 import { Set } from 'immutable'
 import { GeneratorUnlock, GENERATOR_UNLOCKS_BY_ID, getUnlockId } from "../../assets/data/GeneratorUnlocks";
 import { UnlockModal } from "../components/UnlockModal";
-import { StepReward } from "../components/StepReward";
+import { StepsReward } from "../components/StepsReward";
 
 interface HomeScreenProps {
   setScreen: React.Dispatch<React.SetStateAction<Screen>>;
@@ -24,9 +24,10 @@ interface HomeScreenProps {
   buyAmount: BuyAmount;
   setBuyAmount: React.Dispatch<React.SetStateAction<BuyAmount>>;
   temporaryMultiplier: number;
+  stepsToday: number;
 }
 
-export const HomeScreen = ({setScreen, gameState, setGameState, buyAmount, setBuyAmount, temporaryMultiplier}: HomeScreenProps) => {
+export const HomeScreen = ({setScreen, gameState, setGameState, buyAmount, setBuyAmount, temporaryMultiplier, stepsToday}: HomeScreenProps) => {
 
   const [priceOf1ByGeneratorId, setPriceOf1ByGeneratorId] = useState<Map<string,number>>(Map());
   const [priceOf10ByGeneratorId, setPriceOf10ByGeneratorId] = useState<Map<string,number>>(Map());
@@ -38,7 +39,7 @@ export const HomeScreen = ({setScreen, gameState, setGameState, buyAmount, setBu
   const [newUnlocks, setNewUnlocks] = useState<Set<GeneratorUnlock>>(Set())
 
   useEffect(() => {
-    console.log('Calculate max buy for each generator')
+    // console.log('Calculate max buy for each generator')
 
     let priceOfMaxByGeneratorId = Map<string, number>();
     let maxBuyByGeneratorId = Map<string,number>();
@@ -148,7 +149,7 @@ export const HomeScreen = ({setScreen, gameState, setGameState, buyAmount, setBu
           />
         )}
 
-        <StepReward gameState={gameState} setGameState={setGameState}/>
+        <StepsReward gameState={gameState} setGameState={setGameState} stepsToday={stepsToday}/>
     </SafeAreaView>
 
   );

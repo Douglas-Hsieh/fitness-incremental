@@ -1,5 +1,5 @@
+import moment from "moment";
 import Scale from "../../assets/data/Scale";
-
 
 export const numberToHumanFormat = (number: number, smallNumberFractionDigits: number = 2, fractionDigits: number = 3): [string, string] => {
   if (number === undefined) {
@@ -24,3 +24,11 @@ export const numberToHumanFormat = (number: number, smallNumberFractionDigits: n
   // ['1.2345', 'million']
   return [(coefficient * Math.pow(10, roundedDownDigits)).toFixed(fractionDigits), Scale.get(roundedDownScale)!];
 };
+
+export const dateToYYYYMMDDFormat = (date: Date) => {
+  return moment(date).format('YYYY-MM-DD')  // e.g. 2022-02-24
+}
+
+export const dateToDDDMMMMDFormat = (date: Date) => {
+  return moment(date).format('ddd, MMMM D')  // e.g. Wed, February 23
+}

@@ -18,7 +18,7 @@ export class GameState {
   upgradeIds: Set<string>;
   unlockIds: Set<string>;
   ticks: number;  // Intermediate currency generated from user taking steps
-  stepsUntilNextRandomReward: number;
+  stepsRewardTimes: List<Date>;  // Step rewards were given at these times
   lifetimeSteps: number;
   temporaryMultipliers: Set<TemporaryMultiplier>;
   fitnessLocation: FitnessLocation | null;
@@ -38,7 +38,7 @@ export class GameState {
     upgradeIds: Set<string>,
     unlockIds: Set<string>,
     ticks: number,
-    stepsUntilNextRandomReward: number,
+    stepsRewardTimes: List<Date>,
     lifetimeSteps: number,
     temporaryMultipliers: Set<TemporaryMultiplier>,
     fitnessLocation: FitnessLocation | null,
@@ -57,7 +57,7 @@ export class GameState {
     this.upgradeIds = upgradeIds
     this.unlockIds = unlockIds
     this.ticks = ticks
-    this.stepsUntilNextRandomReward = stepsUntilNextRandomReward
+    this.stepsRewardTimes = stepsRewardTimes
     this.lifetimeSteps = lifetimeSteps
     this.temporaryMultipliers = temporaryMultipliers
     this.fitnessLocation = fitnessLocation
@@ -80,7 +80,7 @@ export class GameState {
       Set(obj.upgradeIds),
       Set(obj.unlockIds),
       obj.ticks,
-      obj.stepsUntilNextRandomReward,
+      obj.stepsRewardTimes === undefined ? INITIAL_STEPS_REWARD_TIMES : List(obj.stepsRewardTimes).map(time => new Date(time)),
       obj.lifetimeSteps,
       Set(obj.temporaryMultipliers),
       obj.fitnessLocation,
@@ -105,12 +105,12 @@ export class GameState {
 export const INITIAL_USER = undefined
 export const INITIAL_BALANCE = 0
 export const INITIAL_PRESTIGE = 0
-export const INITIAL_STEPS_UNTIL_NEXT_RANDOM_REWARD = 5000
+export const INITIAL_STEPS_REWARD_TIMES = List<Date>()
 const INITIAL_TICKS = 0
 const INITIAL_LAST_WORKOUT_REWARD_TIME = new Date(0)
 const INITIAL_LAST_PUSH_NOTIFICATION_TIME = new Date(0)
 const INITIAL_SPEED = 1
-const INITIAL_VISIT_HISTORY: List<Visit> = List()
+const INITIAL_VISIT_HISTORY = List<Visit>()
 
 export const INITIAL_GAME_STATE = new GameState(
   INITIAL_USER,
@@ -123,7 +123,7 @@ export const INITIAL_GAME_STATE = new GameState(
   Set(),
   Set(),
   INITIAL_TICKS,
-  INITIAL_STEPS_UNTIL_NEXT_RANDOM_REWARD,
+  INITIAL_STEPS_REWARD_TIMES,
   0,
   Set(),
   null,
@@ -149,7 +149,7 @@ export const DEBUG_GAME_STATE = new GameState(
   Set(),
   Set(),
   DEBUG_TICKS,
-  INITIAL_STEPS_UNTIL_NEXT_RANDOM_REWARD,
+  INITIAL_STEPS_REWARD_TIMES,
   0,
   Set(),
   null,

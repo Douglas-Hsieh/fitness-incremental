@@ -1,35 +1,39 @@
 import React, { useState, useEffect } from "react"
-import { GameState, INITIAL_STEPS_UNTIL_NEXT_RANDOM_REWARD } from "../../assets/data/GameState"
+import { STEPS_REQUIRED_FOR_REWARD } from "../../assets/data/Constants"
+import { GameState } from "../../assets/data/GameState"
 import { GENERATORS } from "../../assets/data/Generators"
 import { numberToHumanFormat } from "../math/formatting"
 import { calculateOneTickBaseRevenue } from "../math/revenue"
-import { generateRandomReward, Reward, generateInstantBonus, generateTemporaryMultiplier } from "../rewards"
+import { generateRandomReward, Reward, generateInstantBonus, generateTemporaryMultiplier, isElligibleForStepsReward } from "../rewards"
 import RewardModalDetails from "../types/RewardModalDetails"
 import { Overlay } from "./Overlay"
 import { RewardModal } from "./RewardModal"
 
-interface StepRewardProps {
+interface StepsRewardProps {
   gameState: GameState;
   setGameState: React.Dispatch<React.SetStateAction<GameState>>;
+  stepsToday: number;
 }
 
-export const StepReward = ({gameState, setGameState}: StepRewardProps) => {
+export const StepsReward = ({gameState, setGameState, stepsToday}: StepsRewardProps) => {
   const [showOverlay, setShowOverlay] = useState<boolean>(false)
   const [rewardModalDetails, setRewardModalDetails] = useState<RewardModalDetails>()
   const [showRewardModal, setShowRewardModal] = useState<boolean>(false)
 
   useEffect(() => {
-    if (gameState.stepsUntilNextRandomReward > 0) {
+    if (!isElligibleForStepsReward(gameState.stepsRewardTimes, stepsToday)) {
       return
     }
 
     const reward = generateRandomReward()
+    const rewardTime = new Date()
+
     let title: string, body: string
 
     if (reward === Reward.Nothing) {
       setGameState(prevGameState => ({
         ...prevGameState,
-        stepsUntilNextRandomReward: INITIAL_STEPS_UNTIL_NEXT_RANDOM_REWARD,
+        stepsRewardTimes: prevGameState.stepsRewardTimes.push(rewardTime),
       }))
       title = 'Nothing :('
       body = 'Better luck next time...'
@@ -40,9 +44,9 @@ export const StepReward = ({gameState, setGameState}: StepRewardProps) => {
       const [coefficient, scale] = numberToHumanFormat(bonus)
       setGameState(prevGameState => ({
         ...prevGameState,
-        stepsUntilNextRandomReward: INITIAL_STEPS_UNTIL_NEXT_RANDOM_REWARD,
-        balance: gameState.balance + bonus,
-        sessionEarnings: gameState.sessionEarnings + bonus,
+        stepsRewardTimes: prevGameState.stepsRewardTimes.push(rewardTime),
+        balance: prevGameState.balance + bonus,
+        sessionEarnings: prevGameState.sessionEarnings + bonus,
       }))
       title = 'Instant Bonus'
       body = `You just gained ${coefficient} ${scale} steps!`
@@ -51,8 +55,8 @@ export const StepReward = ({gameState, setGameState}: StepRewardProps) => {
       const temporaryMultiplier = generateTemporaryMultiplier()
       setGameState(prevGameState => ({
         ...prevGameState,
-        stepsUntilNextRandomReward: INITIAL_STEPS_UNTIL_NEXT_RANDOM_REWARD,
-        temporaryMultipliers: gameState.temporaryMultipliers.add(temporaryMultiplier),
+        stepsRewardTimes: prevGameState.stepsRewardTimes.push(rewardTime),
+        temporaryMultipliers: prevGameState.temporaryMultipliers.add(temporaryMultiplier),
       }))
       title = 'Temporary Multiplier'
       body = `You will produce x${temporaryMultiplier.multiplier} as much for 24 hours!`
@@ -60,13 +64,13 @@ export const StepReward = ({gameState, setGameState}: StepRewardProps) => {
 
     setRewardModalDetails({
       reward: reward,
-      title: `5000 Steps Reward: ${title}`,
+      title: `${STEPS_REQUIRED_FOR_REWARD} Steps Reward: ${title}`,
       body: body,
     })
     setShowOverlay(true)
     setShowRewardModal(true)
 
-  }, [gameState.stepsUntilNextRandomReward])
+  }, [stepsToday])
 
   const handleCloseRewardModal = () => {
     setTimeout(() => {setShowRewardModal(false), 5000})

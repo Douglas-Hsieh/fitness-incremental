@@ -1,3 +1,6 @@
+import { List } from "immutable"
+import { STEPS_REQUIRED_FOR_REWARD } from "../assets/data/Constants"
+import { dateToYYYYMMDDFormat } from "./math/formatting"
 import { TemporaryMultiplier } from "./types/TemporaryMultiplier"
 
 export enum Reward {
@@ -30,4 +33,15 @@ export const generateTemporaryMultiplier = (): TemporaryMultiplier => {
     multiplier: 3,
     expirationDate: oneDayLater
   }
+}
+
+export const isElligibleForStepsReward = (rewardTimes: List<Date>, stepsToday: number) => {
+  const dates = rewardTimes.map(rewardTime => dateToYYYYMMDDFormat(rewardTime))
+  const rewardTime = new Date()
+  const rewardDate = dateToYYYYMMDDFormat(rewardTime)
+
+  const isElligible = stepsToday >= STEPS_REQUIRED_FOR_REWARD
+    && !dates.includes(rewardDate)
+
+  return isElligible
 }

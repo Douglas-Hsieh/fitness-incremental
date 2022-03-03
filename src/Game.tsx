@@ -18,11 +18,12 @@ import { createUser, updateUser } from "./api/users";
 import { logIn } from "./api/auth";
 import BuyAmount from "./enums/BuyAmount";
 import { calculateTicksToUse, calculateTicksUsedSinceLastVisit, progressGenerators } from "./math/revenue";
-import { getStepsBetween } from "./google-fit/google-fit";
+import { getDailyStepsBetween, getStepsBetween } from "./google-fit/google-fit";
 import { TICKS_PER_STEP } from "../assets/data/Constants";
 import { AppState, AppStateStatus } from "react-native";
 import { Visit } from "../assets/data/Visit";
 import { calculateTemporaryMultipliers } from "./math/multipliers";
+import { TasksScreen } from "./screens/TasksScreen";
 
 interface GameProps {
   screen: Screen;
@@ -41,6 +42,7 @@ export const Game = ({screen, setScreen, gameState, setGameState, requestAuthori
   const [buyAmount, setBuyAmount] = useState<BuyAmount>(BuyAmount.One);
   const [visitTime, setVisitTime] = useState<Date>();
   const [temporaryMultiplier, setTemporaryMultiplier] = useState<number>(1);
+  const [stepsToday, setStepsToday] = useState<number>(0)
 
   useEffect(() => {
     const getAndSetUser = async () => {
@@ -83,13 +85,10 @@ export const Game = ({screen, setScreen, gameState, setGameState, requestAuthori
         // Generators progressed from ticks since last visit
         let ticksUsed = calculateTicksUsedSinceLastVisit(now, lastVisit, gameState);
         const {generatorStateById, revenue} = progressGenerators(gameState, ticksUsed)
-        
-        console.log('Ticks used since last visit', ticksUsed)
-        console.log('Revenue since last visit', revenue)
+        console.log(`Since last visit - Ticks used: ${ticksUsed}, Revenue: ${revenue}`)
 
         setGameState(prevGameState => ({
           ...prevGameState,
-          stepsUntilNextRandomReward: gameState.stepsUntilNextRandomReward - lastVisit.steps,
           ticks: gameState.ticks + ticksEarned - ticksUsed,
           generatorStateById: generatorStateById,
           balance: gameState.balance + revenue,
@@ -113,8 +112,7 @@ export const Game = ({screen, setScreen, gameState, setGameState, requestAuthori
       sessionEarnings: gameState.sessionEarnings + revenue,
     }))
 
-    console.log('ticksToUse', ticksToUse)
-    console.log('revenue', revenue)
+    // console.log(`Ticks used: ${ticksToUse}, Revenue: ${revenue}`)
   }, 1000)
 
   useEffect(() => {
@@ -184,7 +182,6 @@ export const Game = ({screen, setScreen, gameState, setGameState, requestAuthori
       const newVisitHistory = prevGameState.visitHistory.push(new Visit(now, steps))
       return {
         ...prevGameState,
-        stepsUntilNextRandomReward: gameState.stepsUntilNextRandomReward - steps,
         ticks: prevGameState.ticks + ticksEarned,
         visitHistory: newVisitHistory,
       }
@@ -203,6 +200,16 @@ export const Game = ({screen, setScreen, gameState, setGameState, requestAuthori
     const temporaryMultiplier = calculateTemporaryMultipliers(gameState.temporaryMultipliers)
     setTemporaryMultiplier(temporaryMultiplier)
   }, 1000)
+
+  useEffect(() => {
+    const today = new Date()
+    getDailyStepsBetween(today, today).then(dailySteps => setStepsToday(dailySteps[0].value))
+  }, [])
+
+  useInterval(() => {
+    const today = new Date()
+    getDailyStepsBetween(today, today).then(dailySteps => setStepsToday(dailySteps[0].value))
+  }, 60 * 1000)
 
   switch(screen) {
     case Screen.Login:
@@ -225,6 +232,7 @@ export const Game = ({screen, setScreen, gameState, setGameState, requestAuthori
           buyAmount={buyAmount}
           setBuyAmount={setBuyAmount}
           temporaryMultiplier={temporaryMultiplier}
+          stepsToday={stepsToday}
         />
       )
     case Screen.Upgrades:
@@ -272,6 +280,15 @@ export const Game = ({screen, setScreen, gameState, setGameState, requestAuthori
         <FitnessLocationAdminScreen
           setScreen={setScreen}
           setGameState={setGameState}
+        />
+      )
+    case Screen.Tasks:
+      return (
+        <TasksScreen
+          setScreen={setScreen}
+          gameState={gameState}
+          setGameState={setGameState}
+          stepsToday={stepsToday}
         />
       )
 

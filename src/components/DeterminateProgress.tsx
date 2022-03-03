@@ -3,18 +3,19 @@ import colors from "../../assets/colors/colors";
 import Animated, { Easing, useAnimatedStyle, useSharedValue, withSequence, withTiming } from "react-native-reanimated";
 import { useEffect, useRef, useState } from 'react';
 import { LayoutChangeEvent, StyleSheet, View } from 'react-native';
+import { window } from '../util/Window';
 
 const AnimatedRect = Animated.createAnimatedComponent(Rect)
 
 interface DeterminateProgressProps {
   progress: number;
-  isGold: boolean;
+  isGold?: boolean;
 }
 
 export const DeterminateProgress = ({progress, isGold}: DeterminateProgressProps) => {
 
   const [colorUsed, setColorUsed] = useState<string>(colors.green3)
-  const [startX, setStartX] = useState<number>(-200)
+  const [startX, setStartX] = useState<number>(-window.width)
   const endX = 0
 
   const translateX = useSharedValue(startX)
@@ -41,7 +42,7 @@ export const DeterminateProgress = ({progress, isGold}: DeterminateProgressProps
       translateX.value = withTiming(startX * (1 - progress), { duration: 500, easing: Easing.linear })
     }
     prevProgress.progress = progress
-  }, [progress])
+  }, [progress, startX])
 
   useEffect(() => {
     if (isGold) {
@@ -75,13 +76,13 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     borderRadius: 100,
     borderWidth: 1,
-    backgroundColor: colors.white,
+    backgroundColor: colors.gray2,
   },
   svgContainer: {
     ...StyleSheet.absoluteFillObject,
     alignItems: 'center',
     justifyContent: 'center',
-    height: 50,
+    height: '100%',
     width: '100%',
   }
 })

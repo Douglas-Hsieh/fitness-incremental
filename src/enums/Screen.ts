@@ -8,6 +8,7 @@ enum Screen {
   Miscellaneous,
   Workout,
   FitnessLocationAdmin,
+  Tasks,
 }
 
 export default Screen;

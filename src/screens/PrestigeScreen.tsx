@@ -78,7 +78,7 @@ export const PrestigeScreen = ({setScreen, gameState, setGameState}: PrestigeScr
         <Header title={'Trainers'}/>
         <Description
           title={'Teamwork makes the dream work'}
-          body={'The more steps everyone takes, the more Personal Trainers you attract! These world class instructors provide huge bonuses but you’ll need to restart your business to hire them.'}
+          body={'The more steps everyone takes, the more Personal Trainers you attract! These guys provide huge bonuses but you’ll need to restart your business to hire them.'}
         />
 
         <View style={styles.prestigeStatusWrapper}>

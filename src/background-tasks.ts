@@ -5,7 +5,9 @@ import { GameState } from "../assets/data/GameState";
 import { BackgroundTask } from './types/BackgroundTask';
 import * as TaskManager from 'expo-task-manager';
 import { AppState } from 'react-native';
-import { getStepsBetween } from './google-fit/google-fit';
+import { getDailyStepsBetween, getStepsBetween } from './google-fit/google-fit';
+import { isElligibleForStepsReward } from './rewards';
+import { STEPS_REQUIRED_FOR_REWARD } from '../assets/data/Constants';
 
 export const handleLocationUpdate: TaskManager.TaskManagerTaskExecutor = async ({ data: { locations }, error }) => {
   console.log(`Location Update Task: ${new Date(Date.now()).toISOString()}` );
@@ -69,16 +71,15 @@ export const handleStepRewardNotificationTask = async () => {
   if (!lastVisit) {
     return
   }
-  const now = new Date()
-  const steps = await getStepsBetween(lastVisit.time, now)
+  const today = new Date()
+  const stepsToday = await getDailyStepsBetween(today, today).then(dailySteps => dailySteps[0].value)
 
   const oneDayBefore = new Date(Date.now() - 86400000)
   if (oneDayBefore < gameState.lastPushNotificationTime) {
     return
   }
 
-  const stepsUntilNextRandomReward = gameState.stepsUntilNextRandomReward - steps
-  if (stepsUntilNextRandomReward > 0) {
+  if (!isElligibleForStepsReward(gameState.stepsRewardTimes, stepsToday)) {
     return
   }
 
@@ -89,7 +90,7 @@ export const handleStepRewardNotificationTask = async () => {
 
   Notifications.scheduleNotificationAsync({
     content: {
-      title: "You just took 5000 steps!",
+      title: `You just took ${STEPS_REQUIRED_FOR_REWARD} steps!`,
       body: "You've been given a random reward",
     },
     trigger: {
