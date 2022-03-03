@@ -16,6 +16,8 @@ import { Set } from 'immutable'
 import { GeneratorUnlock, GENERATOR_UNLOCKS_BY_ID, getUnlockId } from "../../assets/data/GeneratorUnlocks";
 import { UnlockModal } from "../components/UnlockModal";
 import { StepsReward } from "../components/StepsReward";
+import { WorkoutReward } from "../components/WorkoutReward";
+import { LocationObject } from "expo-location";
 
 interface HomeScreenProps {
   setScreen: React.Dispatch<React.SetStateAction<Screen>>;
@@ -25,9 +27,10 @@ interface HomeScreenProps {
   setBuyAmount: React.Dispatch<React.SetStateAction<BuyAmount>>;
   temporaryMultiplier: number;
   stepsToday: number;
+  currentLocation: LocationObject | undefined;
 }
 
-export const HomeScreen = ({setScreen, gameState, setGameState, buyAmount, setBuyAmount, temporaryMultiplier, stepsToday}: HomeScreenProps) => {
+export const HomeScreen = ({setScreen, gameState, setGameState, buyAmount, setBuyAmount, temporaryMultiplier, stepsToday, currentLocation}: HomeScreenProps) => {
 
   const [priceOf1ByGeneratorId, setPriceOf1ByGeneratorId] = useState<Map<string,number>>(Map());
   const [priceOf10ByGeneratorId, setPriceOf10ByGeneratorId] = useState<Map<string,number>>(Map());
@@ -150,6 +153,8 @@ export const HomeScreen = ({setScreen, gameState, setGameState, buyAmount, setBu
         )}
 
         <StepsReward gameState={gameState} setGameState={setGameState} stepsToday={stepsToday}/>
+        <WorkoutReward gameState={gameState} setGameState={setGameState} currentLocation={currentLocation}/>
+
     </SafeAreaView>
 
   );

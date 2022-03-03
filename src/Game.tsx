@@ -233,6 +233,7 @@ export const Game = ({screen, setScreen, gameState, setGameState, requestAuthori
           setBuyAmount={setBuyAmount}
           temporaryMultiplier={temporaryMultiplier}
           stepsToday={stepsToday}
+          currentLocation={currentLocation}
         />
       )
     case Screen.Upgrades:
@@ -289,6 +290,7 @@ export const Game = ({screen, setScreen, gameState, setGameState, requestAuthori
           gameState={gameState}
           setGameState={setGameState}
           stepsToday={stepsToday}
+          currentLocation={currentLocation}
         />
       )
 

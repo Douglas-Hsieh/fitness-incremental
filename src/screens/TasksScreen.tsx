@@ -10,15 +10,20 @@ import { Button } from "../components/Button";
 import EStyleSheet from "react-native-extended-stylesheet";
 import { Description } from "../components/Description";
 import { memo } from "react";
+import { dateToYYYYMMDDFormat } from "../math/formatting";
+import { LocationObject } from "expo-location";
+import { WorkoutReward } from "../components/WorkoutReward";
+import { StepsReward } from "../components/StepsReward";
 
 interface TasksScreenProps {
   setScreen: React.Dispatch<React.SetStateAction<Screen>>;
   gameState: GameState;
   setGameState: React.Dispatch<React.SetStateAction<GameState>>;
   stepsToday: number;
+  currentLocation: LocationObject | undefined;
 }
 
-export const TasksScreen = ({setScreen, gameState, setGameState, stepsToday}: TasksScreenProps) => {
+export const TasksScreen = ({setScreen, gameState, setGameState, stepsToday, currentLocation}: TasksScreenProps) => {
   return (
     <SafeAreaView style={styles.container}>
       <BackgroundImage/>
@@ -35,10 +40,13 @@ export const TasksScreen = ({setScreen, gameState, setGameState, stepsToday}: Ta
           targetSteps={6000}
         />
 
-        <WorkoutTask setScreen={setScreen}/>
+        <WorkoutTask setScreen={setScreen} lastWorkoutRewardTime={gameState.lastWorkoutRewardTime}/>
 
       </View>
       <BottomBar screen={Screen.Tasks} setScreen={setScreen}/>
+
+      <StepsReward gameState={gameState} setGameState={setGameState} stepsToday={stepsToday}/>
+      <WorkoutReward gameState={gameState} setGameState={setGameState} currentLocation={currentLocation}/>
     </SafeAreaView>
   )
 }
@@ -64,14 +72,21 @@ export const StepsTask = memo(({steps, targetSteps}: StepsTaskProps) => {
 
 interface WorkoutTaskProps {
   setScreen: React.Dispatch<React.SetStateAction<Screen>>;
+  lastWorkoutRewardTime: Date;
 }
 
-export const WorkoutTask = memo(({setScreen}: WorkoutTaskProps) => {
-  const progress = 0
+export const WorkoutTask = memo(({setScreen, lastWorkoutRewardTime}: WorkoutTaskProps) => {
+
+  let progress = 0
+  const hasWorkedOutToday = dateToYYYYMMDDFormat(lastWorkoutRewardTime) === dateToYYYYMMDDFormat(new Date())
+  if (hasWorkedOutToday) {
+    progress = 1
+  }
+
   return (
     <View style={styles.taskContainer}>
       <Text style={styles.titleText}>Workout</Text>
-      <Text style={styles.descriptionText}>0/1 gym visits today</Text>
+      <Text style={styles.descriptionText}>{progress}/1 gym visits today</Text>
       <View style={styles.progressBar}>
         <DeterminateProgress progress={progress}/>
       </View>
