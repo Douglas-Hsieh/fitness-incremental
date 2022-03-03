@@ -57,7 +57,10 @@ interface StepsTaskProps {
 }
 
 export const StepsTask = memo(({steps, targetSteps}: StepsTaskProps) => {
-  const progress = steps / targetSteps
+  const progress = steps / targetSteps <= 1
+    ? steps / targetSteps
+    : 1
+  
   return (
     <View style={styles.taskContainer}>
       <Text style={styles.titleText}>Steps</Text>
@@ -65,7 +68,6 @@ export const StepsTask = memo(({steps, targetSteps}: StepsTaskProps) => {
       <View style={styles.progressBar}>
         <DeterminateProgress progress={progress}/>
       </View>
-      <Button text={'Claim Reward'} onPress={() => {}}/>
     </View>
   )
 })

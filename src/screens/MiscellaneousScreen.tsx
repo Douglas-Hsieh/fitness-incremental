@@ -34,6 +34,7 @@ export const MiscellaneousScreen = ({setScreen, gameState, setGameState}: Miscel
       ...DEBUG_GAME_STATE,
       user: gameState.user,
       fitnessLocation: gameState.fitnessLocation,
+      visitHistory: gameState.visitHistory,
     })
   }
 
