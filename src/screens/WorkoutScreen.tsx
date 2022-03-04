@@ -202,7 +202,7 @@ export const WorkoutScreen = ({setScreen, gameState, setGameState, currentLocati
           { fitnessLocation && fitnessLocation.isVerified === null &&
             <Description
               title={'Photo awaiting review'}
-              body={'A human will review your gym photo soon :)\nThis may take awhile....'}
+              body={'A human will review your gym photo soon :)'}
             />
           }
 
@@ -222,7 +222,7 @@ export const WorkoutScreen = ({setScreen, gameState, setGameState, currentLocati
             <>
               <Description
                 title={'Verified'}
-                body={'Congrats, visit this fitness location daily for the chance to receive rewards!'}
+                body={'Visit this fitness location daily for the chance to receive rewards!'}
               />
               <Center>
                 <Image

@@ -137,7 +137,7 @@ export const INITIAL_GAME_STATE = new GameState(
 const DEBUG_BALANCE = 0
 const DEBUG_PRESTIGE = 1e+7
 const DEBUG_LAST_SESSION_EARNINGS = K * Math.pow(DEBUG_PRESTIGE, 2)
-const DEBUG_TICKS = 1e+100
+const DEBUG_TICKS = 1e+6
 
 export const DEBUG_GAME_STATE = new GameState(
   INITIAL_USER,

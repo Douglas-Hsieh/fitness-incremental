@@ -32,7 +32,7 @@ export const TasksScreen = ({setScreen, gameState, setGameState, stepsToday, cur
         <Header title={'Tasks'}/>
         <Description
           title={'A mile a day keeps the doctor away'}
-          body={"Keep yourself fit and healthy and we'll reward you for it"}
+          body={"Get rewarded when you complete one of these fitness tasks"}
         />
 
         <StepsTask
