@@ -116,45 +116,45 @@ export const HomeScreen = ({setScreen, gameState, setGameState, buyAmount, setBu
 
   return (
     <SafeAreaView style={styles.container}>
+      
+      <BackgroundImage/>
 
-        <BackgroundImage/>
-
-        <ScrollView
-          contentInsetAdjustmentBehavior='automatic'
-          showsVerticalScrollIndicator={false}
-          style={styles.scroll}
-        >
-          <GeneratorList
-            gameState={gameState}
-            setGameState={setGameState}
-            priceByGeneratorId={priceByGeneratorId}
-            maxBuyByGeneratorId={maxBuyByGeneratorId}
-            buyAmount={buyAmount}
-            temporaryMultiplier={temporaryMultiplier}
-          />
-          <View style={{height: 150}}/>
-        </ScrollView>
-
-        <TopBar
-          balance={gameState.balance}
-          ticks={gameState.ticks}
-          speed={gameState.speed}
+      <ScrollView
+        contentInsetAdjustmentBehavior='automatic'
+        showsVerticalScrollIndicator={false}
+        style={styles.scroll}
+      >
+        <GeneratorList
+          gameState={gameState}
+          setGameState={setGameState}
+          priceByGeneratorId={priceByGeneratorId}
+          maxBuyByGeneratorId={maxBuyByGeneratorId}
           buyAmount={buyAmount}
-          setBuyAmount={setBuyAmount}
           temporaryMultiplier={temporaryMultiplier}
         />
-        <View style={{flex: 1}}/>
-        <BottomBar screen={Screen.Home} setScreen={setScreen}/>
+        <View style={{height: 150}}/>
+      </ScrollView>
 
-        { newUnlocks.map(newUnlock => 
-          <UnlockModal
-            key={`${newUnlock.generatorId}-${newUnlock.count}`}
-            unlock={newUnlock}
-          />
-        )}
+      <TopBar
+        balance={gameState.balance}
+        ticks={gameState.ticks}
+        speed={gameState.speed}
+        buyAmount={buyAmount}
+        setBuyAmount={setBuyAmount}
+        temporaryMultiplier={temporaryMultiplier}
+      />
+      <View style={{flex: 1, zIndex: -1}}/>
+      <BottomBar screen={Screen.Home} setScreen={setScreen}/>
 
-        <StepsReward gameState={gameState} setGameState={setGameState} stepsToday={stepsToday}/>
-        <WorkoutReward gameState={gameState} setGameState={setGameState} currentLocation={currentLocation}/>
+      { newUnlocks.map(newUnlock => 
+        <UnlockModal
+          key={`${newUnlock.generatorId}-${newUnlock.count}`}
+          unlock={newUnlock}
+        />
+      )}
+
+      <StepsReward gameState={gameState} setGameState={setGameState} stepsToday={stepsToday}/>
+      <WorkoutReward gameState={gameState} setGameState={setGameState} currentLocation={currentLocation}/>
 
     </SafeAreaView>
 

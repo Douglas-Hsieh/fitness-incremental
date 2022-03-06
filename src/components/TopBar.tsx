@@ -125,7 +125,7 @@ export const TopBar = memo(({balance, ticks, speed, buyAmount, setBuyAmount, tem
 
 const styles = EStyleSheet.create({
     topBar: {
-      flex: .2,
+      flex: .18,
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'space-between',
