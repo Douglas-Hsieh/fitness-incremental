@@ -2,6 +2,7 @@ import { Generator, GENERATORS_BY_ID } from "../../assets/data/Generators";
 import { GameState } from "../../assets/data/GameState";
 import { calculateMultipliersFromUpgrades, calculateMultipliersFromUnlocks, calculateTemporaryMultipliers, calculateTicksNeededByGeneratorId } from "./multipliers";
 import { Visit } from "../../assets/data/Visit";
+import { TICK_LEVELS, TICK_THRESHOLDS, TICKS_TO_USE } from "../../assets/data/Constants";
 
 export const calculateGeneratorBaseRevenue = (
   generator: Generator,
@@ -64,35 +65,36 @@ export const calculateOneTickBaseRevenue = (
 };
 
 export const calculateTicksToUse = (ticksRemaining: number, speed: number): number => {
-  let ticksToUse
-  if (ticksRemaining <= 0) {
-    ticksToUse = 0
-  } else if (ticksRemaining < 25000) {
-    ticksToUse = .25
-  } else if (ticksRemaining < 50000) {
-    ticksToUse = .5
-  } else if (ticksRemaining < 100000) {
-    ticksToUse = 1
-  } else if (ticksRemaining < 150000) {
-    ticksToUse = 2
-  } else if (ticksRemaining < 200000) {
-    ticksToUse = 3
-  } else {
-    ticksToUse = 4
-  }
+  const ticksToUse = TICK_LEVELS.find(t => ticksRemaining < t.threshold)!.ticksToUse
   return ticksToUse * speed
 }
 
-export function calculateTicksUsedSinceLastVisit(now: Date, lastVisit: Visit, gameState: GameState) {
-  const secondsLastVisit = (now.getTime() - lastVisit.time.getTime()) / 1000;
-  let ticksRemaining = gameState.ticks;
-  let ticksToUseTotal = 0;
-  for (let i = 0; i < secondsLastVisit; ++i) {
-    const ticksToUse = calculateTicksToUse(ticksRemaining, gameState.speed);
-    ticksRemaining -= ticksToUse;
-    ticksToUseTotal += ticksToUse;
+export function calculateSecondsUntilAllTicksUsed(ticks: number, speed: number) {
+  let seconds = 0
+  
+  for (let i = 0; i < TICK_THRESHOLDS.size - 1; ++i) {
+    if (TICK_THRESHOLDS.get(i)! < ticks && ticks < TICK_THRESHOLDS.get(i + 1)!) {
+      seconds += (ticks - TICK_THRESHOLDS.get(i)!) / (TICKS_TO_USE.get(i + 1)! * speed)
+    } else if (ticks > TICK_THRESHOLDS.get(i + 1)!) {
+      seconds += (TICK_THRESHOLDS.get(i + 1)! - TICK_THRESHOLDS.get(i)!) / (TICKS_TO_USE.get(i + 1)! * speed)
+    }
   }
-  return ticksToUseTotal;
+
+  return seconds
+}
+
+export function calculateTicksUsedSinceLastVisit(now: Date, lastVisit: Visit, gameState: GameState) {
+  let seconds = (now.getTime() - lastVisit.time.getTime()) / 1000;
+  let ticks = gameState.ticks;
+  let ticksUsed = 0;
+
+  // TODO: Big performance hit when user is inactive for a month
+  for (let i = 0; i < seconds; ++i) {
+    const ticksToUse = calculateTicksToUse(ticks, gameState.speed);
+    ticks -= ticksToUse;
+    ticksUsed += ticksToUse;
+  }
+  return ticksUsed;
 }
 
 

@@ -138,6 +138,7 @@ export const HomeScreen = ({setScreen, gameState, setGameState, buyAmount, setBu
         <TopBar
           balance={gameState.balance}
           ticks={gameState.ticks}
+          speed={gameState.speed}
           buyAmount={buyAmount}
           setBuyAmount={setBuyAmount}
           temporaryMultiplier={temporaryMultiplier}

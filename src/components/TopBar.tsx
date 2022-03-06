@@ -1,10 +1,12 @@
-import React, { memo } from "react";
+import React, { memo, useEffect, useState } from "react";
 import { Image, Text, TouchableOpacity, View } from "react-native";
 import EStyleSheet from "react-native-extended-stylesheet";
 import colors from "../../assets/colors/colors";
+import { TickLevel, TICK_LEVELS, TICK_THRESHOLDS } from "../../assets/data/Constants";
 import BuyAmount from "../enums/BuyAmount";
 import { numberToHumanFormat } from "../math/formatting";
 import { playSound, SoundFile } from "../util/sounds";
+import { ProgressBar } from "./ProgressBar";
 
 const AvatarImage = memo(() => (
   <Image source={require('../../assets/images/male-avatar.png')} style={styles.avatarIcon}/>
@@ -22,15 +24,55 @@ const TemporaryMultiplierImage = memo(() => (
   <Image source={require('../../assets/images/hourglass.png')} style={styles.temporaryMultiplierIcon}/>
 ))
 
+interface TicksUsedProgressBarProps {
+  ticks: number;
+}
+
+const TicksUsedProgressBar = ({ticks}: TicksUsedProgressBarProps) => {
+  const [tickLevel, setTickLevel] = useState<TickLevel>()
+  const [progress, setProgress] = useState<number>(0)
+
+  useEffect(() => {
+    for (let i = 0; i < TICK_LEVELS.size - 1; ++i) {
+      if (TICK_THRESHOLDS.get(i)! < ticks && ticks < TICK_THRESHOLDS.get(i + 1)!) {
+        const numerator = ticks - TICK_THRESHOLDS.get(i)!
+        let denominator
+        if (TICK_THRESHOLDS.get(i + 1)! === Infinity) {
+          denominator = TICK_THRESHOLDS.get(i)!
+        } else {
+          denominator = TICK_THRESHOLDS.get(i + 1)! - TICK_THRESHOLDS.get(i)!
+        }
+        const progress = numerator / denominator > 1
+          ? 1
+          : numerator / denominator
+        
+        setTickLevel(TICK_LEVELS.get(i + 1)!)
+        setProgress(progress)
+      }
+    }
+
+
+  }, [ticks])
+
+  return (
+    <ProgressBar
+      progress={progress}
+      text={`x${tickLevel?.ticksToUse}`}
+      progressBarClassnames={tickLevel?.progressBarClassnames}
+    />
+  )
+}
+
 interface TopBarProps {
-  balance: number,
-  ticks: number,
-  buyAmount: BuyAmount,
-  setBuyAmount: (buyAmount: BuyAmount) => void,
+  balance: number;
+  ticks: number;
+  speed: number;
+  buyAmount: BuyAmount;
+  setBuyAmount: (buyAmount: BuyAmount) => void;
   temporaryMultiplier: number;
 }
 
-export const TopBar = memo(({balance, ticks, buyAmount, setBuyAmount, temporaryMultiplier}: TopBarProps) => {
+export const TopBar = memo(({balance, ticks, speed, buyAmount, setBuyAmount, temporaryMultiplier}: TopBarProps) => {
 
   const [coefficient, scale] = numberToHumanFormat(balance);
 
@@ -61,6 +103,7 @@ export const TopBar = memo(({balance, ticks, buyAmount, setBuyAmount, temporaryM
           <TicksImage/>
           <View style={styles.ticksCountWrapper}>
             <Text style={styles.ticksCountText}>{ticks}</Text>
+            <TicksUsedProgressBar ticks={ticks}/>
           </View>
         </View>
       </View>
@@ -82,7 +125,7 @@ export const TopBar = memo(({balance, ticks, buyAmount, setBuyAmount, temporaryM
 
 const styles = EStyleSheet.create({
     topBar: {
-      flex: .15,
+      flex: .2,
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'space-between',
@@ -102,13 +145,16 @@ const styles = EStyleSheet.create({
 
     resourcesWrapper: {
       flexDirection: 'column',
+      width: '45%',
     },
 
     stepsWrapper: {
+      height: '48%',
       flexDirection: 'row',
       alignItems: 'center',
     },
     stepsIcon: {
+      marginLeft: 10,
       width: 25,
       height: 25,
     },
@@ -124,17 +170,19 @@ const styles = EStyleSheet.create({
     },
 
     ticksWrapper: {
-      marginTop: 10,
+      height: '48%',
+      width: '100%',
       flexDirection: 'row',
       alignItems: 'center',
     },
     ticksIcon: {
-      width: 20,
-      height: 20,
+      marginLeft: 10,
+      width: 25,
+      height: 25,
     },
     ticksCountWrapper: {
       marginLeft: 10,
-      alignItems: 'center',
+      width: '65%',
     },
     ticksCountText: {
       fontSize: '1.1rem',

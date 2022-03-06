@@ -36,6 +36,8 @@ export const UnlockProgressBar = ({generator, generatorState}: UnlockProgressBar
       <ProgressBar
         progress={progress}
         text={text}
+        progressBarBackgroundClassnames={'bg-blue-900'}
+        textClassnames={'text-white'}
         textStyle={styles.dropShadow}
       />
     </View>

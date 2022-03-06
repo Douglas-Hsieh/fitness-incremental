@@ -31,7 +31,7 @@ export const ProgressBar: FC<ProgressBarProps> = ({
     containerClassnames,
   ].join(' ')
   const progressBarBackgroundClass = [
-    'w-full h-full bg-blue-900 absolute',
+    'w-full h-full bg-white absolute',
     progressBarBackgroundClassnames,
   ].join(' ')
   const progressBarClass = [
@@ -39,7 +39,7 @@ export const ProgressBar: FC<ProgressBarProps> = ({
     progressBarClassnames,
   ].join(' ')
   const textClass = [
-    'text-white',
+    'text-black',
     textClassnames,
   ].join(' ')
 

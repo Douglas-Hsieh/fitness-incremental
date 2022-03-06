@@ -1,5 +1,5 @@
 import React from "react";
-import { View, TouchableOpacity, Text, Image } from "react-native";
+import { View, TouchableOpacity, Text } from "react-native";
 import EStyleSheet from "react-native-extended-stylesheet";
 import colors from "../../assets/colors/colors";
 import { Generator, GENERATORS, GENERATORS_BY_ID } from "../../assets/data/Generators";
@@ -53,6 +53,7 @@ const BuyGeneratorButton = ({gameState, setGameState, generator, amount, price, 
       <View style={[
         styles.buyGeneratorButton1,
         isLarge ? { height: styles.buyGeneratorButton1.height * 1.5 } : {},
+        isDisabled ? {backgroundColor: colors.gray5} : {},
       ]}>
         <View style={[styles.buyGeneratorButton2, isDisabled ? {backgroundColor: colors.gray4} : {}]}>
           <View style={styles.buyGeneratorBuyAmountWrapper}>
@@ -142,6 +143,7 @@ const styles = EStyleSheet.create({
   // Generator
   generatorListWrapper: {
     marginLeft: 10,
+    marginTop: 30,
   },
   generatorWrapper: {
     flexDirection: 'row',

@@ -32,3 +32,14 @@ export const dateToYYYYMMDDFormat = (date: Date) => {
 export const dateToDDDMMMMDFormat = (date: Date) => {
   return moment(date).format('ddd, MMMM D')  // e.g. Wed, February 23
 }
+
+export const secondsToHumanDateFormat = (seconds: number) => {
+  const days = Math.floor(seconds / 86400)
+  seconds = (seconds % 86400);
+  const hours = Math.floor(seconds / 3600)
+  seconds = (seconds % 3600)
+  const minutes = Math.floor(seconds / 60)
+  seconds = Math.floor(seconds % 60)
+  const timeLeft = `${days}d ${hours}h ${minutes}m ${seconds}s`
+  return timeLeft
+}
