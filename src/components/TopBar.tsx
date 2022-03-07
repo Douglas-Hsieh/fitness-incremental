@@ -63,19 +63,13 @@ const TicksUsedProgressBar = ({ticks}: TicksUsedProgressBarProps) => {
   )
 }
 
-interface TopBarProps {
-  balance: number;
-  ticks: number;
-  speed: number;
+interface BuyAmountButtonProps {
   buyAmount: BuyAmount;
-  setBuyAmount: (buyAmount: BuyAmount) => void;
-  temporaryMultiplier: number;
+  setBuyAmount: React.Dispatch<React.SetStateAction<BuyAmount>>;
 }
 
-export const TopBar = memo(({balance, ticks, speed, buyAmount, setBuyAmount, temporaryMultiplier}: TopBarProps) => {
-
-  const [coefficient, scale] = numberToHumanFormat(balance);
-
+export const BuyAmountButton = memo(({buyAmount, setBuyAmount}: BuyAmountButtonProps) => {
+  
   const toggleBuyAmount = () => {
     if (buyAmount === BuyAmount.One) setBuyAmount(BuyAmount.Ten);
     else if (buyAmount === BuyAmount.Ten) setBuyAmount(BuyAmount.Hundred);
@@ -84,6 +78,26 @@ export const TopBar = memo(({balance, ticks, speed, buyAmount, setBuyAmount, tem
 
     playSound(SoundFile.SwitchOn)
   }
+
+  return (
+  <TouchableOpacity style={styles.buyAmountButton} activeOpacity={.8} onPress={toggleBuyAmount} touchSoundDisabled={true}>
+    <Text style={styles.buyAmountBuyText}>Buy</Text>
+    <Text style={styles.buyAmountAmountText}>{buyAmount}</Text>
+  </TouchableOpacity>
+)})
+
+interface TopBarProps {
+  balance: number;
+  ticks: number;
+  speed: number;
+  buyAmount: BuyAmount;
+  setBuyAmount: React.Dispatch<React.SetStateAction<BuyAmount>>;
+  temporaryMultiplier: number;
+}
+
+export const TopBar = memo(({balance, ticks, speed, buyAmount, setBuyAmount, temporaryMultiplier}: TopBarProps) => {
+
+  const [coefficient, scale] = numberToHumanFormat(balance);
 
   return (
     <View style={styles.topBar}>
@@ -115,10 +129,10 @@ export const TopBar = memo(({balance, ticks, speed, buyAmount, setBuyAmount, tem
         </View>
       }
 
-      <TouchableOpacity style={styles.buyAmountButton} activeOpacity={.8} onPress={toggleBuyAmount} touchSoundDisabled={true}>
-        <Text style={styles.buyAmountBuyText}>Buy</Text>
-        <Text style={styles.buyAmountAmountText}>{buyAmount}</Text>
-      </TouchableOpacity>
+      <BuyAmountButton
+        buyAmount={buyAmount}
+        setBuyAmount={setBuyAmount}
+      />
     </View>
   )
 })
