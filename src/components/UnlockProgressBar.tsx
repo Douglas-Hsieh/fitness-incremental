@@ -1,34 +1,33 @@
-import React from "react";
+import React, { memo } from "react";
 import { StyleSheet, View } from "react-native";
 import colors from "../../assets/colors/colors";
 import { Generator } from "../../assets/data/Generators";
-import { GeneratorState } from "../../assets/data/GeneratorState";
 import { getLastUnlock, getNextUnlock } from "../../assets/data/GeneratorUnlocks";
 import { ProgressBar } from "./ProgressBar";
 
 interface UnlockProgressBarProps {
   generator: Generator;
-  generatorState: GeneratorState;
+  owned: number;
 }
 
-export const UnlockProgressBar = ({generator, generatorState}: UnlockProgressBarProps) => {
+export const UnlockProgressBar = memo(({generator, owned}: UnlockProgressBarProps) => {
 
   let progress
-  const lastUnlock = getLastUnlock(generator.id, generatorState.owned)
-  const nextUnlock = getNextUnlock(generator.id, generatorState.owned)
+  const lastUnlock = getLastUnlock(generator.id, owned)
+  const nextUnlock = getNextUnlock(generator.id, owned)
   if (!lastUnlock && nextUnlock) {
-    progress = generatorState.owned / nextUnlock.count
+    progress = owned / nextUnlock.count
   } else if (lastUnlock && nextUnlock) {
-    progress = (generatorState.owned - lastUnlock.count) / (nextUnlock.count - lastUnlock.count)
+    progress = (owned - lastUnlock.count) / (nextUnlock.count - lastUnlock.count)
   } else {
     progress = 1
   }
 
   let text
   if (nextUnlock) {
-    text = `${generatorState.owned}/${nextUnlock.count}`
+    text = `${owned}/${nextUnlock.count}`
   } else {
-    text = generatorState.owned.toString()
+    text = owned.toString()
   }
 
   return (
@@ -42,7 +41,7 @@ export const UnlockProgressBar = ({generator, generatorState}: UnlockProgressBar
       />
     </View>
   )
-}
+})
 
 const styles = StyleSheet.create({
   container: {

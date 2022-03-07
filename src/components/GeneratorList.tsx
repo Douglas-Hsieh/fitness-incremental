@@ -116,7 +116,7 @@ export const GeneratorList = ({
         <View key={generator.id} style={styles.generatorWrapper}>
           <View style={styles.generatorLeftWrapper}>
             <GeneratorIcon image={generator.image} hasOverlay={!ownsSome}/>
-            <UnlockProgressBar generator={generator} generatorState={generatorState}/>
+            <UnlockProgressBar generator={generator} owned={generatorState.owned}/>
           </View>
           <View style={styles.generatorRightWrapper}>
             { ownsSome &&
