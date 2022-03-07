@@ -31,53 +31,56 @@ interface HomeScreenProps {
 }
 
 export const HomeScreen = ({setScreen, gameState, setGameState, buyAmount, setBuyAmount, temporaryMultiplier, stepsToday, currentLocation}: HomeScreenProps) => {
-
-  const [priceOf1ByGeneratorId, setPriceOf1ByGeneratorId] = useState<Map<string,number>>(Map());
-  const [priceOf10ByGeneratorId, setPriceOf10ByGeneratorId] = useState<Map<string,number>>(Map());
-  const [priceOf100ByGeneratorId, setPriceOf100ByGeneratorId] = useState<Map<string,number>>(Map());
-  const [priceOfMaxByGeneratorId, setPriceOfMaxByGeneratorId] = useState<Map<string,number>>(Map());
   const [maxBuyByGeneratorId, setMaxBuyByGeneratorId] = useState<Map<string,number>>(Map());
   const [priceByGeneratorId, setPriceByGeneratorId] = useState<Map<string,number>>(Map());
-
   const [newUnlocks, setNewUnlocks] = useState<Set<GeneratorUnlock>>(Set())
 
   useEffect(() => {
     // console.log('Calculate max buy for each generator')
+    if (buyAmount !== BuyAmount.Max) {
+      return
+    }
 
-    let priceOfMaxByGeneratorId = Map<string, number>();
-    let maxBuyByGeneratorId = Map<string,number>();
-
-    GENERATORS.forEach(generator => {
-      const generatorState = gameState.generatorStateById.get(generator.id)!;
-      const maxBuy = calculateMaxBuy(gameState.balance, generator.initialPrice, generator.growthRate, generatorState.owned);
-      maxBuyByGeneratorId = maxBuyByGeneratorId.set(generator.id, maxBuy);
-      priceOfMaxByGeneratorId = priceOfMaxByGeneratorId.set(generator.id, calculatePrice(maxBuy, generator.initialPrice, generator.growthRate, generatorState.owned))
-    });
-
-    setMaxBuyByGeneratorId(maxBuyByGeneratorId);
-    setPriceOfMaxByGeneratorId(priceOfMaxByGeneratorId);
-  }, [gameState.balance])
-
-  useEffect(() => {
-    console.log('Generator count has changed')
-
-    // Calculate x1, x10, x100 prices for each generator
-    let priceOf1ByGeneratorId = Map<string, number>();
-    let priceOf10ByGeneratorId = Map<string, number>();
-    let priceOf100ByGeneratorId = Map<string, number>();
-
-    GENERATORS.forEach(generator => {
-      const generatorState = gameState.generatorStateById.get(generator.id)!;
-      priceOf1ByGeneratorId = priceOf1ByGeneratorId.set(generator.id, calculatePrice(1, generator.initialPrice, generator.growthRate, generatorState.owned));
-      priceOf10ByGeneratorId = priceOf10ByGeneratorId.set(generator.id, calculatePrice(10, generator.initialPrice, generator.growthRate, generatorState.owned));
-      priceOf100ByGeneratorId = priceOf100ByGeneratorId.set(generator.id, calculatePrice(100, generator.initialPrice, generator.growthRate, generatorState.owned));
+    const maxBuyByGeneratorId = Map<string,number>().withMutations(maxBuyByGenId => {
+      GENERATORS.forEach(generator => {
+        const generatorState = gameState.generatorStateById.get(generator.id)!;
+        const maxBuy = calculateMaxBuy(gameState.balance, generator.initialPrice, generator.growthRate, generatorState.owned);
+        maxBuyByGenId.set(generator.id, maxBuy)
+      })
     })
 
-    setPriceOf1ByGeneratorId(priceOf1ByGeneratorId);
-    setPriceOf10ByGeneratorId(priceOf10ByGeneratorId);
-    setPriceOf100ByGeneratorId(priceOf100ByGeneratorId);
+    const priceOfMaxByGeneratorId = Map<string, number>().withMutations(priceOfMaxByGenId => {
+      GENERATORS.forEach(generator => {
+        const generatorState = gameState.generatorStateById.get(generator.id)!;
+        const maxBuy = maxBuyByGeneratorId.get(generator.id)!
+        priceOfMaxByGenId.set(generator.id, calculatePrice(maxBuy, generator.initialPrice, generator.growthRate, generatorState.owned))
+      })
+    })
 
-    // Calculate unlocks
+    setMaxBuyByGeneratorId(maxBuyByGeneratorId);
+    setPriceByGeneratorId(priceOfMaxByGeneratorId)
+  }, [buyAmount, gameState.balance])
+
+  useEffect(() => {
+    console.log(`Calculating prices for buying ${buyAmount}`)
+
+    if (buyAmount === BuyAmount.Max) {
+      return
+    }
+
+    const priceByGeneratorId = Map<string, number>().withMutations(priceByGenId => {
+      GENERATORS.forEach(generator => {
+        const generatorState = gameState.generatorStateById.get(generator.id)!
+        priceByGenId.set(generator.id, calculatePrice(buyAmount, generator.initialPrice, generator.growthRate, generatorState.owned))
+      })
+    })
+    setPriceByGeneratorId(priceByGeneratorId)
+
+  }, [buyAmount, JSON.stringify(Array.from(gameState.generatorStateById.values()).map(generatorState => generatorState.owned))])
+
+  useEffect(() => {
+    console.log('Calculate unlocks')
+
     const oldUnlockIds = gameState.unlockIds
     const unlocks = calculateUnlocksFromGenerators(gameState.generatorStateById)
     const unlockIds = Set(unlocks.map(unlock => getUnlockId(unlock)))
@@ -91,32 +94,11 @@ export const HomeScreen = ({setScreen, gameState, setGameState, buyAmount, setBu
       const newUnlocks = newUnlockIds.map(newUnlockId => GENERATOR_UNLOCKS_BY_ID.get(newUnlockId)!) 
       setNewUnlocks(newUnlocks)
     }
-
   }, [JSON.stringify(Array.from(gameState.generatorStateById.values()).map(generatorState => generatorState.owned))])
-
-  useEffect(() => {
-    console.log('Display x1, x10, x100, or MAX prices');
-
-    if (buyAmount === BuyAmount.One) {
-      setPriceByGeneratorId(priceOf1ByGeneratorId);
-    } else if (buyAmount === BuyAmount.Ten) {
-      setPriceByGeneratorId(priceOf10ByGeneratorId);
-    } else if (buyAmount === BuyAmount.Hundred) {
-      setPriceByGeneratorId(priceOf100ByGeneratorId);
-    } else if (buyAmount === BuyAmount.Max) {
-      setPriceByGeneratorId(priceOfMaxByGeneratorId);
-    }
-  }, [
-    buyAmount,
-    priceOf1ByGeneratorId,
-    priceOf10ByGeneratorId,
-    priceOf100ByGeneratorId,
-    priceOfMaxByGeneratorId,
-  ])
 
   return (
     <SafeAreaView style={styles.container}>
-      
+
       <BackgroundImage/>
 
       <ScrollView
