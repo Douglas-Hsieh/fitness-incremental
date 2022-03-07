@@ -28,7 +28,7 @@ interface TicksUsedProgressBarProps {
   ticks: number;
 }
 
-const TicksUsedProgressBar = ({ticks}: TicksUsedProgressBarProps) => {
+const TicksUsedProgressBar = memo(({ticks}: TicksUsedProgressBarProps) => {
   const [tickLevel, setTickLevel] = useState<TickLevel>()
   const [progress, setProgress] = useState<number>(0)
 
@@ -51,7 +51,6 @@ const TicksUsedProgressBar = ({ticks}: TicksUsedProgressBarProps) => {
       }
     }
 
-
   }, [ticks])
 
   return (
@@ -61,7 +60,7 @@ const TicksUsedProgressBar = ({ticks}: TicksUsedProgressBarProps) => {
       progressBarClassnames={tickLevel?.progressBarClassnames}
     />
   )
-}
+})
 
 interface BuyAmountButtonProps {
   buyAmount: BuyAmount;
