@@ -1,55 +1,53 @@
-import React from "react";
+import React, { memo } from "react";
 import { View, TouchableOpacity, Text } from "react-native";
 import EStyleSheet from "react-native-extended-stylesheet";
 import colors from "../../assets/colors/colors";
 import { Generator, GENERATORS, GENERATORS_BY_ID } from "../../assets/data/Generators";
 import { GameState } from "../../assets/data/GameState";
-import { GeneratorState } from "../../assets/data/GeneratorState";
 import BuyAmount from "../enums/BuyAmount";
 import { numberToHumanFormat } from "../math/formatting";
-import { calculatePrice } from "../math/prices";
 import { Map } from 'immutable';
 import { playSound, SoundFile } from "../util/sounds";
 import { UnlockProgressBar } from "./UnlockProgressBar";
 import { GeneratorProgressBar } from "./GeneratorProgressBar";
 import { calculateTicksNeededByGeneratorId } from "../math/multipliers";
 import { GeneratorIcon } from "./GeneratorIcon";
+import { calculatePrice } from "../math/prices";
 
 interface BuyGeneratorButtonProps {
-  gameState: GameState;
   setGameState: React.Dispatch<React.SetStateAction<GameState>>;
   generator: Generator;
-  generatorState: GeneratorState;
   amount: number;
   price: number;
   isDisabled: boolean;
   isLarge: boolean;
 }
 
-const BuyGeneratorButton = ({gameState, setGameState, generator, amount, price, isDisabled, isLarge}: BuyGeneratorButtonProps) => {
+const BuyGeneratorButton = memo(({setGameState, generator, amount, price, isDisabled, isLarge}: BuyGeneratorButtonProps) => {
   const [coefficient, scale] = numberToHumanFormat(price)
-  const generatorState = gameState.generatorStateById.get(generator.id)!;
 
-  const buyGenerator = () => {
-    const price = calculatePrice(amount, generator.initialPrice, generator.growthRate, generatorState.owned);
-
-    if (price <= gameState.balance) {
-      
-      const newGeneratorState = Object.assign({}, generatorState, {owned: generatorState.owned + amount})
-      const generatorStateById = gameState.generatorStateById.set(generator.id, newGeneratorState);
-
-      setGameState(prevGameState => ({
-        ...prevGameState,
-        balance: gameState.balance - price,
-        generatorStateById: generatorStateById,
-      }))
-
-      playSound(SoundFile.MenuSelectionClick)
+  const handleBuy = () => {
+    if (isDisabled) {
+      return
     }
+    
+    setGameState(prevGameState => {
+      const generatorState = prevGameState.generatorStateById.get(generator.id)!
+      const newGeneratorState = Object.assign({}, generatorState, {owned: generatorState.owned + amount})
+      const generatorStateById = prevGameState.generatorStateById.set(generator.id, newGeneratorState);
+
+      return ({
+        ...prevGameState,
+        balance: prevGameState.balance - price,
+        generatorStateById: generatorStateById,
+      })
+    })
+
+    playSound(SoundFile.MenuSelectionClick)
   }
 
   return (
-    <TouchableOpacity activeOpacity={.8} disabled={isDisabled} onPress={buyGenerator} touchSoundDisabled={true}>
+    <TouchableOpacity activeOpacity={.8} disabled={isDisabled} onPress={handleBuy} touchSoundDisabled={true}>
       <View style={[
         styles.buyGeneratorButton1,
         isLarge ? { height: styles.buyGeneratorButton1.height * 1.5 } : {},
@@ -68,7 +66,7 @@ const BuyGeneratorButton = ({gameState, setGameState, generator, amount, price, 
       </View>
     </TouchableOpacity>
   )
-}
+})
 
 interface GeneratorListProps {
   gameState: GameState;
@@ -123,10 +121,8 @@ export const GeneratorList = ({
               <GeneratorProgressBar generator={generator} gameState={gameState} ticksNeeded={ticksNeeded} isGold={isGold}/>
             }
             <BuyGeneratorButton
-              gameState={gameState}
               setGameState={setGameState}
               generator={generator}
-              generatorState={generatorState}
               price={price}
               amount={amount}
               isDisabled={isDisabled}
