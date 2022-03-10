@@ -8,6 +8,7 @@ import { AppState } from 'react-native';
 import { isElligibleForStepsReward } from './rewards';
 import { STEPS_REQUIRED_FOR_REWARD } from '../assets/data/Constants';
 import { getStepsBetween, getStepsToday } from './fitness-api/fitness-api';
+import allSettled from 'promise.allsettled';
 
 export const handleLocationUpdate: TaskManager.TaskManagerTaskExecutor = async ({ data: { locations }, error }) => {
   console.log(`Location Update Task: ${new Date(Date.now()).toISOString()}` );
@@ -209,7 +210,7 @@ TaskManager.defineTask(BackgroundTask.WorkoutRewardNotification, handleWorkoutRe
 TaskManager.defineTask(BackgroundTask.HighBalanceNotification, handleHighBalanceNotificationTask)
 
 export const unregisterTasks = async () => {
-  await Promise.allSettled([
+  await allSettled([
     BackgroundFetch.unregisterTaskAsync(BackgroundTask.StepRewardNotification),
     BackgroundFetch.unregisterTaskAsync(BackgroundTask.WorkoutRewardNotification),
     BackgroundFetch.unregisterTaskAsync(BackgroundTask.HighBalanceNotification),

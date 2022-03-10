@@ -50,9 +50,11 @@ export default function App() {
   useEffect(() => {
     EStyleSheet.build();
 
-    GoogleFit.checkIsAuthorized().then(() => {
-      setIsAuthorized(GoogleFit.isAuthorized);
-    })
+    if (Platform.OS === 'android') {
+      GoogleFit.checkIsAuthorized().then(() => {
+        setIsAuthorized(GoogleFit.isAuthorized);
+      })
+    }
 
     GameState.load().then(gameState => setGameState(gameState));
 

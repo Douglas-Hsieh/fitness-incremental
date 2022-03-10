@@ -25,7 +25,7 @@ export const registerForPushNotificationsAsync = async () => {
     }
     const experienceId = '@random_permutation/fitness-incremental'
     const token = (await Notifications.getExpoPushTokenAsync({ experienceId: experienceId })).data;
-    console.log('token.data', token);
+    // console.log('token.data', token);
     return token;
   } else {
     alert('Must use physical device for Push Notifications');
