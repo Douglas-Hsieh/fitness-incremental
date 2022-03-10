@@ -5,9 +5,9 @@ import { GameState } from "../assets/data/GameState";
 import { BackgroundTask } from './types/BackgroundTask';
 import * as TaskManager from 'expo-task-manager';
 import { AppState } from 'react-native';
-import { getDailyStepsBetween, getStepsBetween } from './google-fit/google-fit';
 import { isElligibleForStepsReward } from './rewards';
 import { STEPS_REQUIRED_FOR_REWARD } from '../assets/data/Constants';
+import { getStepsBetween, getStepsToday } from './fitness-api/fitness-api';
 
 export const handleLocationUpdate: TaskManager.TaskManagerTaskExecutor = async ({ data: { locations }, error }) => {
   console.log(`Location Update Task: ${new Date(Date.now()).toISOString()}` );
@@ -71,8 +71,7 @@ export const handleStepRewardNotificationTask = async () => {
   if (!lastVisit) {
     return
   }
-  const today = new Date()
-  const stepsToday = await getDailyStepsBetween(today, today).then(dailySteps => dailySteps[0].value)
+  const stepsToday = await getStepsToday()
 
   const oneDayBefore = new Date(Date.now() - 86400000)
   if (oneDayBefore < gameState.lastPushNotificationTime) {
@@ -171,7 +170,7 @@ export const handleHighBalanceNotificationTask = async () => {
     return
   }
   const now = new Date()
-  const steps = await getStepsBetween(lastVisit.time, now)
+  const steps = await getStepsBetween({start: lastVisit.time, end: now})
   if (steps < 10000) {
     return
   }

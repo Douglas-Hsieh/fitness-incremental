@@ -6,11 +6,13 @@ import EStyleSheet from 'react-native-extended-stylesheet';
 import { GameState, INITIAL_GAME_STATE } from './assets/data/GameState';
 import Screen from './src/enums/Screen';
 import { Game } from './src/Game';
-import { GOOGLE_FIT_AUTHORIZATION_OPTIONS } from './src/google-fit/google-fit';
+import { GOOGLE_FIT_AUTHORIZATION_OPTIONS } from './src/fitness-api/google-fit';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { Text } from 'react-native';
+import { Platform, Text } from 'react-native';
 import { registerTasks, unregisterTasks } from './src/background-tasks';
 import Center from './src/components/Center';
+import { APPLE_HEALTH_AUTHORIZATION_PERMISSIONS } from './src/fitness-api/apple-health-kit';
+import AppleHealthKit from 'react-native-health'
 
 export default function App() {
   const isLoadingComplete = useCachedResources();
@@ -20,20 +22,29 @@ export default function App() {
   const [screen, setScreen] = useState<Screen>(Screen.WelcomeBack);
   const [gameState, setGameState] = useState<GameState>(INITIAL_GAME_STATE);
 
-  const requestAuthorizationFromGoogleFit = () => {
-    GoogleFit.authorize(GOOGLE_FIT_AUTHORIZATION_OPTIONS)
-      .then(authResult => {
-        if (authResult.success) {
-          console.log("AUTH_SUCCESS");
-          setIsAuthorized(true);
-        } else {
-          console.log("AUTH_DENIED", authResult.message);
-          alert('Connect to Google Fit with your Google Account to continue')
+  const requestAuthorization = () => {
+    if (Platform.OS === 'android') {
+      GoogleFit.authorize(GOOGLE_FIT_AUTHORIZATION_OPTIONS)
+        .then(authResult => {
+          if (authResult.success) {
+            console.log("AUTH_SUCCESS");
+          } else {
+            console.log("AUTH_DENIED", authResult.message);
+            alert('Connect to Google Fit with your Google Account to continue')
+          }
+          setIsAuthorized(authResult.success)
+        })
+        .catch(() => {
+          console.log("AUTH_ERROR");
+        })
+    } else if (Platform.OS === 'ios') {
+      AppleHealthKit.initHealthKit(APPLE_HEALTH_AUTHORIZATION_PERMISSIONS, (error) => {
+        if (error) {
+          console.log('[ERROR] Cannot grant permissions!')
         }
+        setIsAuthorized(!error)
       })
-      .catch(() => {
-        console.log("AUTH_ERROR");
-      })
+    }
   }
 
   useEffect(() => {
@@ -50,10 +61,21 @@ export default function App() {
 
   useEffect(() => {
     if (!isAuthorized) {
-      GoogleFit.authorize(GOOGLE_FIT_AUTHORIZATION_OPTIONS)
-        .then(authResult => {
-          setIsAuthorized(authResult.success)
+
+      if (Platform.OS === 'android') {
+        GoogleFit.authorize(GOOGLE_FIT_AUTHORIZATION_OPTIONS)
+          .then(authResult => {
+            setIsAuthorized(authResult.success)
+          })
+      } else if (Platform.OS === 'ios') {
+        AppleHealthKit.initHealthKit(APPLE_HEALTH_AUTHORIZATION_PERMISSIONS, (error) => {
+          if (error) {
+            console.log('[ERROR] Cannot grant permissions!')
+          }
+          setIsAuthorized(!error)
         })
+      }
+
       return
     }
 
@@ -83,7 +105,7 @@ export default function App() {
         gameState={gameState}
         setGameState={setGameState}
         isAuthorized={isAuthorized}
-        requestAuthorizationFromGoogleFit={requestAuthorizationFromGoogleFit}
+        requestAuthorization={requestAuthorization}
       />
     </GestureHandlerRootView>
   )

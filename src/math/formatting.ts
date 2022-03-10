@@ -25,11 +25,11 @@ export const numberToHumanFormat = (number: number, smallNumberFractionDigits: n
   return [(coefficient * Math.pow(10, roundedDownDigits)).toFixed(fractionDigits), Scale.get(roundedDownScale)!];
 };
 
-export const dateToYYYYMMDDFormat = (date: Date) => {
+export const dateToYYYYMMDDFormat = (date: Date | string) => {
   return moment(date).format('YYYY-MM-DD')  // e.g. 2022-02-24
 }
 
-export const dateToDDDMMMMDFormat = (date: Date) => {
+export const dateToDDDMMMMDFormat = (date: Date | string) => {
   return moment(date).format('ddd, MMMM D')  // e.g. Wed, February 23
 }
 

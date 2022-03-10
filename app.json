@@ -4,9 +4,9 @@
     "slug": "fitness-incremental",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/images/male-avatar.png",
     "splash": {
-      "image": "./assets/splash.png",
+      "image": "./assets/images/puppy.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
@@ -38,6 +38,9 @@
           "projectId": "fitness-incremental"
         }
       }
-    }
+    },
+    "plugins": [
+      "react-native-health"
+    ]
   }
 }

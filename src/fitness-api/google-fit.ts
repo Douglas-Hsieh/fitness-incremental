@@ -1,4 +1,5 @@
 import GoogleFit, { BucketUnit, Scopes } from "react-native-google-fit";
+import { GetDailyStepsBetweenArgs, Steps } from "./fitness-api";
 
 export const GOOGLE_FIT_AUTHORIZATION_OPTIONS = {
   scopes: [
@@ -18,7 +19,7 @@ export const WEEK = 7 * DAY
 
 const SOURCE_ESTIMATED_STEPS = 'com.google.android.gms:estimated_steps'  // Google Fit app uses this source
 
-export const getStepsBetween = async (start: Date, end: Date) => {
+export const getStepsBetween = async ({start, end}: GetDailyStepsBetweenArgs) => {
 
   const opt = {
     startDate: start.toISOString(), // required ISO8601Timestamp
@@ -45,8 +46,7 @@ export const getStepsBetween = async (start: Date, end: Date) => {
     })
 }
 
-export const getDailyStepsBetween = async (start: Date, end: Date) => {
-
+export const getDailyStepsBetween = async ({start, end}: GetDailyStepsBetweenArgs): Promise<Steps[]> => {
   const startDate = new Date(start)
   const endDate = new Date(end)
 
@@ -56,7 +56,7 @@ export const getDailyStepsBetween = async (start: Date, end: Date) => {
   const opt = {
     startDate: startDate.toISOString(),
     endDate: endDate.toISOString(),
-    bucketUnit: BucketUnit.DAY,
+    bucketUnit: BucketUnit.HOUR,
     bucketInterval: 1,
   };
 

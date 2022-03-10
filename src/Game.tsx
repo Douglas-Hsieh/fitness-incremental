@@ -18,12 +18,12 @@ import { createUser, updateUser } from "./api/users";
 import { logIn } from "./api/auth";
 import BuyAmount from "./enums/BuyAmount";
 import { calculateTicksToUse, calculateTicksUsedSinceLastVisit, progressGenerators } from "./math/revenue";
-import { getDailyStepsBetween, getStepsBetween } from "./google-fit/google-fit";
 import { TICKS_PER_STEP } from "../assets/data/Constants";
 import { AppState, AppStateStatus } from "react-native";
 import { Visit } from "../assets/data/Visit";
 import { calculateTemporaryMultipliers } from "./math/multipliers";
 import { TasksScreen } from "./screens/TasksScreen";
+import { getStepsBetween, getStepsToday } from "./fitness-api/fitness-api";
 
 interface GameProps {
   screen: Screen;
@@ -31,10 +31,10 @@ interface GameProps {
   gameState: GameState;
   setGameState: React.Dispatch<React.SetStateAction<GameState>>;
   isAuthorized: boolean;
-  requestAuthorizationFromGoogleFit: () => void;
+  requestAuthorization: () => void;
 }
 
-export const Game = ({screen, setScreen, gameState, setGameState, requestAuthorizationFromGoogleFit}: GameProps) => {
+export const Game = ({screen, setScreen, gameState, setGameState, requestAuthorization}: GameProps) => {
 
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
   const [hasForegroundLocationPermission, setHasForegroundLocationPermission] = useState<boolean>()
@@ -78,7 +78,7 @@ export const Game = ({screen, setScreen, gameState, setGameState, requestAuthori
     }
     const now = new Date()
 
-    getStepsBetween(lastVisit.time, now)
+    getStepsBetween({start: lastVisit.time, end: now})
       .then(steps => {
         const ticksEarned = TICKS_PER_STEP * steps
 
@@ -172,7 +172,7 @@ export const Game = ({screen, setScreen, gameState, setGameState, requestAuthori
     }
     const lastVisit = gameState.visitHistory.last()!
     const now = new Date()
-    const steps = await getStepsBetween(lastVisit.time, now)
+    const steps = await getStepsBetween({start: lastVisit.time, end: now})
     const ticksEarned = TICKS_PER_STEP * steps
 
     if (steps <= 0) {
@@ -202,19 +202,17 @@ export const Game = ({screen, setScreen, gameState, setGameState, requestAuthori
   }, 1000)
 
   useEffect(() => {
-    const today = new Date()
-    getDailyStepsBetween(today, today).then(dailySteps => setStepsToday(dailySteps[0].value))
+    getStepsToday().then(setStepsToday)
   }, [])
 
   useInterval(() => {
-    const today = new Date()
-    getDailyStepsBetween(today, today).then(dailySteps => setStepsToday(dailySteps[0].value))
+    getStepsToday().then(setStepsToday)
   }, 60 * 1000)
 
   switch(screen) {
     case Screen.Login:
       return (
-        <LoginScreen handleLogin={requestAuthorizationFromGoogleFit}/>
+        <LoginScreen handleLogin={requestAuthorization}/>
       )
     case Screen.WelcomeBack:
       return (
