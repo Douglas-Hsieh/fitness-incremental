@@ -1,20 +1,23 @@
-import { GestureResponderEvent, Pressable, StyleProp, Text, TextStyle, ViewStyle } from "react-native"
+import { GestureResponderEvent, LayoutChangeEvent, Pressable, StyleProp, Text, TextStyle, ViewStyle } from "react-native"
 import EStyleSheet from "react-native-extended-stylesheet"
 import colors from "../../assets/colors/colors"
 
 interface ButtonProps {
   text: string;
-  onPress?: (((event: GestureResponderEvent) => void) & (() => void)) | undefined
+  onPress?: (((event: GestureResponderEvent) => void) & (() => void)) | undefined;
+  onLayout?: ((event: LayoutChangeEvent) => void) | undefined;
   style?: StyleProp<ViewStyle>;
   textStyle?: StyleProp<TextStyle>
 }
 
-export const Button = ({text, onPress, style, textStyle}: ButtonProps) => {
+export const Button = ({text, onPress, onLayout, style, textStyle}: ButtonProps) => {
 
   return (
     <Pressable
       style={({pressed}) => [{opacity: pressed ? 0.5 : 1.0}, styles.button, style]}
-      onPress={onPress}>
+      onPress={onPress}
+      onLayout={onLayout}
+    >
       <Text style={[styles.text, textStyle]}>{text}</Text>
     </Pressable>
   )
