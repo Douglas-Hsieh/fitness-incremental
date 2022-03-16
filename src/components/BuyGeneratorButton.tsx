@@ -14,41 +14,39 @@ interface BuyGeneratorButtonProps {
   price: number;
   isDisabled: boolean;
   isLarge: boolean;
-  onBuy: () => void;
 }
 
-export const BuyGeneratorButton = memo(({ setGameState, generator, amount, price, isDisabled, isLarge, onBuy}: BuyGeneratorButtonProps) => {
-  const [coefficient, scale] = numberToHumanFormat(price);
+export const BuyGeneratorButton = memo(({setGameState, generator, amount, price, isDisabled, isLarge}: BuyGeneratorButtonProps) => {
+  const [coefficient, scale] = numberToHumanFormat(price)
 
   const handleBuy = () => {
     if (isDisabled) {
-      return;
+      return
     }
-
+    
     setGameState(prevGameState => {
-      const generatorState = prevGameState.generatorStateById.get(generator.id)!;
-      const newGeneratorState = Object.assign({}, generatorState, { owned: generatorState.owned + amount });
+      const generatorState = prevGameState.generatorStateById.get(generator.id)!
+      const newGeneratorState = Object.assign({}, generatorState, {owned: generatorState.owned + amount})
       const generatorStateById = prevGameState.generatorStateById.set(generator.id, newGeneratorState);
 
       return ({
         ...prevGameState,
         balance: prevGameState.balance - price,
         generatorStateById: generatorStateById,
-      });
-    });
+      })
+    })
 
-    playSound(SoundFile.MenuSelectionClick);
-    onBuy()
-  };
+    playSound(SoundFile.MenuSelectionClick)
+  }
 
   return (
     <TouchableOpacity activeOpacity={.8} disabled={isDisabled} onPress={handleBuy} touchSoundDisabled={true}>
       <View style={[
         styles.buyGeneratorButton1,
         isLarge ? { height: styles.buyGeneratorButton1.height * 1.5 } : {},
-        isDisabled ? { backgroundColor: colors.gray5 } : {},
+        isDisabled ? {backgroundColor: colors.gray5} : {},
       ]}>
-        <View style={[styles.buyGeneratorButton2, isDisabled ? { backgroundColor: colors.gray4 } : {}]}>
+        <View style={[styles.buyGeneratorButton2, isDisabled ? {backgroundColor: colors.gray4} : {}]}>
           <View style={styles.buyGeneratorBuyAmountWrapper}>
             <Text style={styles.buyGeneratorBuyText}>Buy</Text>
             <Text style={styles.buyGeneratorAmountText}>{`x${amount}`}</Text>
@@ -60,8 +58,8 @@ export const BuyGeneratorButton = memo(({ setGameState, generator, amount, price
         </View>
       </View>
     </TouchableOpacity>
-  );
-});
+  )
+})
 
 const styles = EStyleSheet.create({
   // Buy Button
