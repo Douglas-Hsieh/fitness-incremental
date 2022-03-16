@@ -261,7 +261,8 @@ export const Game = ({screen, setScreen, gameState, setGameState, requestAuthori
       return (
         <MiscellaneousScreen
           setScreen={setScreen}
-          gameState={gameState}
+          user={gameState.user}
+          speed={gameState.speed}
           setGameState={setGameState}
         />
       )

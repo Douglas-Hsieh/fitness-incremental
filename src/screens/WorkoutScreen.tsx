@@ -184,14 +184,14 @@ export const WorkoutScreen = ({setScreen, gameState, setGameState, currentLocati
           <Header title={'Workout'}/>
           <Description
             title={'Get rewarded for working out!'}
-            body={`Once per day, when you workout at the gym, you have a chance of winning a reward!`}
+            body={`Earn a reward every day you go to the gym`}
           />
 
           { !fitnessLocation &&
             <>
               <Description
                 title={'How to get started'}
-                body={`Visit your local gym and send us a picture of it! Once we verify that the location is a gym, you will start receiving rewards for visiting that gym!`}
+                body={`Send us a picture of your gym. Once it is verified, you get rewarded everytime you visit!`}
               />
               <Center>
                 <Button text={'Take a Picture'} onPress={takePicture}/>

@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { memo, useEffect, useState } from "react";
 import { Dimensions, LayoutChangeEvent, SafeAreaView, StyleSheet, View } from "react-native";
+import { TouchableOpacity } from "react-native-gesture-handler";
 import { DEBUG_GAME_STATE, GameState, INITIAL_GAME_STATE } from "../../assets/data/GameState";
 import { BackgroundImage } from "../components/BackgroundImage";
 import { BottomBar } from "../components/BottomBar";
@@ -9,18 +10,22 @@ import { ConfirmationModal } from "../components/ConfirmationModal";
 import { Header } from "../components/Header";
 import { Projectile } from "../components/Projectile";
 import Screen from "../enums/Screen";
+import { User } from "../shared/users.interface";
 
 interface MiscellaneousScreenProps {
   setScreen: React.Dispatch<React.SetStateAction<Screen>>;
-  gameState: GameState;
+  user: User | undefined;
+  speed: number;
   setGameState: React.Dispatch<React.SetStateAction<GameState>>;
 }
 
-export const MiscellaneousScreen = ({setScreen, gameState, setGameState}: MiscellaneousScreenProps) => {
+export const MiscellaneousScreen = memo(({setScreen, user, speed, setGameState}: MiscellaneousScreenProps) => {
   const [showDeleteDataModal, setShowDeleteDataModal] = useState<boolean>(false)
+
   const [projectiles, setProjectiles] = useState<JSX.Element[]>([])
   const [x0, setX0] = useState<number>(0)
   const [y0, setY0] = useState<number>(0)
+  const [timeoutId, setTimeoutId] = useState<NodeJS.Timeout>()
 
   const deleteData = () => {
     setGameState(INITIAL_GAME_STATE)
@@ -34,12 +39,12 @@ export const MiscellaneousScreen = ({setScreen, gameState, setGameState}: Miscel
   }
 
   const debug = () => {
-    setGameState({
+    setGameState(prevGameState => ({
       ...DEBUG_GAME_STATE,
-      user: gameState.user,
-      fitnessLocation: gameState.fitnessLocation,
-      visitHistory: gameState.visitHistory,
-    })
+      user: prevGameState.user,
+      fitnessLocation: prevGameState.fitnessLocation,
+      visitHistory: prevGameState.visitHistory,
+    }))
   }
 
   function setX0AndY0(event: LayoutChangeEvent) {
@@ -51,6 +56,13 @@ export const MiscellaneousScreen = ({setScreen, gameState, setGameState}: Miscel
   function spawnProjectiles() {
     const newProjectile = <Projectile x0={x0} y0={y0}/>
     setProjectiles([...projectiles].concat(new Array(4).fill(newProjectile)))
+    if (timeoutId) {
+      clearTimeout(timeoutId)
+    }
+    const newTimeoutId = setTimeout(() => {
+      setProjectiles([])
+    }, 5000)
+    setTimeoutId(newTimeoutId)
   }
 
   return (
@@ -59,12 +71,13 @@ export const MiscellaneousScreen = ({setScreen, gameState, setGameState}: Miscel
 
       <View style={styles.screenWrapper}>
         <Header title={'Miscellaneous'}/>
-        { gameState.user && gameState.user.roles.includes('ROLE_ADMIN') &&
+        { user && user.roles.includes('ROLE_ADMIN') &&
           <Center>
             <Button text={'Fitness Locations'} onPress={() => setScreen(Screen.FitnessLocationAdmin)}/>
-            <Button text={`Speed x${gameState.speed}`} onPress={toggleSpeed}/>
+            <Button text={`Speed x${speed}`} onPress={toggleSpeed}/>
             <Button text={'Debug GameState'} onPress={debug}/>
             <Button text={'Spawn Projectile'} onPress={spawnProjectiles} onLayout={setX0AndY0}/>
+            <Button text={'Does Nothing'}/>
             { projectiles }
           </Center>
         }
@@ -87,7 +100,7 @@ export const MiscellaneousScreen = ({setScreen, gameState, setGameState}: Miscel
       />
     </SafeAreaView>
   )
-}
+})
 
 const styles = StyleSheet.create({
   container: {
