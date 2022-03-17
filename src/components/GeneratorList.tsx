@@ -1,17 +1,13 @@
 import React from "react";
 import { View } from "react-native";
 import EStyleSheet from "react-native-extended-stylesheet";
-import colors from "../../assets/colors/colors";
 import { GENERATORS, GENERATORS_BY_ID } from "../../assets/data/Generators";
 import { GameState } from "../../assets/data/GameState";
 import BuyAmount from "../enums/BuyAmount";
 import { Map } from 'immutable';
-import { UnlockProgressBar } from "./UnlockProgressBar";
-import { GeneratorProgressBar } from "./GeneratorProgressBar";
 import { calculateTicksNeededByGeneratorId } from "../math/multipliers";
-import { GeneratorIcon } from "./GeneratorIcon";
 import { calculatePrice } from "../math/prices";
-import { BuyGeneratorButton } from "./BuyGeneratorButton";
+import { GeneratorComponent } from "./GeneratorComponent";
 
 interface GeneratorListProps {
   gameState: GameState;
@@ -56,85 +52,27 @@ export const GeneratorList = ({
       const isGold = temporaryMultiplier > 1
 
       return (
-        <View key={generator.id} style={styles.generatorWrapper}>
-          <View style={styles.generatorLeftWrapper}>
-            <GeneratorIcon image={generator.image} hasOverlay={!ownsSome}/>
-            <UnlockProgressBar generator={generator} owned={generatorState.owned}/>
-          </View>
-          <View style={styles.generatorRightWrapper}>
-            { ownsSome &&
-              <GeneratorProgressBar generator={generator} gameState={gameState} ticksNeeded={ticksNeeded} isGold={isGold}/>
-            }
-            <BuyGeneratorButton
-              setGameState={setGameState}
-              generator={generator}
-              price={price}
-              amount={amount}
-              isDisabled={isDisabled}
-              isLarge={!ownsSome}
-            />
-          </View>
-        </View>
+        <GeneratorComponent
+          key={generator.id}
+          generator={generator}
+          generatorState={generatorState}
+          gameState={gameState}
+          setGameState={setGameState}
+          price={price}
+          amount={amount}
+          isDisabled={isDisabled}
+          ticksNeeded={ticksNeeded}
+          isGold={isGold}
+          ownsSome={ownsSome}
+        />
       )
     })}
   </View>
 )
 
 const styles = EStyleSheet.create({
-  // Generator
   generatorListWrapper: {
     marginLeft: 10,
     marginTop: 30,
-  },
-  generatorWrapper: {
-    flexDirection: 'row',
-    marginTop: 4,
-    alignItems: 'center',
-  },
-  generatorLeftWrapper: {
-    flexDirection: 'column',
-    alignItems: 'center',
-  },
-  generatorRightWrapper: {
-    flexDirection: 'column',
-    marginLeft: 10,
-  },
-
-  // Buy Button
-  buyGeneratorButton1: {
-    marginTop: 4,
-    width: 200,
-    height: 40,
-    backgroundColor: colors.orange5,
-    borderRadius: 10,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  buyGeneratorButton2: {
-    width: '99%',
-    height: '95%',
-    backgroundColor: colors.orange3,
-    borderRadius: 9,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  buyGeneratorBuyAmountWrapper: {
-    alignItems: 'center',
-  },
-  buyGeneratorBuyText: {
-    color: colors.white,
-  },
-  buyGeneratorAmountText: {
-    color: colors.white,
-  },
-  buyGeneratorPriceWrapper: {
-    alignItems: 'center',
-  },
-  buyGeneratorPriceText: {
-    color: colors.white,
-    fontSize: 15,
-  },
-  buyGeneratorPriceScaleText: {
-    fontSize: 10,
   },
 })

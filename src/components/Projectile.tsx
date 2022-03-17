@@ -16,8 +16,8 @@ export const Projectile = ({x0, y0}: ProjectileProps) => {
   const [rotateZ] = useState<number>(Math.random() * 360)
 
   const time = useSharedValue(0)
-  const endTime = 5
-  const g = -9.81
+  const endTime = 10
+  const g = 9.81
 
   const animatedStyle = useAnimatedStyle(() => {
     const t = time.value;
@@ -49,6 +49,5 @@ export const Projectile = ({x0, y0}: ProjectileProps) => {
 const styles = StyleSheet.create({
   projectile: {
     position: 'absolute',
-    zIndex: 5,
   }
 })

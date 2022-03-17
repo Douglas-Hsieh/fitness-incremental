@@ -14,9 +14,10 @@ interface BuyGeneratorButtonProps {
   price: number;
   isDisabled: boolean;
   isLarge: boolean;
+  onClick: () => void;
 }
 
-export const BuyGeneratorButton = memo(({setGameState, generator, amount, price, isDisabled, isLarge}: BuyGeneratorButtonProps) => {
+export const BuyGeneratorButton = memo(({setGameState, generator, amount, price, isDisabled, isLarge, onClick}: BuyGeneratorButtonProps) => {
   const [coefficient, scale] = numberToHumanFormat(price)
 
   const handleBuy = () => {
@@ -36,6 +37,7 @@ export const BuyGeneratorButton = memo(({setGameState, generator, amount, price,
       })
     })
 
+    onClick()
     playSound(SoundFile.MenuSelectionClick)
   }
 
