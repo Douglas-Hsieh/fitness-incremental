@@ -31,11 +31,11 @@ const INITIAL_SPEED_BY_GENERATOR_ID = Map<string, number>([
 ]);
 
 export const calculateMultipliersFromUpgrades = (
-  upgradeIds: Set<string>
+  multiplierUpgradeIds: Set<string>
 ): Map<string, number> => {
 
   const multipliersByGeneratorId = INITIAL_MULTIPLIERS_BY_GENERATOR_ID.withMutations(multByGenId => {
-    upgradeIds.forEach(upgradeId => {
+    multiplierUpgradeIds.forEach(upgradeId => {
       const upgrade = GENERATOR_MULTIPLIER_UPGRADE_BY_ID.get(upgradeId)!;
       if (upgrade.generatorId === '0') {
         multByGenId.forEach((mult, genId) => {

@@ -24,6 +24,7 @@ import { Visit } from "../assets/data/Visit";
 import { calculateTemporaryMultipliers } from "./math/multipliers";
 import { TasksScreen } from "./screens/TasksScreen";
 import { getStepsBetween, getStepsToday } from "./fitness-api/fitness-api";
+import { UpgradeType } from "../assets/data/Upgrades";
 
 interface GameProps {
   screen: Screen;
@@ -40,6 +41,7 @@ export const Game = ({screen, setScreen, gameState, setGameState, requestAuthori
   const [hasForegroundLocationPermission, setHasForegroundLocationPermission] = useState<boolean>()
   const [currentLocation, setCurrentLocation] = useState<LocationObject>();
   const [buyAmount, setBuyAmount] = useState<BuyAmount>(BuyAmount.One);
+  const [upgradeType, setUpgradeType] = useState<UpgradeType>(UpgradeType.GeneratorMultiplierCashUpgrade)
   const [visitTime, setVisitTime] = useState<Date>();
   const [temporaryMultiplier, setTemporaryMultiplier] = useState<number>(1);
   const [stepsToday, setStepsToday] = useState<number>(0)
@@ -240,6 +242,8 @@ export const Game = ({screen, setScreen, gameState, setGameState, requestAuthori
           setScreen={setScreen}
           gameState={gameState}
           setGameState={setGameState}
+          upgradeType={upgradeType}
+          setUpgradeType={setUpgradeType}
         />
       )
     case Screen.Unlocks:

@@ -3,12 +3,14 @@ import { View, TouchableOpacity, Image, Text } from "react-native";
 import EStyleSheet from "react-native-extended-stylesheet";
 import colors from "../../assets/colors/colors";
 import { GameState } from "../../assets/data/GameState";
+import { GeneratorMultiplierUpgrade, getUpgradeId, ManagerUpgrade, UpgradeType } from "../../assets/data/Upgrades";
 import { Currency } from "../enums/Currency";
 import { numberToHumanFormat } from "../math/formatting";
 import { playSound, SoundFile } from "../util/sounds";
 
 export interface UpgradeItemProps {
-  upgradeId: string;
+  upgradeType: UpgradeType;
+  upgrade: GeneratorMultiplierUpgrade | ManagerUpgrade;
   title: string;
   description: string;
   price: number;
@@ -18,7 +20,8 @@ export interface UpgradeItemProps {
   setGameState: React.Dispatch<React.SetStateAction<GameState>>;
 }
 
-export const UpgradeItem = ({upgradeId, title, description, price, currency, image, gameState, setGameState}: UpgradeItemProps) => {
+export const UpgradeItem = ({upgradeType, upgrade, title, description, price, currency, image, gameState, setGameState}: UpgradeItemProps) => {
+  const upgradeId = getUpgradeId(upgrade)
   const [coefficient, scale] = numberToHumanFormat(price, 0, 0);
   const isDisabled = currency === Currency.Cash
     ? price > gameState.balance
@@ -29,21 +32,50 @@ export const UpgradeItem = ({upgradeId, title, description, price, currency, ima
 
   const buyUpgrade = () => {
     if (!isDisabled) {
-      const upgradeIds = gameState.upgradeIds.add(upgradeId);
+      if (upgradeType === UpgradeType.GeneratorMultiplierCashUpgrade) {
+        setGameState(prevGameState => {
+          const upgradeIds = prevGameState.upgradeState.generatorMultiplierCashUpgradeIds.add(upgradeId)
+          return {
+            ...prevGameState,
+            balance: gameState.balance - price,
+            upgradeState: {
+              ...prevGameState.upgradeState,
+              generatorMultiplierCashUpgradeIds: upgradeIds,
+            }
+          }
+        })
+      } else if (upgradeType === UpgradeType.GeneratorMultiplierPrestigeUpgrade) {
+        setGameState(prevGameState => {
+          const upgradeIds = prevGameState.upgradeState.generatorMultiplierPrestigeUpgradeIds.add(upgradeId)
+          return {
+            ...prevGameState,
+            prestige: gameState.prestige - price,
+            spentPrestige: gameState.spentPrestige + price,
+            upgradeState: {
+              ...prevGameState.upgradeState,
+              generatorMultiplierPrestigeUpgradeIds: upgradeIds,
+            }
+          }
+        })
+      } else if (upgradeType === UpgradeType.ManagerUpgrade) {
+        setGameState(prevGameState => {
+          const upgradeIds = prevGameState.upgradeState.managerUpgradeIds.add(upgradeId)
+          const generatorState = prevGameState.generatorStateById.get(upgrade.generatorId)!
+          const generatorStateById = prevGameState.generatorStateById.set(upgrade.generatorId, {
+            ...generatorState,
+            hasManager: true,
+          })
 
-      if (currency === Currency.Cash) {
-        setGameState(prevGameState => ({
-          ...prevGameState,
-          balance: gameState.balance - price,
-          upgradeIds: upgradeIds,
-        }))
-      } else {
-        setGameState(prevGameState => ({
-          ...prevGameState,
-          prestige: gameState.prestige - price,
-          spentPrestige: gameState.spentPrestige + price,
-          upgradeIds: upgradeIds,
-        }))
+          return {
+            ...prevGameState,
+            balance: gameState.balance - price,
+            upgradeState: {
+              ...prevGameState.upgradeState,
+              managerUpgradeIds: upgradeIds,
+            },
+            generatorStateById: generatorStateById
+          }
+        })
       }
       playSound(SoundFile.CashRegister)
 

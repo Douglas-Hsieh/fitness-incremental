@@ -1,10 +1,10 @@
-import React, { useState } from "react";
+import React from "react";
 import { SafeAreaView, View, Image} from "react-native";
 import EStyleSheet from "react-native-extended-stylesheet";
 import { FlatList, TouchableOpacity } from "react-native-gesture-handler";
 import colors from "../../assets/colors/colors";
 import { EVERYONE_GENERATOR, GENERATORS } from "../../assets/data/Generators";
-import { GENERATOR_MULTIPLIER_CASH_UPGRADES, GENERATOR_MULTIPLIER_PRESTIGE_UPGRADES, getUpgradeId } from "../../assets/data/Upgrades";
+import { GENERATOR_MULTIPLIER_CASH_UPGRADES, GENERATOR_MULTIPLIER_PRESTIGE_UPGRADES, getUpgradeId, MANAGER_UPGRADES, UpgradeType } from "../../assets/data/Upgrades";
 import { GameState } from "../../assets/data/GameState";
 import { BackgroundImage } from "../components/BackgroundImage";
 import { BottomBar } from "../components/BottomBar";
@@ -12,27 +12,37 @@ import { Description } from "../components/Description";
 import { Header } from "../components/Header";
 import Screen from "../enums/Screen";
 import { UpgradeItem, UpgradeItemProps } from "../components/UpgradeItem";
-import { Currency } from "../enums/Currency";
+import { Set } from "immutable";
 
 interface UpgradesListProps {
   gameState: GameState;
   setGameState: React.Dispatch<React.SetStateAction<GameState>>;
-  currency: Currency;
+  upgradeType: UpgradeType;
 }
 
-const UpgradesList = ({gameState, setGameState, currency}: UpgradesListProps) => {
+const UpgradesList = ({gameState, setGameState, upgradeType}: UpgradesListProps) => {
 
-  const generatorMultiplierUpgrades = currency === Currency.Cash
-    ? GENERATOR_MULTIPLIER_CASH_UPGRADES
-    : GENERATOR_MULTIPLIER_PRESTIGE_UPGRADES
+  let upgrades
+  let ownedUpgrades: Set<string>
+  if (upgradeType === UpgradeType.GeneratorMultiplierCashUpgrade) {
+    upgrades = GENERATOR_MULTIPLIER_CASH_UPGRADES
+    ownedUpgrades = gameState.upgradeState.generatorMultiplierCashUpgradeIds
+  } else if (upgradeType === UpgradeType.GeneratorMultiplierPrestigeUpgrade) {
+    upgrades = GENERATOR_MULTIPLIER_PRESTIGE_UPGRADES
+    ownedUpgrades = gameState.upgradeState.generatorMultiplierPrestigeUpgradeIds
+  } else {
+    upgrades = MANAGER_UPGRADES
+    ownedUpgrades = gameState.upgradeState.managerUpgradeIds
+  }
 
-  const remainingUpgrades = generatorMultiplierUpgrades
-    .filter(upgrade => !gameState.upgradeIds.contains(getUpgradeId(upgrade)))
+  const remainingUpgrades = upgrades
+    .filter(upgrade => !ownedUpgrades.has(getUpgradeId(upgrade)))
     .sort((u1, u2) => u1.price - u2.price)
 
   const upgradeData = remainingUpgrades.map(upgrade => {
     let image;
     let generatorName;
+    let description;
 
     if (upgrade.generatorId === '0') {
       image = EVERYONE_GENERATOR.image
@@ -43,10 +53,17 @@ const UpgradesList = ({gameState, setGameState, currency}: UpgradesListProps) =>
       generatorName = generator.name
     }
 
+    if (upgradeType === UpgradeType.ManagerUpgrade) {
+      description = `Automate ${generatorName}`
+    } else {
+      description = `${generatorName} steps x3`
+    }
+
     return {
-      upgradeId: getUpgradeId(upgrade),
+      upgradeType: upgradeType,
+      upgrade: upgrade,
       title: generatorName,
-      description: `${generatorName} steps x3`,
+      description: description,
       price: upgrade.price,
       currency: upgrade.priceCurrency,
       image: image,
@@ -61,7 +78,7 @@ const UpgradesList = ({gameState, setGameState, currency}: UpgradesListProps) =>
     <FlatList
       data={upgradeData}
       renderItem={renderItem}
-      keyExtractor={item => item.upgradeId}
+      keyExtractor={item => getUpgradeId(item.upgrade)}
       style={styles.scroll}
       contentInsetAdjustmentBehavior='automatic'
       showsVerticalScrollIndicator={false}
@@ -73,11 +90,11 @@ interface UpgradesScreenProps {
   setScreen: React.Dispatch<React.SetStateAction<Screen>>;
   gameState: GameState;
   setGameState: React.Dispatch<React.SetStateAction<GameState>>;
+  upgradeType: UpgradeType;
+  setUpgradeType: React.Dispatch<React.SetStateAction<UpgradeType>>;
 }
 
-export const UpgradesScreen = ({setScreen, gameState, setGameState}: UpgradesScreenProps) => {
-
-  const [currency, setCurrency] = useState<Currency>(Currency.Cash)
+export const UpgradesScreen = ({setScreen, gameState, setGameState, upgradeType, setUpgradeType}: UpgradesScreenProps) => {
 
   return (
     <SafeAreaView style={styles.container}>
@@ -90,20 +107,29 @@ export const UpgradesScreen = ({setScreen, gameState, setGameState}: UpgradesScr
         <View style={styles.upgradeIconList}>
           <TouchableOpacity style={[
               styles.upgradeIconContainer,
-              currency === Currency.Cash ? styles.selected : {},
+              upgradeType === UpgradeType.GeneratorMultiplierCashUpgrade ? styles.selected : {},
             ]}
-            onPress={() => setCurrency(Currency.Cash)}
+            onPress={() => setUpgradeType(UpgradeType.GeneratorMultiplierCashUpgrade)}
           >
             <Image source={require('../../assets/images/steps.png')} style={styles.upgradeIcon}/>
           </TouchableOpacity>
           <TouchableOpacity
             style={[
               styles.upgradeIconContainer,
-              currency === Currency.Prestige ? styles.selected : {},
+              upgradeType === UpgradeType.GeneratorMultiplierPrestigeUpgrade ? styles.selected : {},
             ]}
-            onPress={() => setCurrency(Currency.Prestige)}
+            onPress={() => setUpgradeType(UpgradeType.GeneratorMultiplierPrestigeUpgrade)}
           >
             <Image source={require('../../assets/images/trainer.png')} style={styles.upgradeIcon}/>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[
+              styles.upgradeIconContainer,
+              upgradeType === UpgradeType.ManagerUpgrade ? styles.selected : {},
+            ]}
+            onPress={() => setUpgradeType(UpgradeType.ManagerUpgrade)}
+          >
+            <Image source={require('../../assets/images/puppy.png')} style={styles.upgradeIcon}/>
           </TouchableOpacity>
         </View>
 
@@ -115,7 +141,7 @@ export const UpgradesScreen = ({setScreen, gameState, setGameState}: UpgradesScr
         <UpgradesList
           gameState={gameState}
           setGameState={setGameState}
-          currency={currency}
+          upgradeType={upgradeType}
         />
       </View>
 

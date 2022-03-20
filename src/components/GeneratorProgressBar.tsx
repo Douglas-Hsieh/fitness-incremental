@@ -22,17 +22,7 @@ export const GeneratorProgressBar = ({generator, gameState, ticksNeeded, isGold}
   const progress = generatorState.ticks / ticksNeeded
 
   const ticksToUse = calculateTicksToUse(gameState.ticks, gameState.speed)
-  if (ticksToUse > ticksNeeded) {
-    const productivity = calculateGeneratorProductivity(generator, gameState)
-    const [coefficient, scale] = numberToHumanFormat(productivity)
-    const text = `${coefficient} ${scale} / sec`
-    return (
-      <>
-        <IndeterminateProgress isGold={isGold}/>
-        <Text style={styles.text}>{text}</Text>
-      </>
-    )
-  } else {
+  if (ticksToUse <= ticksNeeded || (!generatorState.hasManager && !generatorState.isManuallyOperating)) {
     const revenue = calculateGeneratorRevenue(generator, gameState)
     const [coefficient, scale] = numberToHumanFormat(revenue)
     const text = `${coefficient} ${scale}`
@@ -42,16 +32,20 @@ export const GeneratorProgressBar = ({generator, gameState, ticksNeeded, isGold}
         <Text style={styles.text}>{text}</Text>
       </>
     )
+  } else {
+    const productivity = calculateGeneratorProductivity(generator, gameState)
+    const [coefficient, scale] = numberToHumanFormat(productivity)
+    const text = `${coefficient} ${scale} / sec`
+    return (
+      <>
+        <IndeterminateProgress isGold={isGold}/>
+        <Text style={styles.text}>{text}</Text>
+      </>
+    )
   }
 }
 
 const styles = EStyleSheet.create({
-  animatedProgress: {
-    flex: .75,
-    width: '100%',
-    borderRadius: 100,
-    borderWidth: 1,
-  },
   text: {
     position: 'absolute',
     alignSelf: 'center',

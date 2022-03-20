@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from "react";
-import { LayoutChangeEvent, View } from "react-native";
+import { LayoutChangeEvent, Pressable, View } from "react-native";
 import { Generator } from "../../assets/data/Generators";
 import { GameState } from "../../assets/data/GameState";
 import { UnlockProgressBar } from "./UnlockProgressBar";
@@ -10,6 +10,7 @@ import { GeneratorState } from "../../assets/data/GeneratorState";
 import { Projectile } from "./Projectile";
 import EStyleSheet from "react-native-extended-stylesheet";
 import colors from "../../assets/colors/colors";
+import { playSound, SoundFile } from "../util/sounds";
 
 interface GeneratorComponentProps {
   generator: Generator;
@@ -49,14 +50,30 @@ export const GeneratorComponent = ({ generator, generatorState, gameState, setGa
   }
   const memoizedSpawnProjectiles = useCallback(spawnProjectiles, [x0, y0, projectiles])
 
+  function startGenerator() {
+    if (!ownsSome || generatorState.isManuallyOperating) {
+      return
+    }
+
+    const generatorStateById = gameState.generatorStateById.set(generator.id, {
+      ...generatorState,
+      isManuallyOperating: true,
+    })
+    setGameState(prevGameState => ({ ...prevGameState, generatorStateById: generatorStateById, }))
+
+    playSound(SoundFile.MenuSelectionClick)
+  }
+
+  const hasOverlay = !ownsSome || (!generatorState.isManuallyOperating && !generatorState.hasManager)
+
   return (
     <View>
       <View style={styles.generatorWrapper} onLayout={setX0AndY0}>
-        <View style={styles.generatorLeftWrapper}>
-          <GeneratorIcon image={generator.image} hasOverlay={!ownsSome} />
+        <Pressable style={styles.generatorLeftWrapper} onPress={startGenerator}>
+          <GeneratorIcon image={generator.image} hasOverlay={hasOverlay} />
           <UnlockProgressBar generator={generator} owned={generatorState.owned} />
-        </View>
-        <View style={styles.generatorRightWrapper}>
+        </Pressable>
+        <Pressable style={styles.generatorRightWrapper} onPress={startGenerator}>
           {ownsSome &&
             <GeneratorProgressBar generator={generator} gameState={gameState} ticksNeeded={ticksNeeded} isGold={isGold} />
           }
@@ -69,7 +86,7 @@ export const GeneratorComponent = ({ generator, generatorState, gameState, setGa
             isLarge={!ownsSome}
             onClick={memoizedSpawnProjectiles}
           />
-        </View>
+        </Pressable>
       </View>
       {projectiles}
     </View>

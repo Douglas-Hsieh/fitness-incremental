@@ -1,6 +1,12 @@
 import { Map } from 'immutable'
 import { Currency } from '../../src/enums/Currency'
 
+export enum UpgradeType {
+  GeneratorMultiplierCashUpgrade,
+  GeneratorMultiplierPrestigeUpgrade,
+  ManagerUpgrade,
+}
+
 interface Upgrade {
   price: number;
   priceCurrency: Currency;
@@ -31,6 +37,10 @@ export interface GeneratorCostModifier extends Upgrade {
 // TODO: Implement
 export interface PrestigeUpgrade extends Upgrade {
   effectiveness: number;
+}
+
+export interface ManagerUpgrade extends Upgrade {
+  generatorId: string;
 }
 
 export const GENERATOR_MULTIPLIER_CASH_UPGRADES: GeneratorMultiplierUpgrade[] = [
@@ -663,3 +673,16 @@ export const PRESTIGE_PRESTIGE_UPGRADES: PrestigeUpgrade[] = [
 export const PRESTIGE_PRESTIGE_UPGRADE_BY_ID: Map<string, PrestigeUpgrade> = Map<string, PrestigeUpgrade>(
   PRESTIGE_PRESTIGE_UPGRADES.map(upgrade => [getUpgradeId(upgrade), upgrade])
 )
+
+export const MANAGER_UPGRADES: ManagerUpgrade[] = [
+  { price: 1e+3, priceCurrency: Currency.Cash, generatorId: '1' },
+  { price: 1.5e+4, priceCurrency: Currency.Cash, generatorId: '2' },
+  { price: 1e+5, priceCurrency: Currency.Cash, generatorId: '3' },
+  { price: 5e+5, priceCurrency: Currency.Cash, generatorId: '4' },
+  { price: 1.2e+6, priceCurrency: Currency.Cash, generatorId: '5' },
+  { price: 1e+7, priceCurrency: Currency.Cash, generatorId: '6' },
+  { price: 1.2e+8, priceCurrency: Currency.Cash, generatorId: '7' },
+  { price: 6e+8, priceCurrency: Currency.Cash, generatorId: '8' },
+  { price: 1e+10, priceCurrency: Currency.Cash, generatorId: '9' },
+  { price: 1e+11, priceCurrency: Currency.Cash, generatorId: '10' },
+]

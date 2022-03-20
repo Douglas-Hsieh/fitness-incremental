@@ -8,11 +8,13 @@ export const calculateGeneratorBaseRevenue = (
   generator: Generator,
   gameState: GameState
 ) => {
-  const { generatorStateById, upgradeIds, unlockIds, prestige } = gameState;
+  const { generatorStateById, upgradeState, unlockIds, prestige } = gameState;
 
   const generatorState = generatorStateById.get(generator.id)!;
+  const multiplierUpgradeIds = upgradeState.generatorMultiplierCashUpgradeIds
+    .merge(upgradeState.generatorMultiplierPrestigeUpgradeIds)
 
-  const upgradeMultipliersByGeneratorId = calculateMultipliersFromUpgrades(upgradeIds);
+  const upgradeMultipliersByGeneratorId = calculateMultipliersFromUpgrades(multiplierUpgradeIds);
   const unlockMultipliersByGeneratorId = calculateMultipliersFromUnlocks(unlockIds);
   const prestigeMultiplier = 1 + (prestige * 0.02);
 
@@ -48,9 +50,11 @@ export const calculateOneTickBaseRevenue = (
   generators: Generator[],
   gameState: GameState
 ): number => {
-  const { generatorStateById, upgradeIds, unlockIds, prestige } = gameState;
+  const { generatorStateById, upgradeState, unlockIds, prestige } = gameState;
+  const multiplierUpgradeIds = upgradeState.generatorMultiplierCashUpgradeIds
+    .merge(upgradeState.generatorMultiplierPrestigeUpgradeIds)
 
-  const upgradeMultipliersByGeneratorId = calculateMultipliersFromUpgrades(upgradeIds);
+  const upgradeMultipliersByGeneratorId = calculateMultipliersFromUpgrades(multiplierUpgradeIds);
   const unlockMultipliersByGeneratorId = calculateMultipliersFromUnlocks(unlockIds);
   const prestigeMultiplier = 1 + (prestige * 0.02);
 
@@ -108,7 +112,7 @@ export const progressGenerators = (
   const generatorStateById = gameState.generatorStateById.withMutations(genStateById => {
     Array.from(genStateById.entries())
       .forEach(([id, genState]) => {
-        if (genState.owned <= 0) {
+        if (genState.owned <= 0 || (!genState.hasManager && !genState.isManuallyOperating)) {
           return
         }
 
@@ -118,10 +122,18 @@ export const progressGenerators = (
 
         if (newTicks >= ticksNeeded) {
           const timesProduced = Math.floor(newTicks / ticksNeeded)
-          genStateById.set(id, {
-            ...genState,
-            ticks: newTicks % ticksNeeded,
-          })
+          if (genState.isManuallyOperating) {
+            genStateById.set(id, {
+              ...genState,
+              ticks: 0,
+              isManuallyOperating: false,
+            })
+          } else {
+            genStateById.set(id, {
+              ...genState,
+              ticks: newTicks % ticksNeeded,
+            })
+          }
           revenue += timesProduced * calculateGeneratorRevenue(generator, gameState)
         } else {
           genStateById.set(id, {

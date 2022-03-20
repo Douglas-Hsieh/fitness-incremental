@@ -62,7 +62,7 @@ export const HomeScreen = ({setScreen, gameState, setGameState, buyAmount, setBu
   }, [buyAmount, gameState.balance])
 
   useEffect(() => {
-    console.log(`Calculating prices for buying ${buyAmount}`)
+    // console.log(`Calculating prices for buying ${buyAmount}`)
 
     if (buyAmount === BuyAmount.Max) {
       return
@@ -79,7 +79,7 @@ export const HomeScreen = ({setScreen, gameState, setGameState, buyAmount, setBu
   }, [buyAmount, JSON.stringify(Array.from(gameState.generatorStateById.values()).map(generatorState => generatorState.owned))])
 
   useEffect(() => {
-    console.log('Calculate unlocks')
+    // console.log('Calculate unlocks')
 
     const oldUnlockIds = gameState.unlockIds
     const unlocks = calculateUnlocksFromGenerators(gameState.generatorStateById)

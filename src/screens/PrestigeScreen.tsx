@@ -4,6 +4,7 @@ import { Image, SafeAreaView, StyleSheet, Text, View } from 'react-native'
 import colors from '../../assets/colors/colors'
 import { GameState, INITIAL_BALANCE } from '../../assets/data/GameState'
 import { INITIAL_GENERATOR_STATE_BY_ID } from "../../assets/data/GeneratorState"
+import { UpgradeState } from '../../assets/data/UpgradeState'
 import { BackgroundImage } from '../components/BackgroundImage'
 import { BottomBar } from '../components/BottomBar'
 import { Button } from '../components/Button'
@@ -65,7 +66,7 @@ export const PrestigeScreen = ({setScreen, gameState, setGameState}: PrestigeScr
         lastSessionEarnings: lastSessionEarnings,
         sessionEarnings: 0,
         generatorStateById: INITIAL_GENERATOR_STATE_BY_ID,
-        upgradeIds: Set(),
+        upgradeState: new UpgradeState(),
         unlockIds: Set(),
       }
     })

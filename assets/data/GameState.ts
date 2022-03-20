@@ -7,6 +7,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { K } from '../../src/math/prestige';
 import { Visit } from './Visit';
 import { STEPS_REQUIRED_FOR_REWARD, TICKS_PER_STEP } from './Constants';
+import { UpgradeState } from './UpgradeState';
 
 export class GameState {
   user: User | undefined;
@@ -16,7 +17,7 @@ export class GameState {
   lastSessionEarnings: number;
   sessionEarnings: number;
   generatorStateById: Map<string, GeneratorState>;
-  upgradeIds: Set<string>;
+  upgradeState: UpgradeState;
   unlockIds: Set<string>;
   ticks: number;  // Intermediate currency generated from user taking steps
   stepsRewardTimes: List<Date>;  // Step rewards were given at these times
@@ -36,7 +37,7 @@ export class GameState {
     lastSessionEarnings: number,
     sessionEarnings: number,
     generatorStateById: Map<string, GeneratorState>,
-    upgradeIds: Set<string>,
+    upgradeState: UpgradeState,
     unlockIds: Set<string>,
     ticks: number,
     stepsRewardTimes: List<Date>,
@@ -55,7 +56,7 @@ export class GameState {
     this.lastSessionEarnings = lastSessionEarnings
     this.sessionEarnings = sessionEarnings
     this.generatorStateById = generatorStateById
-    this.upgradeIds = upgradeIds
+    this.upgradeState = upgradeState
     this.unlockIds = unlockIds
     this.ticks = ticks
     this.stepsRewardTimes = stepsRewardTimes
@@ -78,7 +79,7 @@ export class GameState {
       obj.lastSessionEarnings,
       obj.sessionEarnings,
       Map(obj.generatorStateById),
-      Set(obj.upgradeIds),
+      obj.upgradeState === undefined ? new UpgradeState() : UpgradeState.fromJson(obj.upgradeState),
       Set(obj.unlockIds),
       obj.ticks,
       obj.stepsRewardTimes === undefined ? INITIAL_STEPS_REWARD_TIMES : List(obj.stepsRewardTimes).map(time => new Date(time)),
@@ -121,7 +122,7 @@ export const INITIAL_GAME_STATE = new GameState(
   0,
   0,
   INITIAL_GENERATOR_STATE_BY_ID,
-  Set(),
+  new UpgradeState(),
   Set(),
   INITIAL_TICKS,
   INITIAL_STEPS_REWARD_TIMES,
@@ -147,7 +148,7 @@ export const DEBUG_GAME_STATE = new GameState(
   DEBUG_LAST_SESSION_EARNINGS,
   0,
   INITIAL_GENERATOR_STATE_BY_ID,
-  Set(),
+  new UpgradeState(),
   Set(),
   DEBUG_TICKS,
   INITIAL_STEPS_REWARD_TIMES,
