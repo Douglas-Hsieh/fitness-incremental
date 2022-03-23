@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import GoogleFit from 'react-native-google-fit'
 import useCachedResources from './hooks/useCachedResources';
 import EStyleSheet from 'react-native-extended-stylesheet';
-import { GameState, INITIAL_GAME_STATE } from './assets/data/GameState';
+import { GameState } from './assets/data/GameState';
 import Screen from './src/enums/Screen';
 import { Game } from './src/Game';
 import { GOOGLE_FIT_AUTHORIZATION_OPTIONS } from './src/fitness-api/google-fit';
@@ -20,7 +20,7 @@ export default function App() {
   const [isAuthorized, setIsAuthorized] = useState<boolean>(false);
 
   const [screen, setScreen] = useState<Screen>(Screen.WelcomeBack);
-  const [gameState, setGameState] = useState<GameState>(INITIAL_GAME_STATE);
+  const [gameState, setGameState] = useState<GameState>();
 
   const requestAuthorization = () => {
     if (Platform.OS === 'android') {
@@ -88,7 +88,9 @@ export default function App() {
 
     // Autosave game
     useEffect(() => {
-      GameState.save(gameState)
+      if (gameState) {
+        GameState.save(gameState)
+      }
     }, [gameState])
   
   if (!isLoadingComplete || !gameState || !setGameState) {
