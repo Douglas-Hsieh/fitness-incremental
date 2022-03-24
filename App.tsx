@@ -107,7 +107,7 @@ export default function App() {
         screen={screen}
         setScreen={setScreen}
         gameState={gameState}
-        setGameState={setGameState}
+        setGameState={setGameState as React.Dispatch<React.SetStateAction<GameState>>}
         isAuthorized={isAuthorized}
         requestAuthorization={requestAuthorization}
       />

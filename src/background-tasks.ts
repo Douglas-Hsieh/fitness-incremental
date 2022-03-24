@@ -62,7 +62,7 @@ export const handleLocationUpdate: TaskManager.TaskManagerTaskExecutor = async (
 
 export const handleStepRewardNotificationTask = async () => {  
   console.log(`Step Reward Notification Task: ${new Date(Date.now()).toISOString()}`)
-  
+
   if (AppState.currentState == 'active') {
     return
   }
@@ -157,7 +157,6 @@ export const handleWorkoutRewardNotificationTask = async () => {
 
 export const handleHighBalanceNotificationTask = async () => {
   console.log(`High Balance Notification Task: ${new Date(Date.now()).toISOString()}`)
-  console.log('AppState.currentState', AppState.currentState)
   
   if (AppState.currentState == 'active') {
     return
