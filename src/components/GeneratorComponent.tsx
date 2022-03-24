@@ -51,7 +51,7 @@ export const GeneratorComponent = ({ generator, generatorState, gameState, setGa
   const memoizedSpawnProjectiles = useCallback(spawnProjectiles, [x0, y0, projectiles])
 
   function startGenerator() {
-    if (!ownsSome || generatorState.isManuallyOperating) {
+    if (!ownsSome || generatorState.isManuallyOperating || generatorState.hasManager) {
       return
     }
 
