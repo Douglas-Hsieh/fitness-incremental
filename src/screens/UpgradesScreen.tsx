@@ -13,6 +13,7 @@ import { Header } from "../components/Header";
 import Screen from "../enums/Screen";
 import { UpgradeItem, UpgradeItemProps } from "../components/UpgradeItem";
 import { Set } from "immutable";
+import { playSound, SoundFile } from "../util/sounds";
 
 interface UpgradesListProps {
   gameState: GameState;
@@ -109,7 +110,10 @@ export const UpgradesScreen = ({setScreen, gameState, setGameState, upgradeType,
               styles.upgradeIconContainer,
               upgradeType === UpgradeType.GeneratorMultiplierCashUpgrade ? styles.selected : {},
             ]}
-            onPress={() => setUpgradeType(UpgradeType.GeneratorMultiplierCashUpgrade)}
+            onPress={() => {
+              setUpgradeType(UpgradeType.GeneratorMultiplierCashUpgrade)
+              playSound(SoundFile.SwitchOn)
+            }}
           >
             <Image source={require('../../assets/images/steps.png')} style={styles.upgradeIcon}/>
           </TouchableOpacity>
@@ -118,8 +122,10 @@ export const UpgradesScreen = ({setScreen, gameState, setGameState, upgradeType,
               styles.upgradeIconContainer,
               upgradeType === UpgradeType.GeneratorMultiplierPrestigeUpgrade ? styles.selected : {},
             ]}
-            onPress={() => setUpgradeType(UpgradeType.GeneratorMultiplierPrestigeUpgrade)}
-          >
+            onPress={() => {
+              setUpgradeType(UpgradeType.GeneratorMultiplierPrestigeUpgrade)
+              playSound(SoundFile.SwitchOn)
+            }}          >
             <Image source={require('../../assets/images/trainer.png')} style={styles.upgradeIcon}/>
           </TouchableOpacity>
           <TouchableOpacity
@@ -127,7 +133,10 @@ export const UpgradesScreen = ({setScreen, gameState, setGameState, upgradeType,
               styles.upgradeIconContainer,
               upgradeType === UpgradeType.ManagerUpgrade ? styles.selected : {},
             ]}
-            onPress={() => setUpgradeType(UpgradeType.ManagerUpgrade)}
+            onPress={() => {
+              setUpgradeType(UpgradeType.ManagerUpgrade)
+              playSound(SoundFile.SwitchOn)
+            }}
           >
             <Image source={require('../../assets/images/puppy.png')} style={styles.upgradeIcon}/>
           </TouchableOpacity>
