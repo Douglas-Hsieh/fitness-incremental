@@ -1,4 +1,4 @@
-import React from "react";
+import React, { memo } from "react";
 import { View, TouchableOpacity, Image, Text } from "react-native";
 import EStyleSheet from "react-native-extended-stylesheet";
 import colors from "../../assets/colors/colors";
@@ -16,16 +16,13 @@ export interface UpgradeItemProps {
   price: number;
   currency: Currency;
   image: any;
-  gameState: GameState;
+  isDisabled: boolean;
   setGameState: React.Dispatch<React.SetStateAction<GameState>>;
 }
 
-export const UpgradeItem = ({upgradeType, upgrade, title, description, price, currency, image, gameState, setGameState}: UpgradeItemProps) => {
+export const UpgradeItem = memo(({upgradeType, upgrade, title, description, price, currency, image, isDisabled, setGameState}: UpgradeItemProps) => {
   const upgradeId = getUpgradeId(upgrade)
   const [coefficient, scale] = numberToHumanFormat(price, 0, 0);
-  const isDisabled = currency === Currency.Cash
-    ? price > gameState.balance
-    : price > gameState.prestige
   const currencyText = currency === Currency.Cash
     ? 'steps'
     : 'trainers'
@@ -37,7 +34,7 @@ export const UpgradeItem = ({upgradeType, upgrade, title, description, price, cu
           const upgradeIds = prevGameState.upgradeState.generatorMultiplierCashUpgradeIds.add(upgradeId)
           return {
             ...prevGameState,
-            balance: gameState.balance - price,
+            balance: prevGameState.balance - price,
             upgradeState: {
               ...prevGameState.upgradeState,
               generatorMultiplierCashUpgradeIds: upgradeIds,
@@ -49,8 +46,8 @@ export const UpgradeItem = ({upgradeType, upgrade, title, description, price, cu
           const upgradeIds = prevGameState.upgradeState.generatorMultiplierPrestigeUpgradeIds.add(upgradeId)
           return {
             ...prevGameState,
-            prestige: gameState.prestige - price,
-            spentPrestige: gameState.spentPrestige + price,
+            prestige: prevGameState.prestige - price,
+            spentPrestige: prevGameState.spentPrestige + price,
             upgradeState: {
               ...prevGameState.upgradeState,
               generatorMultiplierPrestigeUpgradeIds: upgradeIds,
@@ -68,7 +65,7 @@ export const UpgradeItem = ({upgradeType, upgrade, title, description, price, cu
 
           return {
             ...prevGameState,
-            balance: gameState.balance - price,
+            balance: prevGameState.balance - price,
             upgradeState: {
               ...prevGameState.upgradeState,
               managerUpgradeIds: upgradeIds,
@@ -94,7 +91,7 @@ export const UpgradeItem = ({upgradeType, upgrade, title, description, price, cu
         <Text style={styles.buyUpgradeText}>Buy!</Text>
       </TouchableOpacity>
     </View>
-)}
+)})
 
 const styles = EStyleSheet.create({
   upgradeWrapper: {
