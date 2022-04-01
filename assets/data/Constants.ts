@@ -10,9 +10,9 @@ export interface TickLevel {
 }
 export const TICK_LEVELS: List<TickLevel> = List([
   { ticksToUse: 0, threshold: 0, progressBarClassnames: 'bg-red-500'},
-  { ticksToUse: 1, threshold: 1 * 86400, progressBarClassnames: 'bg-gray-300' },
-  { ticksToUse: 2, threshold: 3 * 86400, progressBarClassnames: 'bg-green-400' },
-  { ticksToUse: 3, threshold: 6 * 86400, progressBarClassnames: 'bg-blue-400' },
+  { ticksToUse: 1, threshold: 2 * 86400, progressBarClassnames: 'bg-gray-300' },
+  { ticksToUse: 2, threshold: 6 * 86400, progressBarClassnames: 'bg-green-400' },
+  { ticksToUse: 3, threshold: 12 * 86400, progressBarClassnames: 'bg-blue-400' },
   { ticksToUse: 4, threshold: Infinity, progressBarClassnames: 'bg-purple-400' },
 ])
 
