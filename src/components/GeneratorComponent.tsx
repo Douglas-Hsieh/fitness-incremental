@@ -11,6 +11,8 @@ import { Projectile } from "./Projectile";
 import EStyleSheet from "react-native-extended-stylesheet";
 import colors from "../../assets/colors/colors";
 import { playSound, SoundFile } from "../util/sounds";
+import { HighlightableElement } from 'react-native-highlight-overlay';
+import { TutorialState } from "../../assets/data/TutorialState";
 
 interface GeneratorComponentProps {
   generator: Generator;
@@ -50,6 +52,19 @@ export const GeneratorComponent = ({ generator, generatorState, gameState, setGa
   }
   const memoizedSpawnProjectiles = useCallback(spawnProjectiles, [x0, y0, projectiles])
 
+  function completeTutorial(key: keyof TutorialState) {
+    setGameState(prevGameState => ({
+      ...prevGameState,
+      tutorialState: {
+        ...prevGameState.tutorialState,
+        [key]: {
+          ...prevGameState.tutorialState[key],
+          isCompleted: true,
+        }
+      }
+    }))
+  }
+
   function startGenerator() {
     if (!ownsSome || generatorState.isManuallyOperating || generatorState.hasManager) {
       return
@@ -59,6 +74,11 @@ export const GeneratorComponent = ({ generator, generatorState, gameState, setGa
       ...generatorState,
       isManuallyOperating: true,
     })
+
+    // Complete tutorial
+    if (generator.id === '1' && !gameState.tutorialState.firstGenerator1.isCompleted) {
+      completeTutorial("firstGenerator1")
+    }
     setGameState(prevGameState => ({ ...prevGameState, generatorStateById: generatorStateById, }))
 
     playSound(SoundFile.MenuSelectionClick)
@@ -67,7 +87,7 @@ export const GeneratorComponent = ({ generator, generatorState, gameState, setGa
   const hasOverlay = !ownsSome || (!generatorState.isManuallyOperating && !generatorState.hasManager)
 
   return (
-    <View>
+    <HighlightableElement id={`generator-${generator.id}`}>
       <View style={styles.generatorWrapper} onLayout={setX0AndY0}>
         <Pressable style={styles.generatorLeftWrapper} onPress={startGenerator}>
           <GeneratorIcon image={generator.image} hasOverlay={hasOverlay} />
@@ -89,7 +109,7 @@ export const GeneratorComponent = ({ generator, generatorState, gameState, setGa
         </Pressable>
       </View>
       {projectiles}
-    </View>
+    </HighlightableElement>
 
   );
 };

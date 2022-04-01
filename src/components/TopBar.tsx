@@ -1,9 +1,11 @@
 import React, { memo, useEffect, useState } from "react";
 import { Image, Text, TouchableOpacity, View } from "react-native";
 import EStyleSheet from "react-native-extended-stylesheet";
+import { HighlightableElement } from "react-native-highlight-overlay";
 import colors from "../../assets/colors/colors";
 import { TickLevel, TICK_LEVELS, TICK_THRESHOLDS } from "../../assets/data/Constants";
 import BuyAmount from "../enums/BuyAmount";
+import { HighlightId } from "../enums/HightlightId";
 import { numberToHumanFormat } from "../math/formatting";
 import { playSound, SoundFile } from "../util/sounds";
 import { ProgressBar } from "./ProgressBar";
@@ -105,21 +107,21 @@ export const TopBar = memo(({balance, ticks, speed, buyAmount, setBuyAmount, tem
       <AvatarImage/>
 
       <View style={styles.resourcesWrapper}>
-        <View style={styles.stepsWrapper}>
+        <HighlightableElement id={HighlightId.Steps} style={styles.stepsWrapper}>
           <StepsImage/>
           <View style={styles.stepsCountWrapper}>
             <Text style={styles.stepsCountText}>{coefficient}</Text>
             <Text style={styles.stepsScaleText}>{scale}</Text>
           </View>
-        </View>
+        </HighlightableElement>
 
-        <View style={styles.ticksWrapper}>
+        <HighlightableElement id={HighlightId.Ticks} style={styles.ticksWrapper}>
           <TicksImage/>
           <View style={styles.ticksCountWrapper}>
             <Text style={styles.ticksCountText}>{ticksText}</Text>
             <TicksUsedProgressBar ticks={ticks}/>
           </View>
-        </View>
+        </HighlightableElement>
       </View>
 
       { temporaryMultiplier !== 1 &&
@@ -129,16 +131,21 @@ export const TopBar = memo(({balance, ticks, speed, buyAmount, setBuyAmount, tem
         </View>
       }
 
-      <BuyAmountButton
-        buyAmount={buyAmount}
-        setBuyAmount={setBuyAmount}
-      />
+      <HighlightableElement id={HighlightId.BuyAmountButton}>
+        <BuyAmountButton
+          buyAmount={buyAmount}
+          setBuyAmount={setBuyAmount}
+        />
+      </HighlightableElement>
+
     </View>
   )
 })
 
 const styles = EStyleSheet.create({
     topBar: {
+      position: 'absolute',
+      width: '100%',
       flex: .18,
       flexDirection: 'row',
       alignItems: 'center',

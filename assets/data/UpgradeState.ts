@@ -24,3 +24,5 @@ export class UpgradeState {
   }
   
 }
+
+export const INITIAL_UPGRADE_STATE = new UpgradeState()

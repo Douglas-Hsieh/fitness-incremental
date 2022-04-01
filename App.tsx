@@ -12,7 +12,8 @@ import { Platform, Text } from 'react-native';
 import { registerTasks, unregisterTasks } from './src/background-tasks';
 import Center from './src/components/Center';
 import { APPLE_HEALTH_AUTHORIZATION_PERMISSIONS } from './src/fitness-api/apple-health-kit';
-import AppleHealthKit from 'react-native-health'
+import AppleHealthKit from 'react-native-health';
+import { HighlightableElementProvider } from 'react-native-highlight-overlay';
 
 export default function App() {
   const isLoadingComplete = useCachedResources();
@@ -103,14 +104,16 @@ export default function App() {
 
   return (
     <GestureHandlerRootView style={{flex: 1}}>
-      <Game
-        screen={screen}
-        setScreen={setScreen}
-        gameState={gameState}
-        setGameState={setGameState as React.Dispatch<React.SetStateAction<GameState>>}
-        isAuthorized={isAuthorized}
-        requestAuthorization={requestAuthorization}
-      />
+      <HighlightableElementProvider>
+        <Game
+          screen={screen}
+          setScreen={setScreen}
+          gameState={gameState}
+          setGameState={setGameState as React.Dispatch<React.SetStateAction<GameState>>}
+          isAuthorized={isAuthorized}
+          requestAuthorization={requestAuthorization}
+        />
+      </HighlightableElementProvider>
     </GestureHandlerRootView>
   )
 

@@ -1,10 +1,12 @@
 import React, { memo } from "react";
 import { View, TouchableOpacity, Image, Text } from "react-native";
 import EStyleSheet from "react-native-extended-stylesheet";
+import { HighlightableElement } from "react-native-highlight-overlay";
 import colors from "../../assets/colors/colors";
 import { GameState } from "../../assets/data/GameState";
 import { GeneratorMultiplierUpgrade, getUpgradeId, ManagerUpgrade, UpgradeType } from "../../assets/data/Upgrades";
 import { Currency } from "../enums/Currency";
+import { HighlightId } from "../enums/HightlightId";
 import { numberToHumanFormat } from "../math/formatting";
 import { playSound, SoundFile } from "../util/sounds";
 
@@ -79,7 +81,7 @@ export const UpgradeItem = memo(({upgradeType, upgrade, title, description, pric
     }
   }
   
-  return (
+  const upgradeItemComponent = (
     <View style={styles.upgradeWrapper}>
       <Image style={styles.generatorIcon} source={image}/>
       <View style={styles.upgradeTextWrapper}>
@@ -91,7 +93,18 @@ export const UpgradeItem = memo(({upgradeType, upgrade, title, description, pric
         <Text style={styles.buyUpgradeText}>Buy!</Text>
       </TouchableOpacity>
     </View>
-)})
+  )
+
+  if (upgradeType === UpgradeType.ManagerUpgrade && upgrade.generatorId === '1') {
+    return (
+      <HighlightableElement id={HighlightId.ManagerUpgrade1}>
+        {upgradeItemComponent}
+      </HighlightableElement>
+    )
+  } else {
+    return upgradeItemComponent
+  }
+})
 
 const styles = EStyleSheet.create({
   upgradeWrapper: {

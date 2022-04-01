@@ -19,12 +19,19 @@ import { logIn } from "./api/auth";
 import BuyAmount from "./enums/BuyAmount";
 import { calculateTicksToUse, calculateTicksUsedSinceLastVisit, progressGenerators } from "./math/revenue";
 import { TICKS_PER_STEP } from "../assets/data/Constants";
-import { AppState, AppStateStatus } from "react-native";
+import { AppState, AppStateStatus, Pressable, StyleSheet } from "react-native";
 import { Visit } from "../assets/data/Visit";
 import { calculateTemporaryMultipliers } from "./math/multipliers";
 import { TasksScreen } from "./screens/TasksScreen";
 import { getStepsBetween, getStepsToday } from "./fitness-api/fitness-api";
-import { UpgradeType } from "../assets/data/Upgrades";
+import { getUpgradeId, MANAGER_UPGRADES, UpgradeType } from "../assets/data/Upgrades";
+import { calculatePrice } from "./math/prices";
+import { GENERATORS } from "../assets/data/Generators";
+import { TutorialState } from "../assets/data/TutorialState";
+import { HighlightId } from "./enums/HightlightId";
+import { HighlightType } from "./enums/HighlightType";
+import { HighlightOverlay } from "react-native-highlight-overlay";
+import { DialogueModal } from "./components/DialogueModal";
 
 interface GameProps {
   screen: Screen;
@@ -45,6 +52,12 @@ export const Game = ({screen, setScreen, gameState, setGameState, requestAuthori
   const [visitTime, setVisitTime] = useState<Date>();
   const [temporaryMultiplier, setTemporaryMultiplier] = useState<number>(1);
   const [stepsToday, setStepsToday] = useState<number>(0)
+
+  const [showDialogueModal, setShowDialogueModal] = useState<boolean>(false)
+  const [dialogueText, setDialogueText] = useState<string>('')
+  const [highlightId, setHighlightId] = useState<string | null>(null)
+  const [generatorsHighlightId, setGeneratorsHighlightId] = useState<string | null>(null)
+  const [onScreenPress, setOnScreenPress] = useState<(() => void) | null>(null)
 
   useEffect(() => {
     const getAndSetUser = async () => {
@@ -101,6 +114,11 @@ export const Game = ({screen, setScreen, gameState, setGameState, requestAuthori
   }, [])
 
   useInterval(() => {
+    // Dangerous: can stop the game loop
+    if (showDialogueModal) {
+      return
+    }
+
     // Generators progress and generate revenue using ticks
     const ticksToUse = calculateTicksToUse(gameState.ticks, gameState.speed)
     if (ticksToUse <= 0) return;
@@ -211,6 +229,118 @@ export const Game = ({screen, setScreen, gameState, setGameState, requestAuthori
     getStepsToday().then(setStepsToday)
   }, 60 * 1000)
 
+  function showTutorial(highlightId: HighlightId | null, highlightType: HighlightType, text: string) {
+    if (highlightType === HighlightType.All) {
+      setHighlightId(highlightId)
+    } else if (highlightType === HighlightType.Generators) {
+      setGeneratorsHighlightId(highlightId)
+    }
+    setDialogueText(text)
+    setShowDialogueModal(true)
+  }
+
+  function hideTutorial() {
+    setHighlightId(null)
+    setGeneratorsHighlightId(null)
+    setDialogueText('')
+    setShowDialogueModal(false)
+  }
+  function completeTutorial(key: keyof TutorialState) {
+    setGameState(prevGameState => ({
+      ...prevGameState,
+      tutorialState: {
+        ...prevGameState.tutorialState,
+        [key]: {
+          ...prevGameState.tutorialState[key],
+          isCompleted: true,
+        }
+      }
+    }))
+  }
+  function hideAndCompleteTutorial(key: keyof TutorialState) {
+    hideTutorial()
+    completeTutorial(key)
+  }
+
+  function setOnFirstScreenPress(onFirstScreenPress: () => void) {
+    setOnScreenPress(() => () => {
+      onFirstScreenPress()
+      setOnScreenPress(null)
+    })
+  }
+
+  /* Tutorial */
+  const { tutorialState } = gameState
+
+  // Start tutorial
+  useEffect(() => {
+    if (showDialogueModal) {
+      return
+    }
+
+    if (!tutorialState.firstGenerator1.isCompleted) {
+      showTutorial(HighlightId.Generator1, HighlightType.Generators, tutorialState.firstGenerator1.message)
+    } else if (!tutorialState.firstGenerator2.isCompleted && gameState.balance >= calculatePrice(1, GENERATORS[0].initialPrice, GENERATORS[0].growthRate, 1)) {
+      showTutorial(HighlightId.Generator1, HighlightType.Generators, tutorialState.firstGenerator2.message)
+    } else if (!tutorialState.firstGenerator3.isCompleted && tutorialState.firstGenerator2.isCompleted) {
+      showTutorial(null, HighlightType.Generators, tutorialState.firstGenerator3.message)
+      setOnFirstScreenPress(() => hideAndCompleteTutorial('firstGenerator3'))
+    } else if (!tutorialState.ticks1.isCompleted && gameState.balance > 250) {
+      showTutorial(HighlightId.Ticks, HighlightType.All, tutorialState.ticks1.message)
+      setOnFirstScreenPress(() => hideAndCompleteTutorial('ticks1'))
+    } else if (!tutorialState.ticks2.isCompleted && tutorialState.ticks1.isCompleted) {
+      showTutorial(HighlightId.Ticks, HighlightType.All, tutorialState.ticks2.message)
+      setOnFirstScreenPress(() => hideAndCompleteTutorial('ticks2'))
+    } else if (!tutorialState.manager1.isCompleted && gameState.balance >= MANAGER_UPGRADES[0].price) {
+      showTutorial(HighlightId.UpgradesTab, HighlightType.All, tutorialState.manager1.message)
+    } else if (!tutorialState.manager2.isCompleted && tutorialState.manager1.isCompleted) {
+      showTutorial(HighlightId.ManagerUpgrades, HighlightType.All, tutorialState.manager2.message)
+    } else if (!tutorialState.manager3.isCompleted && tutorialState.manager2.isCompleted) {
+      showTutorial(HighlightId.ManagerUpgrade1, HighlightType.All, tutorialState.manager3.message)
+    }
+  }, [gameState])
+
+  // End tutorial
+  useEffect(() => {
+    if (!dialogueText) return
+
+    if (dialogueText === tutorialState.firstGenerator1.message && tutorialState.firstGenerator1.isCompleted) {
+      hideTutorial()
+    }
+  }, [gameState.tutorialState])
+
+  useEffect(() => {
+    if (!dialogueText) return
+
+    if (dialogueText === tutorialState.firstGenerator2.message && gameState.generatorStateById.get('1')!.owned > 1) {
+      hideAndCompleteTutorial("firstGenerator2")
+    }
+  }, [gameState.generatorStateById.get('1')!.owned])
+
+  useEffect(() => {
+    if (!dialogueText) return
+
+    if (dialogueText === tutorialState.manager1.message && screen === Screen.Upgrades) {
+      hideAndCompleteTutorial('manager1')
+    }
+  }, [screen])
+
+  useEffect(() => {
+    if (!dialogueText) return
+
+    if (dialogueText === tutorialState.manager2.message && screen === Screen.Upgrades && upgradeType === UpgradeType.ManagerUpgrade) {
+      hideAndCompleteTutorial('manager2')
+    }
+  }, [screen, upgradeType])
+
+  useEffect(() => {
+    if (!dialogueText) return
+
+    if (dialogueText === tutorialState.manager3.message && gameState.upgradeState.managerUpgradeIds.contains(getUpgradeId(MANAGER_UPGRADES[0]))) {
+      hideAndCompleteTutorial('manager3')
+    }
+  }, [gameState.upgradeState.managerUpgradeIds])
+
   switch(screen) {
     case Screen.Login:
       return (
@@ -225,26 +355,43 @@ export const Game = ({screen, setScreen, gameState, setGameState, requestAuthori
       )
     case Screen.Home:
       return (
-        <HomeScreen
-          setScreen={setScreen}
-          gameState={gameState}
-          setGameState={setGameState}
-          buyAmount={buyAmount}
-          setBuyAmount={setBuyAmount}
-          temporaryMultiplier={temporaryMultiplier}
-          stepsToday={stepsToday}
-          currentLocation={currentLocation}
-        />
+        <>
+          <HomeScreen
+            setScreen={setScreen}
+            gameState={gameState}
+            setGameState={setGameState}
+            buyAmount={buyAmount}
+            setBuyAmount={setBuyAmount}
+            temporaryMultiplier={temporaryMultiplier}
+            stepsToday={stepsToday}
+            currentLocation={currentLocation}
+            generatorsHighlightId={generatorsHighlightId}
+          />
+          <HighlightOverlay
+            highlightedElementId={highlightId}
+            onDismiss={() => {}}
+          />
+          { showDialogueModal && <DialogueModal onPress={() => setShowDialogueModal(false)} body={dialogueText}/> }
+          { onScreenPress && <Pressable style={styles.pressable} onPress={onScreenPress}/> }
+        </>
       )
     case Screen.Upgrades:
       return (
-        <UpgradesScreen
-          setScreen={setScreen}
-          gameState={gameState}
-          setGameState={setGameState}
-          upgradeType={upgradeType}
-          setUpgradeType={setUpgradeType}
-        />
+        <>
+          <UpgradesScreen
+            setScreen={setScreen}
+            gameState={gameState}
+            setGameState={setGameState}
+            upgradeType={upgradeType}
+            setUpgradeType={setUpgradeType}
+          />
+          <HighlightOverlay
+            highlightedElementId={highlightId}
+            onDismiss={() => {}}
+          />
+          { showDialogueModal && <DialogueModal onPress={() => setShowDialogueModal(false)} body={dialogueText}/> }
+          { onScreenPress && <Pressable style={styles.pressable} onPress={onScreenPress}/> }
+        </>
       )
     case Screen.Unlocks:
       return (
@@ -300,3 +447,11 @@ export const Game = ({screen, setScreen, gameState, setGameState, requestAuthori
   }
 
 }
+
+const styles = StyleSheet.create({
+  pressable: {
+    position: 'absolute',
+    width: '100%',
+    height: '100%',
+  },
+})

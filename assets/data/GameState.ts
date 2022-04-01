@@ -7,7 +7,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { K } from '../../src/math/prestige';
 import { Visit } from './Visit';
 import { STEPS_REQUIRED_FOR_REWARD, TICKS_PER_STEP } from './Constants';
-import { UpgradeState } from './UpgradeState';
+import { INITIAL_UPGRADE_STATE, UpgradeState } from './UpgradeState';
+import { INITIAL_TUTORIAL_STATE, TutorialState } from './TutorialState';
 
 export class GameState {
   user: User | undefined;
@@ -28,6 +29,7 @@ export class GameState {
   lastPushNotificationTime: Date;
   speed: number;  // Tick usage multiplier
   visitHistory: List<Visit>;
+  tutorialState: TutorialState;
 
   constructor (
     user: User | undefined,
@@ -48,6 +50,7 @@ export class GameState {
     lastPushNotificationTime: Date,
     speed: number,
     visitHistory: List<Visit>,
+    tutorialState: TutorialState,
   ) {
     this.user = user
     this.balance = balance
@@ -67,6 +70,7 @@ export class GameState {
     this.lastPushNotificationTime = lastPushNotificationTime
     this.speed = speed
     this.visitHistory = visitHistory
+    this.tutorialState = tutorialState
   }
 
   static fromJson(gameStateString: string) {
@@ -90,6 +94,7 @@ export class GameState {
       obj.lastPushNotificationTime === undefined ? INITIAL_LAST_PUSH_NOTIFICATION_TIME : new Date(obj.lastPushNotificationTime),
       obj.speed === undefined ? INITIAL_SPEED : obj.speed,
       obj.visitHistory === undefined ? INITIAL_VISIT_HISTORY : List(obj.visitHistory).map(visit => Visit.fromJson(visit)),
+      obj.tutorialState === undefined ? INITIAL_TUTORIAL_STATE : obj.tutorialState,
     )
   }
 
@@ -122,7 +127,7 @@ export const INITIAL_GAME_STATE = new GameState(
   0,
   0,
   INITIAL_GENERATOR_STATE_BY_ID,
-  new UpgradeState(),
+  INITIAL_UPGRADE_STATE,
   Set(),
   INITIAL_TICKS,
   INITIAL_STEPS_REWARD_TIMES,
@@ -133,6 +138,7 @@ export const INITIAL_GAME_STATE = new GameState(
   INITIAL_LAST_PUSH_NOTIFICATION_TIME,
   INITIAL_SPEED,
   INITIAL_VISIT_HISTORY,
+  INITIAL_TUTORIAL_STATE,
 )
 
 const DEBUG_BALANCE = 0
@@ -148,7 +154,7 @@ export const DEBUG_GAME_STATE = new GameState(
   DEBUG_LAST_SESSION_EARNINGS,
   0,
   INITIAL_GENERATOR_STATE_BY_ID,
-  new UpgradeState(),
+  INITIAL_UPGRADE_STATE,
   Set(),
   DEBUG_TICKS,
   INITIAL_STEPS_REWARD_TIMES,
@@ -159,4 +165,5 @@ export const DEBUG_GAME_STATE = new GameState(
   INITIAL_LAST_PUSH_NOTIFICATION_TIME,
   INITIAL_SPEED,
   INITIAL_VISIT_HISTORY,
+  INITIAL_TUTORIAL_STATE,
 )

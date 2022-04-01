@@ -2,8 +2,10 @@ import { Ionicons } from "@expo/vector-icons"
 import React, { memo } from "react"
 import { TouchableOpacity, View } from "react-native"
 import EStyleSheet from "react-native-extended-stylesheet"
+import { HighlightableElement } from "react-native-highlight-overlay"
 import colors from "../../assets/colors/colors"
 import Screen from "../enums/Screen"
+import { HighlightId } from "../enums/HightlightId"
 
 interface BottomBarProps {
   screen: Screen;
@@ -17,9 +19,11 @@ export const BottomBar = memo(({ screen, setScreen }: BottomBarProps) => (
       <TouchableOpacity onPress={() => setScreen(Screen.Home)}>
         <Ionicons name={screen === Screen.Home ? 'person-sharp' : 'person-outline'} size={36}/>
       </TouchableOpacity>
-      <TouchableOpacity onPress={() => setScreen(Screen.Upgrades)}>
-        <Ionicons name={screen === Screen.Upgrades ? 'arrow-up-circle' : 'arrow-up-circle-outline'} size={36}/>
-      </TouchableOpacity>
+      <HighlightableElement id={HighlightId.UpgradesTab}>
+        <TouchableOpacity onPress={() => setScreen(Screen.Upgrades)}>
+          <Ionicons name={screen === Screen.Upgrades ? 'arrow-up-circle' : 'arrow-up-circle-outline'} size={36}/>
+        </TouchableOpacity>
+      </HighlightableElement>
       <TouchableOpacity onPress={() => setScreen(Screen.Unlocks)}>
         <Ionicons name={screen === Screen.Unlocks ? 'lock-open-sharp' : 'lock-closed-outline'} size={36}/>
       </TouchableOpacity>

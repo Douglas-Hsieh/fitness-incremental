@@ -18,6 +18,7 @@ import { UnlockModal } from "../components/UnlockModal";
 import { StepsReward } from "../components/StepsReward";
 import { WorkoutReward } from "../components/WorkoutReward";
 import { LocationObject } from "expo-location";
+import { HighlightOverlay } from 'react-native-highlight-overlay';
 
 interface HomeScreenProps {
   setScreen: React.Dispatch<React.SetStateAction<Screen>>;
@@ -28,9 +29,10 @@ interface HomeScreenProps {
   temporaryMultiplier: number;
   stepsToday: number;
   currentLocation: LocationObject | undefined;
+  generatorsHighlightId: string | null;
 }
 
-export const HomeScreen = ({setScreen, gameState, setGameState, buyAmount, setBuyAmount, temporaryMultiplier, stepsToday, currentLocation}: HomeScreenProps) => {
+export const HomeScreen = ({setScreen, gameState, setGameState, buyAmount, setBuyAmount, temporaryMultiplier, stepsToday, currentLocation, generatorsHighlightId}: HomeScreenProps) => {
   const [maxBuyByGeneratorId, setMaxBuyByGeneratorId] = useState<Map<string,number>>(Map());
   const [priceByGeneratorId, setPriceByGeneratorId] = useState<Map<string,number>>(Map());
   const [newUnlocks, setNewUnlocks] = useState<Set<GeneratorUnlock>>(Set())
@@ -106,6 +108,7 @@ export const HomeScreen = ({setScreen, gameState, setGameState, buyAmount, setBu
         showsVerticalScrollIndicator={false}
         style={styles.scroll}
       >
+        <View style={{height: 90}}/>
         <GeneratorList
           gameState={gameState}
           setGameState={setGameState}
@@ -115,6 +118,10 @@ export const HomeScreen = ({setScreen, gameState, setGameState, buyAmount, setBu
           temporaryMultiplier={temporaryMultiplier}
         />
         <View style={{height: 150}}/>
+        <HighlightOverlay
+          highlightedElementId={generatorsHighlightId}
+          onDismiss={() => {}}
+        />
       </ScrollView>
 
       <TopBar
@@ -148,11 +155,11 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scroll: {
-    position: 'absolute',
+    // position: 'absolute',
     top: 0,
     bottom: 0,
     left: 0,
     right: 0,
-    paddingTop: 90,
+    // paddingTop: 90,
   },
 });
