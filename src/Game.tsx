@@ -17,7 +17,7 @@ import { getFitnessLocations } from "./api/fitness-locations";
 import { createUser, updateUser } from "./api/users";
 import { logIn } from "./api/auth";
 import BuyAmount from "./enums/BuyAmount";
-import { calculateTicksToUse, calculateTicksUsedSinceLastVisit, progressGenerators } from "./math/revenue";
+import { calculateTicksToUse, calculateTicksUsedSinceLastVisit, hasWorkingGenerator, progressGenerators } from "./math/revenue";
 import { TICKS_PER_STEP } from "../assets/data/Constants";
 import { AppState, AppStateStatus, Pressable, StyleSheet } from "react-native";
 import { Visit } from "../assets/data/Visit";
@@ -116,6 +116,10 @@ export const Game = ({screen, setScreen, gameState, setGameState, requestAuthori
   useInterval(() => {
     // Dangerous: can stop the game loop
     if (showDialogueModal) {
+      return
+    }
+
+    if (!hasWorkingGenerator(gameState)) {
       return
     }
 

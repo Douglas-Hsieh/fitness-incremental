@@ -149,3 +149,10 @@ export const progressGenerators = (
     revenue: revenue,
   }
 }
+
+export function hasWorkingGenerator(
+  gameState: GameState,
+) {
+  const genStates = Array.from(gameState.generatorStateById.values())
+  return genStates.filter(genState => genState.isManuallyOperating || genState.hasManager).length > 0
+}
