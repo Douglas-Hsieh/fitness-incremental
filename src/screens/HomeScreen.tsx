@@ -106,9 +106,8 @@ export const HomeScreen = ({setScreen, gameState, setGameState, buyAmount, setBu
       <ScrollView
         contentInsetAdjustmentBehavior='automatic'
         showsVerticalScrollIndicator={false}
-        style={styles.scroll}
       >
-        <View style={{height: 90}}/>
+        <View style={{height: 80}}/>
         <GeneratorList
           gameState={gameState}
           setGameState={setGameState}
@@ -117,7 +116,7 @@ export const HomeScreen = ({setScreen, gameState, setGameState, buyAmount, setBu
           buyAmount={buyAmount}
           temporaryMultiplier={temporaryMultiplier}
         />
-        <View style={{height: 150}}/>
+        <View style={{height: 40}}/>
         <HighlightOverlay
           highlightedElementId={generatorsHighlightId}
           onDismiss={() => {}}
@@ -153,13 +152,5 @@ export const HomeScreen = ({setScreen, gameState, setGameState, buyAmount, setBu
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-  scroll: {
-    // position: 'absolute',
-    top: 0,
-    bottom: 0,
-    left: 0,
-    right: 0,
-    // paddingTop: 90,
   },
 });

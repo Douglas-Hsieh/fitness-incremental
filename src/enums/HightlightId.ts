@@ -13,6 +13,7 @@ export enum HighlightId {
   Ticks = 'ticks',
   BuyAmountButton = 'buyAmountButton',
   UpgradesTab = 'upgradesTab',
+  PrestigeTab = 'prestigeTab',
   ManagerUpgrades = 'managerUpgrades',
   ManagerUpgrade1 = 'managerUpgrade1',
 }

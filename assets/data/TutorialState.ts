@@ -13,6 +13,7 @@ export interface TutorialState {
   manager1: TutorialMessage,
   manager2: TutorialMessage,
   manager3: TutorialMessage,
+  prestige: TutorialMessage,
 }
 
 export const INITIAL_TUTORIAL_STATE: TutorialState = {
@@ -50,6 +51,10 @@ export const INITIAL_TUTORIAL_STATE: TutorialState = {
   },
   manager3: {
     message: "Walking puppies by yourself is tiring! Let's hire a puppy walker!",
+    isCompleted: false,
+  },
+  prestige: {
+    message: "Hey boss! You've got some trainers applying to join your team!",
     isCompleted: false,
   },
 }

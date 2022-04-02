@@ -297,6 +297,8 @@ export const Game = ({screen, setScreen, gameState, setGameState, requestAuthori
       showTutorial(HighlightId.ManagerUpgrades, HighlightType.All, tutorialState.manager2.message)
     } else if (!tutorialState.manager3.isCompleted && tutorialState.manager2.isCompleted) {
       showTutorial(HighlightId.ManagerUpgrade1, HighlightType.All, tutorialState.manager3.message)
+    } else if (!tutorialState.prestige.isCompleted && gameState.prestige >= 100) {
+      showTutorial(HighlightId.PrestigeTab, HighlightType.All, tutorialState.prestige.message)
     }
   }, [gameState])
 
@@ -340,6 +342,14 @@ export const Game = ({screen, setScreen, gameState, setGameState, requestAuthori
       hideAndCompleteTutorial('manager3')
     }
   }, [gameState.upgradeState.managerUpgradeIds])
+
+  useEffect(() => {
+    if (!dialogueText) return
+
+    if (dialogueText === tutorialState.prestige.message && screen === Screen.Prestige) {
+      hideAndCompleteTutorial('prestige')
+    }
+  }, [screen])
 
   switch(screen) {
     case Screen.Login:
