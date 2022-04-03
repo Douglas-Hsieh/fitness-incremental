@@ -1,5 +1,6 @@
 import { List } from "immutable"
 import { STEPS_REQUIRED_FOR_REWARD } from "../assets/data/Constants"
+import { GameState } from "../assets/data/GameState";
 import { dateToYYYYMMDDFormat, numberToHumanFormat } from "./math/formatting"
 
 class Reward {
@@ -86,4 +87,22 @@ export const isElligibleForStepsReward = (rewardTimes: List<Date>, stepsToday: n
     && !dates.includes(rewardDate)
 
   return isElligible
+}
+
+export function giveReward(reward: RewardNothing | RewardInstantBonus | RewardTemporaryMultiplier, setGameState: React.Dispatch<React.SetStateAction<GameState>>) {
+  if (reward instanceof RewardInstantBonus) {
+    const { bonus } = reward
+    setGameState(prevGameState => ({
+      ...prevGameState,
+      balance: prevGameState.balance + bonus,
+      sessionEarnings: prevGameState.sessionEarnings + bonus,
+    }))
+
+  } else if (reward instanceof RewardTemporaryMultiplier) {
+    const { multiplier, expirationDate } = reward
+    setGameState(prevGameState => ({
+      ...prevGameState,
+      temporaryMultipliers: prevGameState.temporaryMultipliers.add({ multiplier, expirationDate }),
+    }))
+  }
 }

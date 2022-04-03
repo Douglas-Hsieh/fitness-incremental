@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react"
 import { GameState } from "../../assets/data/GameState"
 import { GENERATORS } from "../../assets/data/Generators"
 import { calculateOneTickBaseRevenue } from "../math/revenue"
-import { generateRandomReward, RewardInstantBonus, RewardTemporaryMultiplier } from "../rewards"
+import { generateRandomReward, giveReward } from "../rewards"
 import RewardModalDetails from "../types/RewardModalDetails"
 import { Overlay } from "./Overlay"
 import { RewardModal } from "./RewardModal"
@@ -39,21 +39,7 @@ export const WorkoutReward = ({gameState, setGameState, currentLocation}: Workou
       lastWorkoutRewardTime: now,
     }))
 
-    if (reward instanceof RewardInstantBonus) {
-      const { bonus } = reward
-      setGameState(prevGameState => ({
-        ...prevGameState,
-        balance: prevGameState.balance + bonus,
-        sessionEarnings: prevGameState.sessionEarnings + bonus,
-      }))
-
-    } else if (reward instanceof RewardTemporaryMultiplier) {
-      const { multiplier, expirationDate } = reward
-      setGameState(prevGameState => ({
-        ...prevGameState,
-        temporaryMultipliers: prevGameState.temporaryMultipliers.add({ multiplier, expirationDate }),
-      }))
-    }
+    giveReward(reward, setGameState)
 
     setRewardModalDetails({
       reward: reward,

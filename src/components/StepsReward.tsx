@@ -3,7 +3,7 @@ import { STEPS_REQUIRED_FOR_REWARD } from "../../assets/data/Constants"
 import { GameState } from "../../assets/data/GameState"
 import { GENERATORS } from "../../assets/data/Generators"
 import { calculateOneTickBaseRevenue } from "../math/revenue"
-import { generateRandomReward, isElligibleForStepsReward, RewardNothing, RewardInstantBonus, RewardTemporaryMultiplier } from "../rewards"
+import { generateRandomReward, giveReward, isElligibleForStepsReward } from "../rewards"
 import RewardModalDetails from "../types/RewardModalDetails"
 import { Overlay } from "./Overlay"
 import { RewardModal } from "./RewardModal"
@@ -33,21 +33,7 @@ export const StepsReward = ({gameState, setGameState, stepsToday}: StepsRewardPr
       stepsRewardTimes: prevGameState.stepsRewardTimes.push(rewardTime),
     }))
 
-    if (reward instanceof RewardInstantBonus) {
-      const { bonus } = reward
-      setGameState(prevGameState => ({
-        ...prevGameState,
-        balance: prevGameState.balance + bonus,
-        sessionEarnings: prevGameState.sessionEarnings + bonus,
-      }))
-
-    } else if (reward instanceof RewardTemporaryMultiplier) {
-      const { multiplier, expirationDate } = reward
-      setGameState(prevGameState => ({
-        ...prevGameState,
-        temporaryMultipliers: prevGameState.temporaryMultipliers.add({ multiplier, expirationDate }),
-      }))
-    }
+    giveReward(reward, setGameState)
 
     setRewardModalDetails({
       reward: reward,
