@@ -3,7 +3,7 @@ import { Image, Text } from "react-native"
 import EStyleSheet from "react-native-extended-stylesheet"
 import Animated, { useAnimatedStyle, useSharedValue, withSpring } from "react-native-reanimated"
 import colors from "../../assets/colors/colors"
-import { Reward } from "../rewards"
+import { RewardInstantBonus, RewardNothing, RewardTemporaryMultiplier } from "../rewards"
 import RewardModalDetails from "../types/RewardModalDetails"
 import { playSound, SoundFile } from "../util/sounds"
 import { window } from "../util/Window"
@@ -46,11 +46,11 @@ export const RewardModal = ({details, onClose}: RewardModalProps) => {
 
   const clueImage = require('../../assets/images/clue.png')
   let rewardImage
-  if (reward === Reward.Nothing) {
+  if (reward instanceof RewardNothing) {
     rewardImage = require('../../assets/images/garbage.png')
-  } else if (reward === Reward.InstantBonus) {
+  } else if (reward instanceof RewardInstantBonus) {
     rewardImage = require('../../assets/images/steps.png')
-  } else if (reward === Reward.TemporaryMultiplier) {
+  } else if (reward instanceof RewardTemporaryMultiplier) {
     rewardImage = require('../../assets/images/hourglass.png')
   }
 

@@ -77,7 +77,9 @@ const UpgradesList = ({ gameState, setGameState, upgradeType }: UpgradesListProp
       renderItem={renderItem}
       keyExtractor={item => getUpgradeId(item.upgrade)}
       contentInsetAdjustmentBehavior='automatic'
-      showsVerticalScrollIndicator={false} />
+      showsVerticalScrollIndicator={false}
+      initialNumToRender={5}
+    />
   );
 };
 

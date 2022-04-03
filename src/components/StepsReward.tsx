@@ -2,9 +2,8 @@ import React, { useState, useEffect } from "react"
 import { STEPS_REQUIRED_FOR_REWARD } from "../../assets/data/Constants"
 import { GameState } from "../../assets/data/GameState"
 import { GENERATORS } from "../../assets/data/Generators"
-import { numberToHumanFormat } from "../math/formatting"
 import { calculateOneTickBaseRevenue } from "../math/revenue"
-import { generateRandomReward, Reward, generateInstantBonus, generateTemporaryMultiplier, isElligibleForStepsReward } from "../rewards"
+import { generateRandomReward, isElligibleForStepsReward, RewardNothing, RewardInstantBonus, RewardTemporaryMultiplier } from "../rewards"
 import RewardModalDetails from "../types/RewardModalDetails"
 import { Overlay } from "./Overlay"
 import { RewardModal } from "./RewardModal"
@@ -24,42 +23,30 @@ export const StepsReward = ({gameState, setGameState, stepsToday}: StepsRewardPr
     if (!isElligibleForStepsReward(gameState.stepsRewardTimes, stepsToday)) {
       return
     }
-
-    const reward = generateRandomReward()
+    const oneTickBaseRevenue = calculateOneTickBaseRevenue(GENERATORS, gameState)
+    const reward = generateRandomReward(oneTickBaseRevenue)
     const rewardTime = new Date()
+    const { title, body } = reward
 
-    let title: string, body: string
+    setGameState(prevGameState => ({
+      ...prevGameState,
+      stepsRewardTimes: prevGameState.stepsRewardTimes.push(rewardTime),
+    }))
 
-    if (reward === Reward.Nothing) {
+    if (reward instanceof RewardInstantBonus) {
+      const { bonus } = reward
       setGameState(prevGameState => ({
         ...prevGameState,
-        stepsRewardTimes: prevGameState.stepsRewardTimes.push(rewardTime),
-      }))
-      title = 'Nothing :('
-      body = 'Better luck next time...'
-
-    } else if (reward === Reward.InstantBonus) {
-      const oneTickBaseRevenue = calculateOneTickBaseRevenue(GENERATORS, gameState)
-      const bonus = generateInstantBonus(oneTickBaseRevenue)
-      const [coefficient, scale] = numberToHumanFormat(bonus)
-      setGameState(prevGameState => ({
-        ...prevGameState,
-        stepsRewardTimes: prevGameState.stepsRewardTimes.push(rewardTime),
         balance: prevGameState.balance + bonus,
         sessionEarnings: prevGameState.sessionEarnings + bonus,
       }))
-      title = 'Instant Bonus'
-      body = `You just gained ${coefficient} ${scale} steps!`
 
-    } else {
-      const temporaryMultiplier = generateTemporaryMultiplier()
+    } else if (reward instanceof RewardTemporaryMultiplier) {
+      const { multiplier, expirationDate } = reward
       setGameState(prevGameState => ({
         ...prevGameState,
-        stepsRewardTimes: prevGameState.stepsRewardTimes.push(rewardTime),
-        temporaryMultipliers: prevGameState.temporaryMultipliers.add(temporaryMultiplier),
+        temporaryMultipliers: prevGameState.temporaryMultipliers.add({ multiplier, expirationDate }),
       }))
-      title = 'Temporary Multiplier'
-      body = `You will produce x${temporaryMultiplier.multiplier} as much for 24 hours!`
     }
 
     setRewardModalDetails({

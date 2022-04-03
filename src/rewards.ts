@@ -1,38 +1,80 @@
 import { List } from "immutable"
 import { STEPS_REQUIRED_FOR_REWARD } from "../assets/data/Constants"
-import { dateToYYYYMMDDFormat } from "./math/formatting"
-import { TemporaryMultiplier } from "./types/TemporaryMultiplier"
+import { dateToYYYYMMDDFormat, numberToHumanFormat } from "./math/formatting"
 
-export enum Reward {
-  Nothing,
-  InstantBonus,
-  TemporaryMultiplier,
+class Reward {
+  title: string;
+  body: string;
+
+  constructor(title: string, body: string) {
+    this.title = title
+    this.body = body
+  }
 }
 
-export const generateRandomReward = () => {
+export class RewardNothing extends Reward {}
+
+export class RewardInstantBonus extends Reward {
+  bonus: number;
+
+  constructor(title: string, body: string, bonus: number) {
+    super(title, body)
+    this.bonus = bonus
+  }
+}
+
+export class RewardTemporaryMultiplier extends Reward {
+  multiplier: number;
+  expirationDate: Date;
+
+  constructor(title: string, body: string, multiplier: number, expirationDate: Date) {
+    super(title, body)
+    this.multiplier = multiplier
+    this.expirationDate = expirationDate
+  }
+}
+
+export const generateRandomReward = (oneTickRevenue: number) => {
   const p = Math.random()
 
   if (p < 0.5) {
-    return Reward.Nothing
+    return generateNothingReward()
   } else if (p < 0.75) {
-    return Reward.InstantBonus
+    return generateInstantBonus(oneTickRevenue)
   } else {
-    return Reward.TemporaryMultiplier
+    return generateTemporaryMultiplier()
   }
+}
+
+export const generateNothingReward = () => {
+  return new RewardNothing(
+    'Nothing',
+    'Better luck next time...',
+  )
 }
 
 export const generateInstantBonus = (oneTickRevenue: number) => {
-  return 86400 * oneTickRevenue
+  const bonus = 86400 * oneTickRevenue
+  const [coefficient, scale] = numberToHumanFormat(bonus)
+
+  return new RewardInstantBonus(
+    'Instant Bonus',
+    `You just gained ${coefficient} ${scale} steps!`,
+    bonus,
+  )
 }
 
-export const generateTemporaryMultiplier = (): TemporaryMultiplier => {
+export const generateTemporaryMultiplier = () => {
+  const multiplier = 3
   const now = new Date()
   const oneDayLater = new Date(now.getTime() + 86400000)
 
-  return {
-    multiplier: 3,
-    expirationDate: oneDayLater
-  }
+  return new RewardTemporaryMultiplier(
+    'Temporary Multiplier',
+    `You will produce x${multiplier} as much for 24 hours!`,
+    multiplier,
+    oneDayLater,
+  )
 }
 
 export const isElligibleForStepsReward = (rewardTimes: List<Date>, stepsToday: number) => {

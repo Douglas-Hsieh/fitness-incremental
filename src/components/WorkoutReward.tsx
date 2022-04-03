@@ -2,9 +2,8 @@ import { LocationObject } from "expo-location"
 import React, { useState, useEffect } from "react"
 import { GameState } from "../../assets/data/GameState"
 import { GENERATORS } from "../../assets/data/Generators"
-import { numberToHumanFormat } from "../math/formatting"
 import { calculateOneTickBaseRevenue } from "../math/revenue"
-import { generateRandomReward, Reward, generateInstantBonus, generateTemporaryMultiplier } from "../rewards"
+import { generateRandomReward, RewardInstantBonus, RewardTemporaryMultiplier } from "../rewards"
 import RewardModalDetails from "../types/RewardModalDetails"
 import { Overlay } from "./Overlay"
 import { RewardModal } from "./RewardModal"
@@ -27,51 +26,42 @@ export const WorkoutReward = ({gameState, setGameState, currentLocation}: Workou
       return
     }
     const now = new Date()
-
-    if (canReceiveWorkoutReward(fitnessLocation, currentLocation, gameState.lastWorkoutRewardTime, now)) {
-      const reward = generateRandomReward()
-      let title: string, body: string
-  
-      if (reward === Reward.Nothing) {
-        setGameState(prevGameState => ({
-          ...prevGameState,
-          lastWorkoutRewardTime: now,
-        }))
-        title = 'Nothing :('
-        body = 'Better luck next time...'
-  
-      } else if (reward === Reward.InstantBonus) {
-        const oneTickBaseRevenue = calculateOneTickBaseRevenue(GENERATORS, gameState)
-        const bonus = generateInstantBonus(oneTickBaseRevenue)
-        const [coefficient, scale] = numberToHumanFormat(bonus)
-        setGameState(prevGameState => ({
-          ...prevGameState,
-          lastWorkoutRewardTime: now,
-          balance: gameState.balance + bonus,
-          sessionEarnings: gameState.sessionEarnings + bonus,
-        }))
-        title = 'Instant Bonus'
-        body = `You just gained ${coefficient} ${scale} steps!`
-  
-      } else {
-        const temporaryMultiplier = generateTemporaryMultiplier()
-        setGameState(prevGameState => ({
-          ...prevGameState,
-          lastWorkoutRewardTime: now,
-          temporaryMultipliers: gameState.temporaryMultipliers.add(temporaryMultiplier),
-        }))
-        title = 'Temporary Multiplier'
-        body = `You will produce x${temporaryMultiplier.multiplier} as much for 24 hours!`
-      }
-  
-      setRewardModalDetails({
-        reward: reward,
-        title: `Workout Reward: ${title}`,
-        body: body,
-      })
-      setShowOverlay(true)
-      setShowRewardModal(true)
+    if (!canReceiveWorkoutReward(fitnessLocation, currentLocation, gameState.lastWorkoutRewardTime, now)) {
+      return
     }
+
+    const oneTickBaseRevenue = calculateOneTickBaseRevenue(GENERATORS, gameState)
+    const reward = generateRandomReward(oneTickBaseRevenue)
+    const { title, body } = reward
+
+    setGameState(prevGameState => ({
+      ...prevGameState,
+      lastWorkoutRewardTime: now,
+    }))
+
+    if (reward instanceof RewardInstantBonus) {
+      const { bonus } = reward
+      setGameState(prevGameState => ({
+        ...prevGameState,
+        balance: prevGameState.balance + bonus,
+        sessionEarnings: prevGameState.sessionEarnings + bonus,
+      }))
+
+    } else if (reward instanceof RewardTemporaryMultiplier) {
+      const { multiplier, expirationDate } = reward
+      setGameState(prevGameState => ({
+        ...prevGameState,
+        temporaryMultipliers: prevGameState.temporaryMultipliers.add({ multiplier, expirationDate }),
+      }))
+    }
+
+    setRewardModalDetails({
+      reward: reward,
+      title: `Workout Reward: ${title}`,
+      body: body,
+    })
+    setShowOverlay(true)
+    setShowRewardModal(true)
 
   }, [fitnessLocation, currentLocation])
 
