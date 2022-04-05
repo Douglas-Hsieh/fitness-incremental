@@ -1,6 +1,7 @@
 import { Set } from 'immutable'
 import React, { memo, useState } from 'react'
 import { Image, SafeAreaView, StyleSheet, Text, View } from 'react-native'
+import { ScrollView } from 'react-native-gesture-handler'
 import colors from '../../assets/colors/colors'
 import { GameState, INITIAL_BALANCE } from '../../assets/data/GameState'
 import { INITIAL_GENERATOR_STATE_BY_ID } from "../../assets/data/GeneratorState"
@@ -79,8 +80,16 @@ export const PrestigeScreen = ({setScreen, gameState, setGameState}: PrestigeScr
         <Header title={'Trainers'}/>
         <Description
           title={'Teamwork makes the dream work'}
-          body={'The more steps everyone takes, the more Personal Trainers you attract! These guys provide huge bonuses but you’ll need to restart your business to hire them.'}
+          body={'The more steps everyone takes, the more Personal Trainers you attract!\n\nThese guys provide huge bonuses but you’ll need to restart your business to hire them.'}
         />
+
+        <View style={{width: '100%', height: 10}}/>
+        <ScrollView
+          style={styles.scroll}
+          contentInsetAdjustmentBehavior='automatic'
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.scrollContainer}
+        >
 
         <View style={styles.prestigeStatusWrapper}>
           <PrestigeIcon/>
@@ -100,6 +109,9 @@ export const PrestigeScreen = ({setScreen, gameState, setGameState}: PrestigeScr
           <Text>Last Session Earnings: {lastSessionEarningsCoeff} {lastSessionEarningsScale}</Text> */}
           <Button text={'Hire & Restart'} onPress={() => setShowClaimPrestigeModal(true)}/>
         </View>
+
+        <View style={{width: '100%', height: 10}}/>
+      </ScrollView>
 
       </View>
       <BottomBar screen={Screen.Prestige} setScreen={setScreen}/>
@@ -125,6 +137,14 @@ const styles = StyleSheet.create({
   screenWrapper: {
     flex: 1,
     alignItems: 'center',
+  },
+  scroll: {
+    width: '100%',
+  },
+  scrollContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-around',
   },
 
   prestigeStatusWrapper: {

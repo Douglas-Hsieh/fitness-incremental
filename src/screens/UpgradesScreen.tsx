@@ -37,8 +37,10 @@ export const UpgradesScreen = ({setScreen, gameState, setGameState, upgradeType,
 
         <Description
           title={'The best investment you can ever make is in your own health.'}
-          body={'Spend your hard earned steps to give your followers a boost.'}
+          body={'Spend steps to make your followers stronger and faster.'}
         />
+
+        <View style={{height: 10}}/>
 
         <UpgradesList
           gameState={gameState}

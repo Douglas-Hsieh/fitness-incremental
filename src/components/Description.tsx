@@ -1,5 +1,5 @@
 import React, { memo } from "react"
-import { StyleSheet, Text, View } from "react-native";
+import { Text, View } from "react-native";
 import EStyleSheet from "react-native-extended-stylesheet";
 import colors from "../../assets/colors/colors";
 
@@ -24,14 +24,17 @@ const styles = EStyleSheet.create({
       backgroundColor: colors.white,
       alignItems: 'center',
       justifyContent: 'center',
+      paddingHorizontal: 10,
     },
     descriptionTitle: {
       fontFamily: 'oleo-script',
       color: colors.orange3,
+      fontSize: '1rem',
+      textAlign: 'center',
     },
     descriptionBody: {
       marginTop: 5,
+      fontSize: '.9rem',
       textAlign: 'center',
-      fontSize: 12,
     },
 })
