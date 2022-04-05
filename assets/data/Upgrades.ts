@@ -13,7 +13,6 @@ interface Upgrade {
 }
 
 export const getUpgradeId = (upgrade: Upgrade): string => {
-  // return `${upgrade.price}-${upgrade.priceCurrency}`
   return JSON.stringify(upgrade)
 }
 

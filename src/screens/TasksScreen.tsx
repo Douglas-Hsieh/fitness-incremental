@@ -1,5 +1,5 @@
 import { GameState } from "../../assets/data/GameState";
-import { SafeAreaView, Text, View } from "react-native";
+import { Image, SafeAreaView, Text, View } from "react-native";
 import { DeterminateProgress } from "../components/DeterminateProgress";
 import { BackgroundImage } from "../components/BackgroundImage";
 import { BottomBar } from "../components/BottomBar";
@@ -14,6 +14,12 @@ import { dateToYYYYMMDDFormat } from "../math/formatting";
 import { LocationObject } from "expo-location";
 import { WorkoutReward } from "../components/WorkoutReward";
 import { StepsReward } from "../components/StepsReward";
+import { STEP_REWARDS } from "../../assets/data/Constants";
+import { ScrollView } from "react-native-gesture-handler";
+
+const RewardImage = memo(() => (
+  <Image source={require('../../assets/images/present.png')} style={styles.rewardIcon}/>
+));
 
 interface TasksScreenProps {
   setScreen: React.Dispatch<React.SetStateAction<Screen>>;
@@ -31,16 +37,20 @@ export const TasksScreen = ({setScreen, gameState, setGameState, stepsToday, cur
 
         <Header title={'Tasks'}/>
         <Description
-          title={'A mile a day keeps the doctor away'}
-          body={"Get rewarded when you complete one of these fitness tasks"}
+          title={'Pain today becomes strength tomorrow'}
+          body={"Get rewarded for becoming an athlete"}
         />
-
-        <StepsTask
-          steps={stepsToday}
-          targetSteps={6000}
-        />
-
-        <WorkoutTask setScreen={setScreen} lastWorkoutRewardTime={gameState.lastWorkoutRewardTime}/>
+        <View style={{width: '100%', height: 10}}/>
+        <ScrollView
+          style={styles.scroll}
+          contentInsetAdjustmentBehavior='automatic'
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.scrollContainer}
+        >
+          <StepsTask steps={stepsToday}/>
+          <WorkoutTask setScreen={setScreen} lastWorkoutRewardTime={gameState.lastWorkoutRewardTime}/>
+          <View style={{width: '100%', height: 10}}/>
+        </ScrollView>
 
       </View>
       <BottomBar screen={Screen.Tasks} setScreen={setScreen}/>
@@ -53,21 +63,45 @@ export const TasksScreen = ({setScreen, gameState, setGameState, stepsToday, cur
 
 interface StepsTaskProps {
   steps: number;
-  targetSteps: number;
 }
 
-export const StepsTask = memo(({steps, targetSteps}: StepsTaskProps) => {
-  const progress = steps / targetSteps <= 1
-    ? steps / targetSteps
-    : 1
+export const StepsTask = memo(({steps}: StepsTaskProps) => {
+  const targetSteps = STEP_REWARDS
+    .filter(stepReward => steps < stepReward.steps)
+    .map(stepReward => stepReward.steps)
+    .min()
+
+  let descriptionText
+  let progress
+  let progressBarText
+  if (targetSteps) {
+    descriptionText = `${targetSteps - steps} steps until next reward`
+    progress = steps / targetSteps <= 1
+      ? steps / targetSteps
+      : 1
+    progressBarText = `${steps} / ${targetSteps}`
+  } else {
+    descriptionText = `Congrats, you've completed all step tasks today`
+    progress = 1
+
+    const highestRewardSteps = STEP_REWARDS.map(stepReward => stepReward.steps).max()
+    progressBarText = `${steps} / ${highestRewardSteps}`
+  }
   
   return (
     <View style={styles.taskContainer}>
-      <Text style={styles.titleText}>Steps</Text>
-      <Text style={styles.descriptionText}>{steps}/{targetSteps} steps today</Text>
+      <Text style={styles.titleText}>Steps Today</Text>
+      <Text style={styles.descriptionText}>{descriptionText}</Text>
       <View style={styles.progressBar}>
         <DeterminateProgress progress={progress}/>
+        <Text style={styles.progressBarText}>{progressBarText}</Text>
       </View>
+      { targetSteps && <>
+        <Text style={styles.rewardText}>Reward: 1 Fitness Box</Text>
+        <RewardImage/>
+      </>
+      }
+
     </View>
   )
 })
@@ -79,20 +113,33 @@ interface WorkoutTaskProps {
 
 export const WorkoutTask = memo(({setScreen, lastWorkoutRewardTime}: WorkoutTaskProps) => {
 
-  let progress = 0
   const hasWorkedOutToday = dateToYYYYMMDDFormat(lastWorkoutRewardTime) === dateToYYYYMMDDFormat(new Date())
-  if (hasWorkedOutToday) {
-    progress = 1
-  }
+  const progress = hasWorkedOutToday ? 1 : 0
+  const descriptionText = hasWorkedOutToday
+    ? `Great job making it to the gym!`
+    : `Visit the gym today to claim`
+  const progressBarText = `${progress} / 1`
 
   return (
     <View style={styles.taskContainer}>
       <Text style={styles.titleText}>Workout</Text>
-      <Text style={styles.descriptionText}>{progress}/1 gym visits today</Text>
+      <Text style={styles.descriptionText}>{descriptionText}</Text>
       <View style={styles.progressBar}>
         <DeterminateProgress progress={progress}/>
+        <Text style={styles.progressBarText}>{progressBarText}</Text>
       </View>
-      <Button text={'Workout'} onPress={() => {setScreen(Screen.Workout)}}/>
+      { !hasWorkedOutToday && <>
+          <Text style={styles.rewardText}>Reward: 2 Fitness Boxes</Text>
+          <View style={styles.rewardLine}>
+            <RewardImage/>
+            <RewardImage/>
+          </View>
+        </>
+      }
+
+      <View style={styles.buttonWrapper}>
+        <Button text={'Workout'} onPress={() => {setScreen(Screen.Workout)}}/>
+      </View>
     </View>
   )
 })
@@ -105,6 +152,14 @@ const styles = EStyleSheet.create({
     flex: 1,
     alignItems: 'center',
   },
+  scroll: {
+    width: '100%',
+  },
+  scrollContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-around',
+  },
 
   taskContainer: {
     marginTop: 10,
@@ -112,29 +167,41 @@ const styles = EStyleSheet.create({
     width: '90%',
     borderRadius: 10,
     alignItems: 'center',
-    paddingVertical: 10,
+    padding: 10,
   },
   titleText: {
     fontFamily: 'oleo-script',
+    fontSize: '1.1rem',
     color: colors.orange3,
   },
   descriptionText: {
     marginTop: 10,
     fontSize: '1rem',
+    textAlign: 'center',
+  },
+  rewardLine: {
+    flexDirection: 'row',
+  },
+  rewardText: {
+    fontFamily: 'oleo-script',
+    fontSize: '1.1rem',
+    marginVertical: 10,
+  },
+  rewardIcon: {
+    width: 32,
+    height: 32,
   },
   progressBar: {
     marginTop: 10,
-    width: '80%',
-    height: 30,
+    width: '90%',
+    height: 40,
   },
-  progressBarNumbers: {
-    flexDirection: 'row',
-    width: '80%',
-    justifyContent: 'space-between',
+  progressBarText: {
+    position: 'absolute',
+    alignSelf: 'center',
+    fontSize: '1.1rem',
   },
-
-  milesAndCalories: {
-    flexDirection: 'column',
+  buttonWrapper: {
+    marginTop: 10,
   },
-
 })

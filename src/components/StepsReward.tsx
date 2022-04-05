@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react"
-import { STEPS_REQUIRED_FOR_REWARD } from "../../assets/data/Constants"
 import { GameState } from "../../assets/data/GameState"
 import { GENERATORS } from "../../assets/data/Generators"
+import { dateToYYYYMMDDFormat } from "../math/formatting"
 import { calculateOneTickBaseRevenue } from "../math/revenue"
-import { generateRandomReward, giveReward, isElligibleForStepsReward } from "../rewards"
+import { generateReward, giveReward, displayReward, calculateStepRewardsLeft } from "../rewards"
 import RewardModalDetails from "../types/RewardModalDetails"
 import { Overlay } from "./Overlay"
 import { RewardModal } from "./RewardModal"
@@ -20,33 +20,37 @@ export const StepsReward = ({gameState, setGameState, stepsToday}: StepsRewardPr
   const [showRewardModal, setShowRewardModal] = useState<boolean>(false)
 
   useEffect(() => {
-    if (!isElligibleForStepsReward(gameState.stepsRewardTimes, stepsToday)) {
+    if (showRewardModal) {
       return
     }
+
+    const today = dateToYYYYMMDDFormat(new Date())
+    const fitnessRewards = gameState.fitnessRewardsByDate.get(today)
+    if (!fitnessRewards) return
+
+    const rewardsLeft = calculateStepRewardsLeft(fitnessRewards.steps, fitnessRewards.stepRewards)
+    if (rewardsLeft <= 0) {
+      return
+    }
+
     const oneTickBaseRevenue = calculateOneTickBaseRevenue(GENERATORS, gameState)
-    const reward = generateRandomReward(oneTickBaseRevenue)
-    const rewardTime = new Date()
+    const reward = generateReward(oneTickBaseRevenue)
     const { title, body } = reward
 
     setGameState(prevGameState => ({
       ...prevGameState,
-      stepsRewardTimes: prevGameState.stepsRewardTimes.push(rewardTime),
+      fitnessRewardsByDate: prevGameState.fitnessRewardsByDate.set(
+        today,
+        fitnessRewards.set("stepRewards", fitnessRewards.get("stepRewards") + 1)
+      )
     }))
-
     giveReward(reward, setGameState)
-
-    setRewardModalDetails({
-      reward: reward,
-      title: `${STEPS_REQUIRED_FOR_REWARD} Steps Reward: ${title}`,
-      body: body,
-    })
-    setShowOverlay(true)
-    setShowRewardModal(true)
-
-  }, [stepsToday])
+    displayReward(setRewardModalDetails, reward, `Steps Reward: ${title}`, body, setShowOverlay, setShowRewardModal)
+  }, [stepsToday, showRewardModal])
 
   const handleCloseRewardModal = () => {
-    setTimeout(() => {setShowRewardModal(false), 5000})
+    setShowRewardModal(false)
+    setRewardModalDetails(undefined)
     setShowOverlay(false)
   }
 

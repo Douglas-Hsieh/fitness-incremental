@@ -1,14 +1,13 @@
 import * as Notifications from 'expo-notifications'
 import * as BackgroundFetch from 'expo-background-fetch';
-import { canReceiveWorkoutReward } from "./math/workout-reward";
 import { GameState } from "../assets/data/GameState";
 import { BackgroundTask } from './types/BackgroundTask';
 import * as TaskManager from 'expo-task-manager';
 import { AppState } from 'react-native';
-import { isElligibleForStepsReward } from './rewards';
-import { STEPS_REQUIRED_FOR_REWARD } from '../assets/data/Constants';
-import { getStepsBetween, getStepsToday } from './fitness-api/fitness-api';
+import { calculateStepRewardsLeft, canReceiveWorkoutReward } from './rewards';
+import { getStepsBetween } from './fitness-api/fitness-api';
 import allSettled from 'promise.allsettled';
+import { dateToYYYYMMDDFormat } from './math/formatting';
 
 export const handleLocationUpdate: TaskManager.TaskManagerTaskExecutor = async ({ data: { locations }, error }) => {
   console.log(`Location Update Task: ${new Date(Date.now()).toISOString()}` );
@@ -72,14 +71,20 @@ export const handleStepRewardNotificationTask = async () => {
   if (!lastVisit) {
     return
   }
-  const stepsToday = await getStepsToday()
 
   const oneDayBefore = new Date(Date.now() - 86400000)
   if (oneDayBefore < gameState.lastPushNotificationTime) {
     return
   }
 
-  if (!isElligibleForStepsReward(gameState.stepsRewardTimes, stepsToday)) {
+  const today = dateToYYYYMMDDFormat(new Date())
+  const fitnessRewards = gameState.fitnessRewardsByDate.get(today)
+  if (!fitnessRewards) {
+    return
+  }
+
+  const stepRewardsLeft = calculateStepRewardsLeft(fitnessRewards.steps, fitnessRewards.stepRewards)
+  if (stepRewardsLeft <= 0) {
     return
   }
 
@@ -88,10 +93,19 @@ export const handleStepRewardNotificationTask = async () => {
     return
   }
 
+  let title: string, body: string
+  if (stepRewardsLeft > 1) {
+    title = 'Fitness Rewards'
+    body = `You have ${stepRewardsLeft} unopened fitness boxes`
+  } else {
+    title = 'Fitness Reward'
+    body = `You have 1 unopened fitness box`
+  }
+
   Notifications.scheduleNotificationAsync({
     content: {
-      title: `You just took ${STEPS_REQUIRED_FOR_REWARD} steps!`,
-      body: "You've been given a random reward",
+      title: title,
+      body: body,
     },
     trigger: {
       seconds: 5,

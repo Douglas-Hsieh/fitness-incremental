@@ -3,7 +3,7 @@ import { Image, Text } from "react-native"
 import EStyleSheet from "react-native-extended-stylesheet"
 import Animated, { useAnimatedStyle, useSharedValue, withSpring } from "react-native-reanimated"
 import colors from "../../assets/colors/colors"
-import { RewardInstantBonus, RewardNothing, RewardTemporaryMultiplier } from "../rewards"
+import { RewardInstantBonus, RewardNothing, RewardPermanentMultiplier, RewardTemporaryMultiplier } from "../rewards"
 import RewardModalDetails from "../types/RewardModalDetails"
 import { playSound, SoundFile } from "../util/sounds"
 import { window } from "../util/Window"
@@ -44,7 +44,7 @@ export const RewardModal = ({details, onClose}: RewardModalProps) => {
     playSound(SoundFile.CoinWinning)
   }, [])
 
-  const clueImage = require('../../assets/images/clue.png')
+  const presentImage = require('../../assets/images/present.png')
   let rewardImage
   if (reward instanceof RewardNothing) {
     rewardImage = require('../../assets/images/garbage.png')
@@ -52,16 +52,18 @@ export const RewardModal = ({details, onClose}: RewardModalProps) => {
     rewardImage = require('../../assets/images/steps.png')
   } else if (reward instanceof RewardTemporaryMultiplier) {
     rewardImage = require('../../assets/images/hourglass.png')
+  } else if (reward instanceof RewardPermanentMultiplier) {
+    rewardImage = require('../../assets/images/stars.png')
   }
 
   return (
     <Animated.View style={[styles.modal, animatedStyle]}>
       { !showReward &&
         <>
-          <Text style={styles.title}>{'Potential Reward'}</Text>
-          <Image source={clueImage} style={styles.icon}/>
-          <Text style={styles.body}>{'You spot something in the distance...'}</Text>
-          <Button text={'Examine'} onPress={() => {
+          <Text style={styles.title}>{'Fitness Box'}</Text>
+          <Image source={presentImage} style={styles.icon}/>
+          <Text style={styles.body}>{''}</Text>
+          <Button text={'Open'} onPress={() => {
             setShowReward(true)
           }}/>
         </>
@@ -94,6 +96,7 @@ const styles = EStyleSheet.create({
     borderRadius: 10,
     alignItems: 'center',
     justifyContent: 'space-around',
+    padding: 10,
   },
   icon: {
     width: window.width / 5,

@@ -6,9 +6,10 @@ import { User } from '../../src/shared/users.interface';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { K } from '../../src/math/prestige';
 import { Visit } from './Visit';
-import { STEPS_REQUIRED_FOR_REWARD, TICKS_PER_STEP } from './Constants';
+import { TICKS_PER_STEP } from './Constants';
 import { INITIAL_UPGRADE_STATE, UpgradeState } from './UpgradeState';
 import { INITIAL_TUTORIAL_STATE, TutorialState } from './TutorialState';
+import { FitnessReward } from '../../src/rewards';
 
 export class GameState {
   user: User | undefined;
@@ -23,6 +24,7 @@ export class GameState {
   ticks: number;  // Intermediate currency generated from user taking steps
   stepsRewardTimes: List<Date>;  // Step rewards were given at these times
   lifetimeSteps: number;
+  permanentMultiplier: number;
   temporaryMultipliers: Set<TemporaryMultiplier>;
   fitnessLocation: FitnessLocation | null;
   lastWorkoutRewardTime: Date;
@@ -30,6 +32,7 @@ export class GameState {
   speed: number;  // Tick usage multiplier
   visitHistory: List<Visit>;
   tutorialState: TutorialState;
+  fitnessRewardsByDate: Map<string, FitnessReward>;  // YYYY-MM-DD formatted date
 
   constructor (
     user: User | undefined,
@@ -44,6 +47,7 @@ export class GameState {
     ticks: number,
     stepsRewardTimes: List<Date>,
     lifetimeSteps: number,
+    permanentMultiplier: number,
     temporaryMultipliers: Set<TemporaryMultiplier>,
     fitnessLocation: FitnessLocation | null,
     lastWorkoutRewardTime: Date,
@@ -51,6 +55,7 @@ export class GameState {
     speed: number,
     visitHistory: List<Visit>,
     tutorialState: TutorialState,
+    fitnessHistory: Map<string, FitnessReward>
   ) {
     this.user = user
     this.balance = balance
@@ -64,6 +69,7 @@ export class GameState {
     this.ticks = ticks
     this.stepsRewardTimes = stepsRewardTimes
     this.lifetimeSteps = lifetimeSteps
+    this.permanentMultiplier = permanentMultiplier
     this.temporaryMultipliers = temporaryMultipliers
     this.fitnessLocation = fitnessLocation
     this.lastWorkoutRewardTime = lastWorkoutRewardTime
@@ -71,6 +77,7 @@ export class GameState {
     this.speed = speed
     this.visitHistory = visitHistory
     this.tutorialState = tutorialState
+    this.fitnessRewardsByDate = fitnessHistory
   }
 
   static fromJson(gameStateString: string) {
@@ -88,6 +95,7 @@ export class GameState {
       obj.ticks,
       obj.stepsRewardTimes === undefined ? INITIAL_STEPS_REWARD_TIMES : List(obj.stepsRewardTimes).map(time => new Date(time)),
       obj.lifetimeSteps,
+      obj.permanentMultiplier === undefined ? INITIAL_PERMANENT_MULTIPLIER : obj.permanentMultiplier,
       Set(obj.temporaryMultipliers),
       obj.fitnessLocation,
       obj.lastWorkoutRewardTime === undefined ? INITIAL_LAST_WORKOUT_REWARD_TIME : new Date(obj.lastWorkoutRewardTime),  // handling old saves
@@ -95,6 +103,7 @@ export class GameState {
       obj.speed === undefined ? INITIAL_SPEED : obj.speed,
       obj.visitHistory === undefined ? INITIAL_VISIT_HISTORY : List(obj.visitHistory).map(visit => Visit.fromJson(visit)),
       obj.tutorialState === undefined ? INITIAL_TUTORIAL_STATE : obj.tutorialState,
+      obj.fitnessRewardsByDate === undefined ? INITIAL_FITNESS_REWARDS_BY_DATE : Map(obj.fitnessRewardsByDate).map(fr => FitnessReward.fromJson(fr)),
     )
   }
 
@@ -113,11 +122,13 @@ export const INITIAL_USER = undefined
 export const INITIAL_BALANCE = 0
 export const INITIAL_PRESTIGE = 0
 export const INITIAL_STEPS_REWARD_TIMES = List<Date>()
-const INITIAL_TICKS = TICKS_PER_STEP * STEPS_REQUIRED_FOR_REWARD
+const INITIAL_TICKS = TICKS_PER_STEP * 5000
+const INITIAL_PERMANENT_MULTIPLIER = 1
 const INITIAL_LAST_WORKOUT_REWARD_TIME = new Date(0)
 const INITIAL_LAST_PUSH_NOTIFICATION_TIME = new Date(0)
 const INITIAL_SPEED = 1
 const INITIAL_VISIT_HISTORY = List<Visit>()
+const INITIAL_FITNESS_REWARDS_BY_DATE = Map<string, FitnessReward>()
 
 export const INITIAL_GAME_STATE = new GameState(
   INITIAL_USER,
@@ -132,6 +143,7 @@ export const INITIAL_GAME_STATE = new GameState(
   INITIAL_TICKS,
   INITIAL_STEPS_REWARD_TIMES,
   0,
+  INITIAL_PERMANENT_MULTIPLIER,
   Set(),
   null,
   INITIAL_LAST_WORKOUT_REWARD_TIME,
@@ -139,6 +151,7 @@ export const INITIAL_GAME_STATE = new GameState(
   INITIAL_SPEED,
   INITIAL_VISIT_HISTORY,
   INITIAL_TUTORIAL_STATE,
+  INITIAL_FITNESS_REWARDS_BY_DATE,
 )
 
 const DEBUG_BALANCE = 0
@@ -159,6 +172,7 @@ export const DEBUG_GAME_STATE = new GameState(
   DEBUG_TICKS,
   INITIAL_STEPS_REWARD_TIMES,
   0,
+  INITIAL_PERMANENT_MULTIPLIER,
   Set(),
   null,
   INITIAL_LAST_WORKOUT_REWARD_TIME,
@@ -166,4 +180,5 @@ export const DEBUG_GAME_STATE = new GameState(
   INITIAL_SPEED,
   INITIAL_VISIT_HISTORY,
   INITIAL_TUTORIAL_STATE,
+  INITIAL_FITNESS_REWARDS_BY_DATE,
 )

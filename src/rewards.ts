@@ -1,9 +1,13 @@
-import { List } from "immutable"
-import { STEPS_REQUIRED_FOR_REWARD } from "../assets/data/Constants"
+import { LocationObject } from "expo-location";
+import haversine from "haversine";
+import { Record } from "immutable"
+import { STEP_REWARDS } from "../assets/data/Constants"
 import { GameState } from "../assets/data/GameState";
-import { dateToYYYYMMDDFormat, numberToHumanFormat } from "./math/formatting"
+import { numberToHumanFormat } from "./math/formatting"
+import { FitnessLocation, toLatLng } from "./shared/fitness-locations.interface";
+import RewardModalDetails from "./types/RewardModalDetails";
 
-class Reward {
+class BaseReward {
   title: string;
   body: string;
 
@@ -13,9 +17,9 @@ class Reward {
   }
 }
 
-export class RewardNothing extends Reward {}
+export class RewardNothing extends BaseReward {}
 
-export class RewardInstantBonus extends Reward {
+export class RewardInstantBonus extends BaseReward {
   bonus: number;
 
   constructor(title: string, body: string, bonus: number) {
@@ -24,7 +28,7 @@ export class RewardInstantBonus extends Reward {
   }
 }
 
-export class RewardTemporaryMultiplier extends Reward {
+export class RewardTemporaryMultiplier extends BaseReward {
   multiplier: number;
   expirationDate: Date;
 
@@ -35,22 +39,31 @@ export class RewardTemporaryMultiplier extends Reward {
   }
 }
 
-export const generateRandomReward = (oneTickRevenue: number) => {
+export class RewardPermanentMultiplier extends BaseReward {
+  multiplier: number;
+
+  constructor(title: string, body: string, multiplier: number) {
+    super(title, body)
+    this.multiplier = multiplier
+  }
+}
+
+export const generateReward = (oneTickRevenue: number) => {
   const p = Math.random()
 
   if (p < 0.5) {
-    return generateNothingReward()
-  } else if (p < 0.75) {
     return generateInstantBonus(oneTickRevenue)
+  } else if (p < 0.75) {
+    return generateTemporaryMultiplier(5)
   } else {
-    return generateTemporaryMultiplier()
+    return generatePermanentMultiplier(3)
   }
 }
 
 export const generateNothingReward = () => {
   return new RewardNothing(
     'Nothing',
-    'Better luck next time...',
+    'Better luck next time',
   )
 }
 
@@ -65,8 +78,7 @@ export const generateInstantBonus = (oneTickRevenue: number) => {
   )
 }
 
-export const generateTemporaryMultiplier = () => {
-  const multiplier = 3
+export const generateTemporaryMultiplier = (multiplier: number) => {
   const now = new Date()
   const oneDayLater = new Date(now.getTime() + 86400000)
 
@@ -78,18 +90,45 @@ export const generateTemporaryMultiplier = () => {
   )
 }
 
-export const isElligibleForStepsReward = (rewardTimes: List<Date>, stepsToday: number) => {
-  const dates = rewardTimes.map(rewardTime => dateToYYYYMMDDFormat(rewardTime))
-  const rewardTime = new Date()
-  const rewardDate = dateToYYYYMMDDFormat(rewardTime)
+export const generatePermanentMultiplier = (multiplier: number) => {
 
-  const isElligible = stepsToday >= STEPS_REQUIRED_FOR_REWARD
-    && !dates.includes(rewardDate)
-
-  return isElligible
+  return new RewardPermanentMultiplier(
+    'Permanent Multiplier',
+    `You will now produce x${multiplier} as much!`,
+    multiplier,
+  )
 }
 
-export function giveReward(reward: RewardNothing | RewardInstantBonus | RewardTemporaryMultiplier, setGameState: React.Dispatch<React.SetStateAction<GameState>>) {
+/**
+ * @param steps steps taken on this day
+ * @param rewardsGiven rewards already given on this day
+ * @returns number of rewards left to be given
+ */
+export const calculateStepRewardsLeft = (steps: number, rewardsGiven: number) => {
+  const rewardsTotal = STEP_REWARDS
+    .filter(stepReward => steps >= stepReward.steps)
+    .map(stepReward => stepReward.rewards)
+    .max()!
+  return rewardsTotal - rewardsGiven
+}
+
+export const canReceiveWorkoutReward = (
+  fitnessLocation: FitnessLocation,
+  currentLocation: LocationObject,
+  lastWorkoutRewardTime: Date,
+  currentTime: Date
+) => {
+  const fitnessLocationLatLng = toLatLng(fitnessLocation);
+  const isNearFitnessLocation = haversine(fitnessLocationLatLng, currentLocation.coords, { unit: 'mile', threshold: 0.1})
+
+  const EIGHT_HOURS_MS = 8 * 60 * 60 * 1000
+  const diffTime = Math.abs(currentTime.getTime() - lastWorkoutRewardTime.getTime())
+  const enoughTimeSinceLastReward = diffTime > EIGHT_HOURS_MS
+
+  return isNearFitnessLocation && enoughTimeSinceLastReward
+}
+
+export function giveReward(reward: RewardNothing | RewardInstantBonus | RewardTemporaryMultiplier | RewardPermanentMultiplier, setGameState: React.Dispatch<React.SetStateAction<GameState>>) {
   if (reward instanceof RewardInstantBonus) {
     const { bonus } = reward
     setGameState(prevGameState => ({
@@ -104,5 +143,44 @@ export function giveReward(reward: RewardNothing | RewardInstantBonus | RewardTe
       ...prevGameState,
       temporaryMultipliers: prevGameState.temporaryMultipliers.add({ multiplier, expirationDate }),
     }))
+  } else if (reward instanceof RewardPermanentMultiplier) {
+    const { multiplier } = reward
+    setGameState(prevGameState => ({
+      ...prevGameState,
+      permanentMultiplier: prevGameState.permanentMultiplier * multiplier,
+    }))
   }
+}
+
+export class FitnessReward extends Record({
+  steps: 0,  // # of steps taken
+  stepRewards: 0,  // # of rewards given for step count
+  gymVisits: 0,
+  gymVisitRewards: 0,
+}) {
+  static fromJson(fr: FitnessReward) {
+    return new FitnessReward({
+      steps: fr.steps,
+      stepRewards: fr.stepRewards,
+      gymVisits: fr.gymVisits,
+      gymVisitRewards: fr.gymVisitRewards
+    })
+  }
+}
+
+export function displayReward(
+  setRewardModalDetails: React.Dispatch<React.SetStateAction<RewardModalDetails | undefined>>,
+  reward: RewardNothing | RewardInstantBonus | RewardTemporaryMultiplier,
+  title: string,
+  body: string,
+  setShowOverlay: React.Dispatch<React.SetStateAction<boolean>>,
+  setShowRewardModal: React.Dispatch<React.SetStateAction<boolean>>
+) {
+  setRewardModalDetails({
+    reward: reward,
+    title: title,
+    body: body,
+  })
+  setShowOverlay(true)
+  setShowRewardModal(true)
 }

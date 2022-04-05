@@ -50,7 +50,7 @@ interface WorkoutScreenProps {
 }
 
 export const WorkoutScreen = ({setScreen, gameState, setGameState, currentLocation}: WorkoutScreenProps) => {
-  const { fitnessLocation, lastWorkoutRewardTime } = gameState
+  const { fitnessLocation } = gameState
   const [hasCameraPermission, setHasCameraPermission] = useState<boolean>();
   const cameraRef = useRef<Camera | null>()
   const [hasForegroundLocationPermission, setHasForegroundLocationPermission] = useState<boolean>();
@@ -182,11 +182,6 @@ export const WorkoutScreen = ({setScreen, gameState, setGameState, currentLocati
   
         <View style={styles.screenWrapper}>
           <Header title={'Workout'}/>
-          <Description
-            title={'Get rewarded for working out!'}
-            body={`Earn a reward every day you go to the gym`}
-          />
-
           { !fitnessLocation &&
             <>
               <Description

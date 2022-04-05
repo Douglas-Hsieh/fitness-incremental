@@ -3,11 +3,10 @@ import React, { useState, useEffect } from "react"
 import { GameState } from "../../assets/data/GameState"
 import { GENERATORS } from "../../assets/data/Generators"
 import { calculateOneTickBaseRevenue } from "../math/revenue"
-import { generateRandomReward, giveReward } from "../rewards"
+import { canReceiveWorkoutReward, displayReward, generateReward, giveReward } from "../rewards"
 import RewardModalDetails from "../types/RewardModalDetails"
 import { Overlay } from "./Overlay"
 import { RewardModal } from "./RewardModal"
-import { canReceiveWorkoutReward } from "../math/workout-reward"
 
 interface WorkoutReward {
   gameState: GameState;
@@ -20,6 +19,7 @@ export const WorkoutReward = ({gameState, setGameState, currentLocation}: Workou
   const [showOverlay, setShowOverlay] = useState<boolean>(false)
   const [rewardModalDetails, setRewardModalDetails] = useState<RewardModalDetails>()
   const [showRewardModal, setShowRewardModal] = useState<boolean>(false)
+  const [rewardsLeft, setRewardsLeft] = useState<number>(0)
 
   useEffect(() => {
     if (!fitnessLocation || !currentLocation) {
@@ -30,29 +30,34 @@ export const WorkoutReward = ({gameState, setGameState, currentLocation}: Workou
       return
     }
 
-    const oneTickBaseRevenue = calculateOneTickBaseRevenue(GENERATORS, gameState)
-    const reward = generateRandomReward(oneTickBaseRevenue)
-    const { title, body } = reward
-
+    setRewardsLeft(2)
     setGameState(prevGameState => ({
       ...prevGameState,
       lastWorkoutRewardTime: now,
     }))
-
-    giveReward(reward, setGameState)
-
-    setRewardModalDetails({
-      reward: reward,
-      title: `Workout Reward: ${title}`,
-      body: body,
-    })
-    setShowOverlay(true)
-    setShowRewardModal(true)
-
   }, [fitnessLocation, currentLocation])
 
+  useEffect(() => {
+    if (rewardsLeft <= 0) {
+      return
+    }
+    if (showRewardModal) {
+      return
+    }
+
+    const oneTickBaseRevenue = calculateOneTickBaseRevenue(GENERATORS, gameState)
+    const reward = generateReward(oneTickBaseRevenue)
+    const { title, body } = reward
+
+    giveReward(reward, setGameState)
+    displayReward(setRewardModalDetails, reward, `Workout Reward: ${title}`, body, setShowOverlay, setShowRewardModal)
+
+    setRewardsLeft(rewardsLeft - 1)
+  }, [rewardsLeft, showRewardModal])
+
   const handleCloseRewardModal = () => {
-    setTimeout(() => {setShowRewardModal(false), 5000})
+    setShowRewardModal(false)
+    setRewardModalDetails(undefined)
     setShowOverlay(false)
   }
 

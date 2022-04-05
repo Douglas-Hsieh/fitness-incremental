@@ -17,11 +17,13 @@ export const calculateGeneratorBaseRevenue = (
   const upgradeMultipliersByGeneratorId = calculateMultipliersFromUpgrades(multiplierUpgradeIds);
   const unlockMultipliersByGeneratorId = calculateMultipliersFromUnlocks(unlockIds);
   const prestigeMultiplier = 1 + (prestige * 0.02);
+  const permanentMultiplier = gameState.permanentMultiplier
 
   const revenue = (generator.initialRevenue * generatorState.owned)
     * upgradeMultipliersByGeneratorId.get(generator.id)!
     * unlockMultipliersByGeneratorId.get(generator.id)!
-    * prestigeMultiplier;
+    * prestigeMultiplier
+    * permanentMultiplier;
 
   return revenue;
 };

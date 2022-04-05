@@ -32,6 +32,8 @@ import { HighlightId } from "./enums/HightlightId";
 import { HighlightType } from "./enums/HighlightType";
 import { HighlightOverlay } from "react-native-highlight-overlay";
 import { DialogueModal } from "./components/DialogueModal";
+import { dateToYYYYMMDDFormat } from "./math/formatting";
+import { FitnessReward } from "./rewards";
 
 interface GameProps {
   screen: Screen;
@@ -51,8 +53,8 @@ export const Game = ({screen, setScreen, gameState, setGameState, requestAuthori
   const [upgradeType, setUpgradeType] = useState<UpgradeType>(UpgradeType.GeneratorMultiplierCashUpgrade)
   const [visitTime, setVisitTime] = useState<Date>();
   const [temporaryMultiplier, setTemporaryMultiplier] = useState<number>(1);
-  const [stepsToday, setStepsToday] = useState<number>(0)
 
+  const [stepsToday, setStepsToday] = useState<number>(0)
   const [showDialogueModal, setShowDialogueModal] = useState<boolean>(false)
   const [dialogueText, setDialogueText] = useState<string>('')
   const [highlightId, setHighlightId] = useState<string | null>(null)
@@ -232,6 +234,24 @@ export const Game = ({screen, setScreen, gameState, setGameState, requestAuthori
   useInterval(() => {
     getStepsToday().then(setStepsToday)
   }, 60 * 1000)
+
+
+  /** Update fitness rewards */
+  useEffect(() => {
+    const today = dateToYYYYMMDDFormat(new Date())
+
+    setGameState(prevGameState => {
+      const fitnessRewards = prevGameState.fitnessRewardsByDate.get(today)
+      const fitnessRewardsByDate = fitnessRewards
+        ? prevGameState.fitnessRewardsByDate.set(today, fitnessRewards.set("steps", stepsToday))
+        : prevGameState.fitnessRewardsByDate.set(today, new FitnessReward().set("steps", stepsToday))
+      return ({
+        ...prevGameState,
+        fitnessRewardsByDate: fitnessRewardsByDate,
+      })
+    })
+  }, [stepsToday])
+
 
   function showTutorial(highlightId: HighlightId | null, highlightType: HighlightType, text: string) {
     if (highlightType === HighlightType.All) {
