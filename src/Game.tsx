@@ -406,7 +406,7 @@ export const Game = ({screen, setScreen, gameState, setGameState, requestAuthori
             onDismiss={() => {}}
           />
           { showDialogueModal && <DialogueModal onPress={() => setShowDialogueModal(false)} body={dialogueText}/> }
-          { onScreenPress && <Pressable style={styles.pressable} onPress={onScreenPress}/> }
+          { onScreenPress && <Pressable style={styles.invisibleScreen} onPress={onScreenPress}/> }
         </>
       )
     case Screen.Upgrades:
@@ -424,7 +424,7 @@ export const Game = ({screen, setScreen, gameState, setGameState, requestAuthori
             onDismiss={() => {}}
           />
           { showDialogueModal && <DialogueModal onPress={() => setShowDialogueModal(false)} body={dialogueText}/> }
-          { onScreenPress && <Pressable style={styles.pressable} onPress={onScreenPress}/> }
+          { onScreenPress && <Pressable style={styles.invisibleScreen} onPress={onScreenPress}/> }
         </>
       )
     case Screen.Unlocks:
@@ -483,7 +483,7 @@ export const Game = ({screen, setScreen, gameState, setGameState, requestAuthori
 }
 
 const styles = StyleSheet.create({
-  pressable: {
+  invisibleScreen: {
     position: 'absolute',
     width: '100%',
     height: '100%',

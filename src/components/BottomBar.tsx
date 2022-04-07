@@ -7,6 +7,8 @@ import colors from "../../assets/colors/colors"
 import Screen from "../enums/Screen"
 import { HighlightId } from "../enums/HightlightId"
 
+const ICON_SIZE = 36
+
 interface BottomBarProps {
   screen: Screen;
   setScreen: React.Dispatch<React.SetStateAction<Screen>>;
@@ -16,35 +18,24 @@ export const BottomBar = memo(({ screen, setScreen }: BottomBarProps) => (
   <View style={styles.bottomBar}>
     <View style={styles.overlay}/>
     <View style={styles.bottomBarWrapper}>
-
-      <TouchableOpacity onPress={() => setScreen(Screen.Home)}>
-        <Ionicons name={screen === Screen.Home ? 'person-sharp' : 'person-outline'} size={36}/>
-      </TouchableOpacity>
-
+      <Ionicons name={screen === Screen.Home ? 'person-sharp' : 'person-outline'} size={ICON_SIZE}/>
+      <Ionicons name={screen === Screen.Upgrades ? 'arrow-up-circle' : 'arrow-up-circle-outline'} size={ICON_SIZE}/>
+      <Ionicons name={screen === Screen.Unlocks ? 'lock-open-sharp' : 'lock-closed-outline'} size={ICON_SIZE}/>
+      <Ionicons name={screen === Screen.Prestige ? 'star' : 'star-outline'} size={ICON_SIZE}/>
+      <Ionicons name={screen === Screen.Tasks ? 'barbell-sharp' : 'barbell-outline'} size={ICON_SIZE}/>
+      <Ionicons name={screen === Screen.Miscellaneous ? 'settings-sharp' : 'settings-outline'} size={ICON_SIZE}/>
+    </View>
+    <View style={[{position: 'absolute'}, styles.bottomBarWrapper]}>
+      <TouchableOpacity style={styles.touchableIcon} onPress={() => setScreen(Screen.Home)}/>
       <HighlightableElement id={HighlightId.UpgradesTab}>
-        <TouchableOpacity onPress={() => setScreen(Screen.Upgrades)}>
-          <Ionicons name={screen === Screen.Upgrades ? 'arrow-up-circle' : 'arrow-up-circle-outline'} size={36}/>
-        </TouchableOpacity>
+        <TouchableOpacity style={styles.touchableIcon} onPress={() => setScreen(Screen.Upgrades)}/>
       </HighlightableElement>
-
-      <TouchableOpacity onPress={() => setScreen(Screen.Unlocks)}>
-        <Ionicons name={screen === Screen.Unlocks ? 'lock-open-sharp' : 'lock-closed-outline'} size={36}/>
-      </TouchableOpacity>
-
+      <TouchableOpacity style={styles.touchableIcon} onPress={() => setScreen(Screen.Unlocks)}/>
       <HighlightableElement id={HighlightId.PrestigeTab}>
-        <TouchableOpacity onPress={() => setScreen(Screen.Prestige)}>
-          <Ionicons name={screen === Screen.Prestige ? 'star' : 'star-outline'} size={36}/>
-        </TouchableOpacity>
+        <TouchableOpacity style={styles.touchableIcon} onPress={() => setScreen(Screen.Prestige)}/>
       </HighlightableElement>
-
-      <TouchableOpacity onPress={() => setScreen(Screen.Tasks)}>
-        <Ionicons name={screen === Screen.Tasks ? 'barbell-sharp' : 'barbell-outline'} size={36}/>
-      </TouchableOpacity>
-
-      <TouchableOpacity onPress={() => setScreen(Screen.Miscellaneous)}>
-        <Ionicons name={screen === Screen.Miscellaneous ? 'settings-sharp' : 'settings-outline'} size={36}/>
-      </TouchableOpacity>
-
+      <TouchableOpacity style={styles.touchableIcon} onPress={() => setScreen(Screen.Tasks)}/>
+      <TouchableOpacity style={styles.touchableIcon} onPress={() => setScreen(Screen.Miscellaneous)}/>
     </View>
   </View>
 ))
@@ -70,4 +61,8 @@ const styles = EStyleSheet.create({
       justifyContent: 'space-around',
       alignItems: 'center',
     },
+    touchableIcon: {
+      width: ICON_SIZE,
+      height: ICON_SIZE,
+    }
 })
