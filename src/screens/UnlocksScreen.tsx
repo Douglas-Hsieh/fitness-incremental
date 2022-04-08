@@ -145,7 +145,7 @@ const styles = EStyleSheet.create({
   cardContainer1: {
     width: '6.5rem',
     height: '9rem',
-    backgroundColor: colors.orange3,
+    backgroundColor: colors.gray4,
     marginVertical: '1%',
     marginHorizontal: '.5%',
     borderRadius: 10,
