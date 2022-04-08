@@ -73,10 +73,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     borderRadius: 80,
     marginLeft: 10,
-    borderWidth: 1,
+    borderWidth: 2,
+    borderColor: colors.orange3,
   },
   selected: {
-    backgroundColor: colors.gray4,
+    borderColor: colors.gray4,
   },
   upgradeIcon: {
     height: 50,
