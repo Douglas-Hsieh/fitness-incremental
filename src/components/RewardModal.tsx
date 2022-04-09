@@ -6,8 +6,36 @@ import colors from "../../assets/colors/colors"
 import { RewardInstantBonus, RewardNothing, RewardPermanentMultiplier, RewardTemporaryMultiplier } from "../rewards"
 import RewardModalDetails from "../types/RewardModalDetails"
 import { playSound, SoundFile } from "../util/sounds"
+import useInterval from "../util/useInterval"
 import { window } from "../util/Window"
 import { Button } from "./Button"
+
+const PresentImage = () => (
+  <Image source={require('../../assets/images/present.png')} style={styles.icon}/>
+)
+
+const RewardNothingImage = () => (
+  <Image source={require('../../assets/images/garbage.png')} style={styles.icon}/>
+)
+
+const RewardInstantBonusImage = () => (
+  <Image source={require('../../assets/images/steps.png')} style={styles.icon}/>
+)
+
+const RewardTemporaryMultiplierImage = () => (
+  <Image source={require('../../assets/images/hourglass.png')} style={styles.icon}/>
+)
+
+const RewardPermanentMultiplierImage = () => (
+  <Image source={require('../../assets/images/stars.png')} style={styles.icon}/>
+)
+
+const rewardImages = [
+  RewardNothingImage,
+  RewardInstantBonusImage,
+  RewardTemporaryMultiplierImage,
+  RewardPermanentMultiplierImage,
+]
 
 interface RewardModalProps {
   details: RewardModalDetails
@@ -17,7 +45,9 @@ interface RewardModalProps {
 export const RewardModal = ({details, onClose}: RewardModalProps) => {
   const {reward, title, body} = details
 
+  const [showRandomReward, setShowRandomReward] = useState<boolean>(false)
   const [showReward, setShowReward] = useState<boolean>(false)
+  const [randomRewardImage, setRandomRewardImage] = useState<JSX.Element>(RewardNothingImage)
 
   const opacity = useSharedValue(0)
   const scale = useSharedValue(0)
@@ -44,7 +74,6 @@ export const RewardModal = ({details, onClose}: RewardModalProps) => {
     playSound(SoundFile.CoinWinning)
   }, [])
 
-  const presentImage = require('../../assets/images/present.png')
   let rewardImage
   if (reward instanceof RewardNothing) {
     rewardImage = require('../../assets/images/garbage.png')
@@ -56,26 +85,40 @@ export const RewardModal = ({details, onClose}: RewardModalProps) => {
     rewardImage = require('../../assets/images/stars.png')
   }
 
+  useInterval(() => {
+    const randomImage = rewardImages[Math.floor(Math.random() * rewardImages.length)]
+    setRandomRewardImage(randomImage)
+  }, 150)
+
   return (
     <Animated.View style={[styles.modal, animatedStyle]}>
-      { !showReward &&
+      { !showRandomReward && !showReward &&
         <>
           <Text style={styles.title}>{'Fitness Box'}</Text>
-          <Image source={presentImage} style={styles.icon}/>
-          <Text style={styles.body}>{''}</Text>
+          <PresentImage/>
+          <Text style={styles.body}>{"Great effort! Take this gift for exercising today"}</Text>
           <Button text={'Open'} onPress={() => {
-            setShowReward(true)
+            setShowRandomReward(true)
           }}/>
         </>
       }
-      { showReward &&
+      { showRandomReward && !showReward &&
+        <>
+          { randomRewardImage }
+          <Button text={'Claim'} onPress={() => {
+            setShowRandomReward(false)
+            setShowReward(true)
+            playSound(SoundFile.Winning)
+          }}/>
+        </>
+      }
+      { !showRandomReward && showReward &&
         <>
           <Text style={styles.title}>{title}</Text>
           <Image source={rewardImage} style={styles.icon}/>
           <Text style={styles.body}>{body}</Text>
-          <Button text={'Claim'} onPress={() => {
+          <Button text={'Ok'} onPress={() => {
             showModal(false)
-            playSound(SoundFile.Winning)
             onClose()
           }}/>
         </>
@@ -106,6 +149,7 @@ const styles = EStyleSheet.create({
     fontSize: '1.2rem',
   },
   body: {
-    fontSize: '.9rem',
+    fontSize: '1rem',
+    textAlign: 'center',
   },
 })
