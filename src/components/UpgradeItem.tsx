@@ -3,6 +3,7 @@ import { View, TouchableOpacity, Image, Text } from "react-native";
 import EStyleSheet from "react-native-extended-stylesheet";
 import { HighlightableElement } from "react-native-highlight-overlay";
 import colors from "../../assets/colors/colors";
+import { HIGHLIGHTABLE_RECTANGLE_OPTIONS } from "../../assets/data/Constants";
 import { GameState } from "../../assets/data/GameState";
 import { GeneratorMultiplierUpgrade, getUpgradeId, ManagerUpgrade, UpgradeType } from "../../assets/data/Upgrades";
 import { Currency } from "../enums/Currency";
@@ -97,7 +98,7 @@ export const UpgradeItem = memo(({upgradeType, upgrade, title, description, pric
 
   if (upgradeType === UpgradeType.ManagerUpgrade && upgrade.generatorId === '1') {
     return (
-      <HighlightableElement id={HighlightId.ManagerUpgrade1}>
+      <HighlightableElement id={HighlightId.ManagerUpgrade1} options={HIGHLIGHTABLE_RECTANGLE_OPTIONS}>
         {upgradeItemComponent}
       </HighlightableElement>
     )

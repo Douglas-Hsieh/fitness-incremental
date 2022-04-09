@@ -2,6 +2,7 @@ import React, { memo } from "react";
 import { View, Image, StyleSheet, TouchableOpacity } from "react-native";
 import { HighlightableElement } from "react-native-highlight-overlay";
 import colors from "../../assets/colors/colors";
+import { HIGHLIGHTABLE_RECTANGLE_OPTIONS } from "../../assets/data/Constants";
 import { UpgradeType } from "../../assets/data/Upgrades";
 import { HighlightId } from "../enums/HightlightId";
 import { playSound, SoundFile } from "../util/sounds";
@@ -41,7 +42,7 @@ export const UpgradeIconList = memo(({upgradeType, setUpgradeType}: UpgradeIconL
         <Image source={require('../../assets/images/trainer.png')} style={styles.upgradeIcon} />
       </TouchableOpacity>
 
-      <HighlightableElement id={HighlightId.ManagerUpgrades}>
+      <HighlightableElement id={HighlightId.ManagerUpgrades} options={HIGHLIGHTABLE_RECTANGLE_OPTIONS}>
         <TouchableOpacity
           style={[
             styles.upgradeIconContainer,

@@ -13,6 +13,7 @@ import colors from "../../assets/colors/colors";
 import { playSound, SoundFile } from "../util/sounds";
 import { HighlightableElement } from 'react-native-highlight-overlay';
 import { TutorialState } from "../../assets/data/TutorialState";
+import { HIGHLIGHTABLE_RECTANGLE_OPTIONS } from "../../assets/data/Constants";
 
 interface GeneratorComponentProps {
   generator: Generator;
@@ -87,7 +88,7 @@ export const GeneratorComponent = ({ generator, generatorState, gameState, setGa
   const hasOverlay = !ownsSome || (!generatorState.isManuallyOperating && !generatorState.hasManager)
 
   return (
-    <HighlightableElement id={`generator-${generator.id}`}>
+    <HighlightableElement id={`generator-${generator.id}`} options={HIGHLIGHTABLE_RECTANGLE_OPTIONS}>
       <View style={styles.generatorWrapper} onLayout={setX0AndY0}>
         <Pressable style={styles.generatorLeftWrapper} onPress={startGenerator}>
           <GeneratorIcon image={generator.image} hasOverlay={hasOverlay} />

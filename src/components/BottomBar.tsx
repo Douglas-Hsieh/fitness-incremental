@@ -6,6 +6,7 @@ import { HighlightableElement } from "react-native-highlight-overlay"
 import colors from "../../assets/colors/colors"
 import Screen from "../enums/Screen"
 import { HighlightId } from "../enums/HightlightId"
+import { HIGHLIGHTABLE_RECTANGLE_OPTIONS } from "../../assets/data/Constants"
 
 const ICON_SIZE = 36
 
@@ -27,11 +28,11 @@ export const BottomBar = memo(({ screen, setScreen }: BottomBarProps) => (
     </View>
     <View style={[{position: 'absolute'}, styles.bottomBarWrapper]}>
       <TouchableOpacity style={styles.touchableIcon} onPress={() => setScreen(Screen.Home)}/>
-      <HighlightableElement id={HighlightId.UpgradesTab}>
+      <HighlightableElement id={HighlightId.UpgradesTab} options={HIGHLIGHTABLE_RECTANGLE_OPTIONS}>
         <TouchableOpacity style={styles.touchableIcon} onPress={() => setScreen(Screen.Upgrades)}/>
       </HighlightableElement>
       <TouchableOpacity style={styles.touchableIcon} onPress={() => setScreen(Screen.Unlocks)}/>
-      <HighlightableElement id={HighlightId.PrestigeTab}>
+      <HighlightableElement id={HighlightId.PrestigeTab} options={HIGHLIGHTABLE_RECTANGLE_OPTIONS}>
         <TouchableOpacity style={styles.touchableIcon} onPress={() => setScreen(Screen.Prestige)}/>
       </HighlightableElement>
       <TouchableOpacity style={styles.touchableIcon} onPress={() => setScreen(Screen.Tasks)}/>

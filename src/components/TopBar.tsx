@@ -3,7 +3,7 @@ import { Image, Text, TouchableOpacity, View } from "react-native";
 import EStyleSheet from "react-native-extended-stylesheet";
 import { HighlightableElement } from "react-native-highlight-overlay";
 import colors from "../../assets/colors/colors";
-import { TickLevel, TICK_LEVELS, TICK_THRESHOLDS } from "../../assets/data/Constants";
+import { HIGHLIGHTABLE_RECTANGLE_OPTIONS, TickLevel, TICK_LEVELS, TICK_THRESHOLDS } from "../../assets/data/Constants";
 import BuyAmount from "../enums/BuyAmount";
 import { HighlightId } from "../enums/HightlightId";
 import { numberToHumanFormat } from "../math/formatting";
@@ -107,7 +107,7 @@ export const TopBar = memo(({balance, ticks, speed, buyAmount, setBuyAmount, tem
       <AvatarImage/>
 
       <View style={styles.resourcesWrapper}>
-        <HighlightableElement id={HighlightId.Steps} style={styles.stepsWrapper}>
+        <HighlightableElement id={HighlightId.Steps} style={styles.stepsWrapper} options={HIGHLIGHTABLE_RECTANGLE_OPTIONS}>
           <StepsImage/>
           <View style={styles.stepsCountWrapper}>
             <Text style={styles.stepsCountText}>{coefficient}</Text>
@@ -115,7 +115,7 @@ export const TopBar = memo(({balance, ticks, speed, buyAmount, setBuyAmount, tem
           </View>
         </HighlightableElement>
 
-        <HighlightableElement id={HighlightId.Ticks} style={styles.ticksWrapper}>
+        <HighlightableElement id={HighlightId.Ticks} style={styles.ticksWrapper} options={HIGHLIGHTABLE_RECTANGLE_OPTIONS}>
           <TicksImage/>
           <View style={styles.ticksCountWrapper}>
             <Text style={styles.ticksCountText}>{ticksText}</Text>
@@ -131,7 +131,7 @@ export const TopBar = memo(({balance, ticks, speed, buyAmount, setBuyAmount, tem
         </View>
       }
 
-      <HighlightableElement id={HighlightId.BuyAmountButton}>
+      <HighlightableElement id={HighlightId.BuyAmountButton} options={HIGHLIGHTABLE_RECTANGLE_OPTIONS}>
         <BuyAmountButton
           buyAmount={buyAmount}
           setBuyAmount={setBuyAmount}

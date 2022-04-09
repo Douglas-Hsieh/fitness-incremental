@@ -1,4 +1,5 @@
 import { List } from "immutable"
+import { HighlightOptions } from "react-native-highlight-overlay/lib/typescript/context/context";
 
 export const APP_NAME = 'Fitness Tycoon'
 export const TICKS_PER_STEP = 15
@@ -32,3 +33,8 @@ export const STEP_REWARDS: List<StepReward> = List([
   { steps: 12500, rewards: 4 },
   { steps: 15000, rewards: 5 },
 ])
+
+export const HIGHLIGHTABLE_RECTANGLE_OPTIONS: HighlightOptions = {
+  mode: 'rectangle',
+  borderRadius: 10,
+}
