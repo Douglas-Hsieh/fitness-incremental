@@ -12,8 +12,6 @@ import { Description } from "../components/Description";
 import { memo } from "react";
 import { dateToYYYYMMDDFormat } from "../math/formatting";
 import { LocationObject } from "expo-location";
-import { WorkoutReward } from "../components/WorkoutReward";
-import { StepsReward } from "../components/StepsReward";
 import { STEP_REWARDS } from "../../assets/data/Constants";
 import { ScrollView } from "react-native-gesture-handler";
 
@@ -55,8 +53,6 @@ export const TasksScreen = ({setScreen, gameState, setGameState, stepsToday, cur
       </View>
       <BottomBar screen={Screen.Tasks} setScreen={setScreen}/>
 
-      <StepsReward gameState={gameState} setGameState={setGameState} stepsToday={stepsToday}/>
-      <WorkoutReward gameState={gameState} setGameState={setGameState} currentLocation={currentLocation}/>
     </SafeAreaView>
   )
 }

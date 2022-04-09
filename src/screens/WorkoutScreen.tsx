@@ -15,7 +15,6 @@ import Center from "../components/Center";
 import colors from "../../assets/colors/colors";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { manipulateAsync } from 'expo-image-manipulator'
-import { WorkoutReward } from "../components/WorkoutReward";
 import { createFitnessLocation, getFitnessLocations, updateFitnessLocation } from "../api/fitness-locations";
 import { FitnessLocation } from "../shared/fitness-locations.interface";
 import { BackgroundTask } from "../types/BackgroundTask";
@@ -230,9 +229,6 @@ export const WorkoutScreen = ({setScreen, gameState, setGameState, currentLocati
         </View>
   
         <BottomBar screen={Screen.Workout} setScreen={setScreen}/>
-
-        <WorkoutReward gameState={gameState} setGameState={setGameState} currentLocation={currentLocation}/>
-
       </SafeAreaView>
     )
   }

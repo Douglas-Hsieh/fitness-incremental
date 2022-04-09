@@ -104,7 +104,9 @@ export const RewardModal = ({details, onClose}: RewardModalProps) => {
       }
       { showRandomReward && !showReward &&
         <>
+          <Text style={styles.title}>{'Fitness Box'}</Text>
           { randomRewardImage }
+          <Text style={styles.body}>{"Great effort! Take this gift for exercising today"}</Text>
           <Button text={'Claim'} onPress={() => {
             setShowRandomReward(false)
             setShowReward(true)

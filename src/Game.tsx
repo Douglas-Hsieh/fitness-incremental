@@ -34,6 +34,8 @@ import { HighlightOverlay } from "react-native-highlight-overlay";
 import { DialogueModal } from "./components/DialogueModal";
 import { dateToYYYYMMDDFormat } from "./math/formatting";
 import { FitnessReward } from "./rewards";
+import { StepsReward } from "./components/StepsReward";
+import { WorkoutReward } from "./components/WorkoutReward";
 
 interface GameProps {
   screen: Screen;
@@ -407,6 +409,9 @@ export const Game = ({screen, setScreen, gameState, setGameState, requestAuthori
           />
           { showDialogueModal && <DialogueModal onPress={() => setShowDialogueModal(false)} body={dialogueText}/> }
           { onScreenPress && <Pressable style={styles.invisibleScreen} onPress={onScreenPress}/> }
+
+          { !showDialogueModal && <StepsReward gameState={gameState} setGameState={setGameState} stepsToday={stepsToday}/> }
+          { !showDialogueModal && <WorkoutReward gameState={gameState} setGameState={setGameState} currentLocation={currentLocation}/> }
         </>
       )
     case Screen.Upgrades:
@@ -469,13 +474,17 @@ export const Game = ({screen, setScreen, gameState, setGameState, requestAuthori
       )
     case Screen.Tasks:
       return (
-        <TasksScreen
-          setScreen={setScreen}
-          gameState={gameState}
-          setGameState={setGameState}
-          stepsToday={stepsToday}
-          currentLocation={currentLocation}
-        />
+        <>
+          <TasksScreen
+            setScreen={setScreen}
+            gameState={gameState}
+            setGameState={setGameState}
+            stepsToday={stepsToday}
+            currentLocation={currentLocation}
+          />
+          { !showDialogueModal && <StepsReward gameState={gameState} setGameState={setGameState} stepsToday={stepsToday}/> }
+          { !showDialogueModal && <WorkoutReward gameState={gameState} setGameState={setGameState} currentLocation={currentLocation}/> }
+        </>
       )
 
   }

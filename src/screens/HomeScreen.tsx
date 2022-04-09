@@ -15,8 +15,6 @@ import Screen from "../enums/Screen";
 import { Set } from 'immutable'
 import { GeneratorUnlock, GENERATOR_UNLOCKS_BY_ID, getUnlockId } from "../../assets/data/GeneratorUnlocks";
 import { UnlockModal } from "../components/UnlockModal";
-import { StepsReward } from "../components/StepsReward";
-import { WorkoutReward } from "../components/WorkoutReward";
 import { LocationObject } from "expo-location";
 import { HighlightOverlay } from 'react-native-highlight-overlay';
 
@@ -140,9 +138,6 @@ export const HomeScreen = ({setScreen, gameState, setGameState, buyAmount, setBu
           unlock={newUnlock}
         />
       )}
-
-      <StepsReward gameState={gameState} setGameState={setGameState} stepsToday={stepsToday}/>
-      <WorkoutReward gameState={gameState} setGameState={setGameState} currentLocation={currentLocation}/>
 
     </SafeAreaView>
 
