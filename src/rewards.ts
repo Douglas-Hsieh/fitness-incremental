@@ -51,7 +51,9 @@ export class RewardPermanentMultiplier extends BaseReward {
 export const generateReward = (oneTickRevenue: number) => {
   const p = Math.random()
 
-  if (p < 0.5) {
+  if (p < 0.25) {
+    return generateNothingReward()
+  } else if (p < 0.5) {
     return generateInstantBonus(oneTickRevenue)
   } else if (p < 0.75) {
     return generateTemporaryMultiplier(5)
@@ -119,7 +121,7 @@ export const canReceiveWorkoutReward = (
   currentTime: Date
 ) => {
   const fitnessLocationLatLng = toLatLng(fitnessLocation);
-  const isNearFitnessLocation = haversine(fitnessLocationLatLng, currentLocation.coords, { unit: 'mile', threshold: 0.1})
+  const isNearFitnessLocation = haversine(fitnessLocationLatLng, currentLocation.coords, { unit: 'mile', threshold: 0.25})
 
   const EIGHT_HOURS_MS = 8 * 60 * 60 * 1000
   const diffTime = Math.abs(currentTime.getTime() - lastWorkoutRewardTime.getTime())
