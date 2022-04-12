@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { GestureResponderEvent, Image, SafeAreaView, StyleSheet, View } from "react-native";
 import { GameState } from "../../assets/data/GameState";
-import { BackgroundImage } from "../components/BackgroundImage";
+import { Background } from "../components/BackgroundImage";
 import { BottomBar } from "../components/BottomBar";
 import { Button } from "../components/Button";
 import { Description } from "../components/Description";
@@ -177,7 +177,7 @@ export const WorkoutScreen = ({setScreen, gameState, setGameState, currentLocati
   if (!isTakingPicture) {
     return (
       <SafeAreaView style={styles.container}>
-        <BackgroundImage/>
+        <Background/>
   
         <View style={styles.screenWrapper}>
           <Header title={'Workout'}/>

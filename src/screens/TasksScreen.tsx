@@ -1,7 +1,7 @@
 import { GameState } from "../../assets/data/GameState";
 import { Image, SafeAreaView, Text, View } from "react-native";
 import { DeterminateProgress } from "../components/DeterminateProgress";
-import { BackgroundImage } from "../components/BackgroundImage";
+import { Background } from "../components/BackgroundImage";
 import { BottomBar } from "../components/BottomBar";
 import Screen from "../enums/Screen";
 import colors from "../../assets/colors/colors";
@@ -30,7 +30,7 @@ interface TasksScreenProps {
 export const TasksScreen = ({setScreen, gameState, setGameState, stepsToday, currentLocation}: TasksScreenProps) => {
   return (
     <SafeAreaView style={styles.container}>
-      <BackgroundImage/>
+      <Background/>
       <View style={styles.screenWrapper}>
 
         <Header title={'Tasks'}/>

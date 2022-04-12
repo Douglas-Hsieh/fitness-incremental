@@ -4,7 +4,7 @@ import EStyleSheet from "react-native-extended-stylesheet";
 import colors from "../../assets/colors/colors";
 import { UpgradeType } from "../../assets/data/Upgrades";
 import { GameState } from "../../assets/data/GameState";
-import { BackgroundImage } from "../components/BackgroundImage";
+import { Background } from "../components/BackgroundImage";
 import { BottomBar } from "../components/BottomBar";
 import { Description } from "../components/Description";
 import { Header } from "../components/Header";
@@ -24,7 +24,7 @@ export const UpgradesScreen = ({setScreen, gameState, setGameState, upgradeType,
 
   return (
     <SafeAreaView style={styles.container}>
-      <BackgroundImage/>
+      <Background/>
       <View style={styles.backgroundOverlay}/>
 
       <View style={styles.upgradesWrapper}>

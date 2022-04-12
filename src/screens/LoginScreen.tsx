@@ -3,7 +3,7 @@ import { SafeAreaView, View, Text } from "react-native"
 import EStyleSheet from "react-native-extended-stylesheet"
 import { TouchableOpacity } from "react-native-gesture-handler"
 import colors from "../../assets/colors/colors"
-import { BackgroundImage } from "../components/BackgroundImage"
+import { Background } from "../components/BackgroundImage"
 
 interface LoginScreenProps {
   handleLogin: any;
@@ -13,7 +13,7 @@ export const LoginScreen = ({handleLogin}: LoginScreenProps) => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <BackgroundImage/>
+      <Background/>
       
       <View style={styles.screenWrapper}>
         <View style={styles.title}>

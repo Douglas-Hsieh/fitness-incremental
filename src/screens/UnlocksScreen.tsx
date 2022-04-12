@@ -8,7 +8,7 @@ import { GENERATORS_BY_ID } from "../../assets/data/Generators"
 import { GameState } from "../../assets/data/GameState"
 import { GeneratorState } from "../../assets/data/GeneratorState"
 import { GeneratorUnlock, getNextUnlock, UnlockReward } from "../../assets/data/GeneratorUnlocks"
-import { BackgroundImage } from "../components/BackgroundImage"
+import { Background } from "../components/BackgroundImage"
 import { BottomBar } from "../components/BottomBar"
 import { Description } from "../components/Description"
 import { Header } from "../components/Header"
@@ -97,7 +97,7 @@ export const UnlocksScreen = ({setScreen, gameState}: UnlocksScreenProps) => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <BackgroundImage/>
+      <Background/>
       <View style={styles.backgroundOverlay}/>
       <View style={styles.unlocksWrapper}>
         <Header title={'Milestones'}/>

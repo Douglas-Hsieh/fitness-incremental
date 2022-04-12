@@ -6,7 +6,7 @@ import colors from '../../assets/colors/colors'
 import { GameState, INITIAL_BALANCE } from '../../assets/data/GameState'
 import { INITIAL_GENERATOR_STATE_BY_ID } from "../../assets/data/GeneratorState"
 import { UpgradeState } from '../../assets/data/UpgradeState'
-import { BackgroundImage } from '../components/BackgroundImage'
+import { Background } from '../components/BackgroundImage'
 import { BottomBar } from '../components/BottomBar'
 import { Button } from '../components/Button'
 import { ConfirmationModal } from '../components/ConfirmationModal'
@@ -75,12 +75,12 @@ export const PrestigeScreen = ({setScreen, gameState, setGameState}: PrestigeScr
 
   return (
     <SafeAreaView style={styles.container}>
-      <BackgroundImage/>
+      <Background/>
       <View style={styles.screenWrapper}>
         <Header title={'Trainers'}/>
         <Description
           title={'Teamwork makes the dream work'}
-          body={'The more steps everyone takes, the more Personal Trainers you attract!\n\nThese guys provide huge bonuses but you’ll need to restart your business to hire them.'}
+          body={'The more steps everyone takes, the more Personal Trainers you attract!\n\nThese guys make your followers a lot faster, but you’ll need to abandon your followers to hire them.'}
         />
 
         <View style={{width: '100%', height: 10}}/>

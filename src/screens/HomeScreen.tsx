@@ -10,7 +10,7 @@ import { Map } from 'immutable';
 import { TopBar } from "../components/TopBar";
 import { GeneratorList } from "../components/GeneratorList";
 import { BottomBar } from "../components/BottomBar";
-import { BackgroundImage } from "../components/BackgroundImage";
+import { Background } from "../components/BackgroundImage";
 import Screen from "../enums/Screen";
 import { Set } from 'immutable'
 import { GeneratorUnlock, GENERATOR_UNLOCKS_BY_ID, getUnlockId } from "../../assets/data/GeneratorUnlocks";
@@ -99,7 +99,7 @@ export const HomeScreen = ({setScreen, gameState, setGameState, buyAmount, setBu
   return (
     <SafeAreaView style={styles.container}>
 
-      <BackgroundImage/>
+      <Background/>
 
       <ScrollView
         contentInsetAdjustmentBehavior='automatic'

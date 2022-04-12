@@ -1,7 +1,7 @@
 import React, { memo, useState } from "react";
 import { SafeAreaView, StyleSheet, View } from "react-native";
 import { DEBUG_GAME_STATE, GameState, INITIAL_GAME_STATE } from "../../assets/data/GameState";
-import { BackgroundImage } from "../components/BackgroundImage";
+import { Background } from "../components/BackgroundImage";
 import { BottomBar } from "../components/BottomBar";
 import { Button } from "../components/Button";
 import Center from "../components/Center";
@@ -42,7 +42,7 @@ export const MiscellaneousScreen = memo(({setScreen, user, speed, setGameState}:
 
   return (
     <SafeAreaView style={styles.container}>
-      <BackgroundImage/>
+      <Background/>
 
       <View style={styles.screenWrapper}>
         <Header title={'Miscellaneous'}/>

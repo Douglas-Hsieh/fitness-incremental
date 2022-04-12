@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Image, SafeAreaView, StyleSheet, Text, View } from "react-native";
 import { GameState } from "../../assets/data/GameState";
-import { BackgroundImage } from "../components/BackgroundImage";
+import { Background } from "../components/BackgroundImage";
 import { BottomBar } from "../components/BottomBar";
 import { Button } from "../components/Button";
 import { Header } from "../components/Header";
@@ -41,7 +41,7 @@ export const FitnessLocationAdminScreen = ({setScreen, setGameState}: FitnessLoc
 
   return (
     <SafeAreaView style={styles.container}>
-      <BackgroundImage/>
+      <Background/>
 
       <View style={styles.screenWrapper}>
         <Header title={'Fitness Locations'}/>
