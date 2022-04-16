@@ -189,7 +189,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   restartBody2: {
-    marginTop: 5,
+    marginVertical: 10,
   },
   restartButton: {
     marginTop: 10,

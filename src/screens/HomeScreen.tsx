@@ -101,26 +101,6 @@ export const HomeScreen = ({setScreen, gameState, setGameState, buyAmount, setBu
 
       <Background/>
 
-      <ScrollView
-        contentInsetAdjustmentBehavior='automatic'
-        showsVerticalScrollIndicator={false}
-      >
-        <View style={{height: 80}}/>
-        <GeneratorList
-          gameState={gameState}
-          setGameState={setGameState}
-          priceByGeneratorId={priceByGeneratorId}
-          maxBuyByGeneratorId={maxBuyByGeneratorId}
-          buyAmount={buyAmount}
-          temporaryMultiplier={temporaryMultiplier}
-        />
-        <View style={{height: 40}}/>
-        <HighlightOverlay
-          highlightedElementId={generatorsHighlightId}
-          onDismiss={() => {}}
-        />
-      </ScrollView>
-
       <TopBar
         balance={gameState.balance}
         ticks={gameState.ticks}
@@ -129,9 +109,27 @@ export const HomeScreen = ({setScreen, gameState, setGameState, buyAmount, setBu
         setBuyAmount={setBuyAmount}
         temporaryMultiplier={temporaryMultiplier}
       />
-      <View style={{flex: 1, zIndex: -1}}/>
-      <BottomBar screen={Screen.Home} setScreen={setScreen}/>
 
+      <ScrollView
+        contentInsetAdjustmentBehavior='automatic'
+        showsVerticalScrollIndicator={false}
+      >
+        <GeneratorList
+          gameState={gameState}
+          setGameState={setGameState}
+          priceByGeneratorId={priceByGeneratorId}
+          maxBuyByGeneratorId={maxBuyByGeneratorId}
+          buyAmount={buyAmount}
+          temporaryMultiplier={temporaryMultiplier}
+        />
+        <HighlightOverlay
+          highlightedElementId={generatorsHighlightId}
+          onDismiss={() => {}}
+        />
+      </ScrollView>
+
+      <BottomBar screen={Screen.Home} setScreen={setScreen}/>
+      
       { newUnlocks.map(newUnlock => 
         <UnlockModal
           key={`${newUnlock.generatorId}-${newUnlock.count}`}

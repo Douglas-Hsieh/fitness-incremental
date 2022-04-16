@@ -73,6 +73,6 @@ export const GeneratorList = ({
 const styles = EStyleSheet.create({
   generatorListWrapper: {
     marginLeft: 10,
-    marginTop: 30,
+    marginVertical: 10,
   },
 })

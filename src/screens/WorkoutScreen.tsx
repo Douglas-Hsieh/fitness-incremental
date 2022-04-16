@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { GestureResponderEvent, Image, SafeAreaView, StyleSheet, View } from "react-native";
+import { GestureResponderEvent, Image, SafeAreaView, StyleSheet, View, TouchableOpacity } from "react-native";
 import { GameState } from "../../assets/data/GameState";
 import { Background } from "../components/BackgroundImage";
 import { BottomBar } from "../components/BottomBar";
@@ -13,7 +13,6 @@ import { requestForegroundPermissionsAsync, getCurrentPositionAsync, LocationObj
 import { Feather } from "@expo/vector-icons";
 import Center from "../components/Center";
 import colors from "../../assets/colors/colors";
-import { TouchableOpacity } from "react-native-gesture-handler";
 import { manipulateAsync } from 'expo-image-manipulator'
 import { createFitnessLocation, getFitnessLocations, updateFitnessLocation } from "../api/fitness-locations";
 import { FitnessLocation } from "../shared/fitness-locations.interface";
@@ -36,7 +35,7 @@ interface ExitCameraIconProps {
 const ExitCameraIcon = ({onPress}: ExitCameraIconProps) => (
   <View style={styles.xIconWrapper}>
     <TouchableOpacity onPress={onPress}>
-      <Feather name={'x'} size={window.width / 10} color={'white'}/>
+      <Feather name={'x'} size={window.width / 7} color={'white'}/>
     </TouchableOpacity>
   </View>
 )
@@ -280,15 +279,20 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   window: {
-    position: 'absolute',
     width: window.width,
     height: window.height,
   },
   xIconWrapper: {
+    position: 'absolute',
+    width: '100%',
     flexDirection: 'row',
     justifyContent: 'flex-end',
+    zIndex: 1,
   },
   cameraActionWrapper: {
+    position: 'absolute',
+    height: '95%',
+    width: '100%',
     flex: 1,
     alignItems: 'center',
     justifyContent: 'flex-end',
@@ -299,7 +303,7 @@ const styles = StyleSheet.create({
     borderRadius: window.width / 5,
     backgroundColor: colors.white,
     borderColor: colors.black,
-    borderWidth: window.width / 100,
+    borderWidth: window.width / 200,
     margin: 20,
   },
   buttonGroup: {
