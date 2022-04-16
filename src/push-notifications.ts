@@ -20,7 +20,7 @@ export const registerForPushNotificationsAsync = async () => {
       finalStatus = status;
     }
     if (finalStatus !== 'granted') {
-      alert('Failed to get push token for push notification!');
+      console.log('Failed to get push token for push notification!');
       return;
     }
     const experienceId = '@random_permutation/fitness-incremental'
@@ -28,6 +28,6 @@ export const registerForPushNotificationsAsync = async () => {
     // console.log('token.data', token);
     return token;
   } else {
-    alert('Must use physical device for Push Notifications');
+    console.log('Must use physical device for Push Notifications');
   }
 };
