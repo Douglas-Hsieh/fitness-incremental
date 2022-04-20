@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { GameState } from "../assets/data/GameState";
 import Screen from "./enums/Screen";
 import { HomeScreen } from "./screens/HomeScreen";
-import { LoginScreen } from "./screens/LoginScreen";
 import { PrestigeScreen } from "./screens/PrestigeScreen";
 import { UnlocksScreen } from "./screens/UnlocksScreen";
 import { UpgradesScreen } from "./screens/UpgradesScreen";
@@ -42,11 +41,9 @@ interface GameProps {
   setScreen: React.Dispatch<React.SetStateAction<Screen>>;
   gameState: GameState;
   setGameState: React.Dispatch<React.SetStateAction<GameState>>;
-  isAuthorized: boolean;
-  requestAuthorization: () => void;
 }
 
-export const Game = ({screen, setScreen, gameState, setGameState, requestAuthorization}: GameProps) => {
+export const Game = ({ screen, setScreen, gameState, setGameState }: GameProps) => {
 
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
   const [hasForegroundLocationPermission, setHasForegroundLocationPermission] = useState<boolean>()
@@ -118,10 +115,10 @@ export const Game = ({screen, setScreen, gameState, setGameState, requestAuthori
   }, [])
 
   useInterval(() => {
-    // Dangerous: can stop the game loop
-    if (showDialogueModal) {
-      return
-    }
+    // // Dangerous: can stop the game loop
+    // if (showDialogueModal) {
+    //   return
+    // }
 
     if (!hasWorkingGenerator(gameState)) {
       return
@@ -256,11 +253,11 @@ export const Game = ({screen, setScreen, gameState, setGameState, requestAuthori
 
 
   function showTutorial(highlightId: HighlightId | null, highlightType: HighlightType, text: string) {
-    if (highlightType === HighlightType.All) {
-      setHighlightId(highlightId)
-    } else if (highlightType === HighlightType.Generators) {
-      setGeneratorsHighlightId(highlightId)
-    }
+    // if (highlightType === HighlightType.All) {
+    //   setHighlightId(highlightId)
+    // } else if (highlightType === HighlightType.Generators) {
+    //   setGeneratorsHighlightId(highlightId)
+    // }
     setDialogueText(text)
     setShowDialogueModal(true)
   }
@@ -295,8 +292,14 @@ export const Game = ({screen, setScreen, gameState, setGameState, requestAuthori
     })
   }
 
-  /* Tutorial */
+  // /* Tutorial */
   const { tutorialState } = gameState
+
+  useEffect(() => {
+    // ios: breaks on v1.2.1 (goes to loading screen)
+    // android: breaks on v1.3.0 (multiple ui glitch)
+    // showTutorial(HighlightId.Generator1, HighlightType.Generators, tutorialState.firstGenerator1.message)
+  }, [])
 
   // Start tutorial
   useEffect(() => {
@@ -378,10 +381,6 @@ export const Game = ({screen, setScreen, gameState, setGameState, requestAuthori
   }, [screen])
 
   switch(screen) {
-    case Screen.Login:
-      return (
-        <LoginScreen handleLogin={requestAuthorization}/>
-      )
     case Screen.WelcomeBack:
       return (
         <WelcomeBackScreen

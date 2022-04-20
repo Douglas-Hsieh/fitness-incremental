@@ -1,6 +1,5 @@
 import React, { useEffect } from 'react';
-import { Image, StyleSheet, Text, View } from 'react-native';
-import { TouchableOpacity } from 'react-native-gesture-handler';
+import { Image, StyleSheet, Text, View, TouchableOpacity } from 'react-native';
 import Animated, { useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
 import colors from '../../assets/colors/colors';
 import { GENERATORS_BY_ID } from '../../assets/data/Generators';

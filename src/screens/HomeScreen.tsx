@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, SafeAreaView, StyleSheet } from "react-native";
+import { SafeAreaView, StyleSheet } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 import { GENERATORS } from "../../assets/data/Generators";
 import { GameState } from "../../assets/data/GameState";
@@ -122,12 +122,11 @@ export const HomeScreen = ({setScreen, gameState, setGameState, buyAmount, setBu
           buyAmount={buyAmount}
           temporaryMultiplier={temporaryMultiplier}
         />
-        <HighlightOverlay
-          highlightedElementId={generatorsHighlightId}
-          onDismiss={() => {}}
-        />
       </ScrollView>
-
+      <HighlightOverlay
+        highlightedElementId={generatorsHighlightId}
+        onDismiss={() => {}}
+      />
       <BottomBar screen={Screen.Home} setScreen={setScreen}/>
       
       { newUnlocks.map(newUnlock => 
