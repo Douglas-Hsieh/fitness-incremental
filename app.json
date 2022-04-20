@@ -22,7 +22,7 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
+        "foregroundImage": "./assets/images/male-avatar.png",
         "backgroundColor": "#FFFFFF"
       },
       "package": "com.randompermutation.fitnessincremental",
