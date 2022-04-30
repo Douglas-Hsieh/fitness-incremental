@@ -1,22 +1,6 @@
 import { Platform } from "react-native"
-import GoogleFit from "react-native-google-fit";
-import { GOOGLE_FIT_AUTHORIZATION_OPTIONS } from "./google-fit";
-import AppleHealthKit from 'react-native-health'
-import { APPLE_HEALTH_AUTHORIZATION_PERMISSIONS } from "./apple-health-kit";
 import * as GF from './google-fit';
 import * as AH from './apple-health-kit'
-
-export const requestAuthorization = () => {
-  if (Platform.OS === 'android') {
-    return GoogleFit.authorize(GOOGLE_FIT_AUTHORIZATION_OPTIONS)
-  } else if (Platform.OS === 'ios') {
-    return AppleHealthKit.initHealthKit(APPLE_HEALTH_AUTHORIZATION_PERMISSIONS, (error) => {
-      if (error) {
-        throw error
-      }
-    })
-  }
-}
 
 export interface Steps {
   date: string;

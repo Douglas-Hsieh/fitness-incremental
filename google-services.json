@@ -14,6 +14,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "449996184337-r8tnpme2ijvn3jholi0o8bckhgf01iua.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.randompermutation.fitnessincremental",
+            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
+          }
+        },
+        {
           "client_id": "449996184337-h3nmg0vln8jeh8u40o2p7bbm4r1oamds.apps.googleusercontent.com",
           "client_type": 3
         }

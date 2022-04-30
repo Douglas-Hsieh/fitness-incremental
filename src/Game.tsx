@@ -13,8 +13,8 @@ import { FitnessLocationAdminScreen } from "./screens/FitnessLocationAdminScreen
 import { Accuracy, LocationObject, requestForegroundPermissionsAsync, watchPositionAsync } from "expo-location";
 import { registerForPushNotificationsAsync } from "./push-notifications";
 import { getFitnessLocations } from "./api/fitness-locations";
-import { createUser, updateUser } from "./api/users";
-import { logIn } from "./api/auth";
+import { updateUser } from "./api/users";
+import { signIn } from "./api/auth";
 import BuyAmount from "./enums/BuyAmount";
 import { calculateTicksToUse, calculateTicksUsedSinceLastVisit, hasWorkingGenerator, progressGenerators } from "./math/revenue";
 import { TICKS_PER_STEP } from "../assets/data/Constants";
@@ -35,15 +35,17 @@ import { dateToYYYYMMDDFormat } from "./math/formatting";
 import { FitnessReward } from "./rewards";
 import { StepsReward } from "./components/StepsReward";
 import { WorkoutReward } from "./components/WorkoutReward";
+import { isAppleUser, isGoogleUser, SignInAuth } from "./types/SignInAuth";
 
 interface GameProps {
   screen: Screen;
   setScreen: React.Dispatch<React.SetStateAction<Screen>>;
   gameState: GameState;
   setGameState: React.Dispatch<React.SetStateAction<GameState>>;
+  userInfo: SignInAuth;
 }
 
-export const Game = ({ screen, setScreen, gameState, setGameState }: GameProps) => {
+export const Game = ({ screen, setScreen, gameState, setGameState, userInfo}: GameProps) => {
 
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
   const [hasForegroundLocationPermission, setHasForegroundLocationPermission] = useState<boolean>()
@@ -61,24 +63,33 @@ export const Game = ({ screen, setScreen, gameState, setGameState }: GameProps) 
   const [onScreenPress, setOnScreenPress] = useState<(() => void) | null>(null)
 
   useEffect(() => {
-    const getAndSetUser = async () => {
-      if (!gameState.user) {
-        const user = await createUser();
-        setGameState(prevGameState => ({ ...prevGameState, user: user, }))
-      }
+    if (isLoggedIn || !userInfo) {
+      return
     }
-    getAndSetUser()
-  }, [])
 
-  useEffect(() => {
-    if (gameState.user && !isLoggedIn) {
-      logIn(gameState.user.uuid)
-        .then((user) => {
-          setGameState(prevGameState => ({ ...prevGameState, user: user, }))
-          setIsLoggedIn(true)
-        })
+    let idToken, serverAuthCode;
+    if (isGoogleUser(userInfo)) {
+      idToken = userInfo.idToken;
+      serverAuthCode = userInfo.serverAuthCode;
+    } else if (isAppleUser(userInfo)){
+      idToken = userInfo.identityToken;
+      serverAuthCode = userInfo.authorizationCode;
+    } else {
+      console.log('Cannot login because user info is not Google or Apple')
+      return
     }
-  }, [gameState.user, isLoggedIn])
+
+    if (!idToken) {
+      console.log('Cannot login because idToken is empty')
+      return
+    }
+
+    signIn({ idToken, serverAuthCode })
+      .then(user => {
+        setGameState(prevGameState => ({ ...prevGameState, user: user, }))
+        setIsLoggedIn(true)
+      })
+  }, [isLoggedIn, userInfo])
 
   useEffect(() => {
 
@@ -159,7 +170,11 @@ export const Game = ({ screen, setScreen, gameState, setGameState }: GameProps) 
 
     // Register for push notifications
     registerForPushNotificationsAsync()
-      .then(token => updateUser({ id: gameState.user!.id, expoPushToken: token }))
+      .then(token => {
+        if (token) {
+          updateUser({ id: gameState.user!.id, expoPushToken: token })
+        }
+      })
   }, [isLoggedIn])
 
   useEffect(() => {

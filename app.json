@@ -18,7 +18,8 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.randompermutation.fitnessincremental"
+      "bundleIdentifier": "com.randompermutation.fitnessincremental",
+      "usesAppleSignIn": true
     },
     "android": {
       "adaptiveIcon": {
@@ -40,7 +41,8 @@
       }
     },
     "plugins": [
-      "react-native-health"
+      "react-native-health",
+      "@react-native-google-signin/google-signin"
     ]
   }
 }
