@@ -5,7 +5,7 @@ import { Platform } from "react-native";
 
 const endpoint = API_URL
 
-export const logIn = async (idToken: string, serverAuthCode: string | null, os: string): Promise<User> => {
+export const login = async (idToken: string): Promise<User> => {
   return await fetch(`${endpoint}/login`, {
     method: 'POST',
     headers: {
@@ -14,8 +14,7 @@ export const logIn = async (idToken: string, serverAuthCode: string | null, os: 
     },
     body: JSON.stringify({
       idToken: idToken,
-      serverAuthCode: serverAuthCode,
-      os: os,
+      os: Platform.OS,
     }),
   })
     .then(res => {
@@ -35,13 +34,12 @@ interface SignInProps {
 
 export async function signIn({ idToken, serverAuthCode }: SignInProps) {
   let user;
-  const os = Platform.OS;
 
   try {
-    user = await logIn(idToken, serverAuthCode, os)
+    user = await login(idToken)
   } catch(error) {
-    user = await createUser(idToken)
-      .then(() => logIn(idToken, serverAuthCode, os))
+    user = await createUser(idToken, serverAuthCode)
+      .then(() => login(idToken))
   }
 
   return user

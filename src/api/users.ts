@@ -11,7 +11,7 @@ export const getUser = async (userId: string): Promise<User> => {
     .then(res => res.data)
 }
 
-export const createUser = async (idToken: string): Promise<User> => {
+export const createUser = async (idToken: string, serverAuthCode: string | null): Promise<User> => {
   return fetch(`${endpoint}`, {
     method: 'POST',
     headers: {
@@ -20,6 +20,7 @@ export const createUser = async (idToken: string): Promise<User> => {
     },
     body: JSON.stringify({
       idToken: idToken,
+      serverAuthCode: serverAuthCode,
       os: Platform.OS,
       timezoneOffsetMinutes: new Date().getTimezoneOffset(),
     }),
