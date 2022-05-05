@@ -1,6 +1,6 @@
 export interface User {
   id: number;
-  uuid: string;
+  sub: string;
   roles: string;
   expoPushToken: string;
 }
