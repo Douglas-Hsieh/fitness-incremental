@@ -3,7 +3,7 @@ import { Image, SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from 'r
 import colors from '../../assets/colors/colors'
 import { TICKS_PER_STEP } from '../../assets/data/Constants'
 import { GameState } from '../../assets/data/GameState'
-import { Background } from "../components/BackgroundImage"
+import { FancyBackground } from "../components/BackgroundImage"
 import Screen from '../enums/Screen'
 
 const WelcomeBackHeader = memo(() => (
@@ -31,7 +31,7 @@ export const WelcomeBackScreen = ({setScreen, gameState}: WelcomeBackScreenProps
 
   return (
     <SafeAreaView style={styles.container}>
-      <Background/>
+      <FancyBackground/>
 
       <WelcomeBackHeader/>
 
