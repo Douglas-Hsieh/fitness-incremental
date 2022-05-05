@@ -4,10 +4,6 @@ import { GetDailyStepsBetweenArgs, Steps } from "./fitness-api";
 export const GOOGLE_FIT_AUTHORIZATION_OPTIONS = {
   scopes: [
     Scopes.FITNESS_ACTIVITY_READ,
-    Scopes.FITNESS_ACTIVITY_WRITE,
-    Scopes.FITNESS_BODY_READ,
-    Scopes.FITNESS_BODY_WRITE,
-    Scopes.FITNESS_LOCATION_READ,
   ],
 }
 
