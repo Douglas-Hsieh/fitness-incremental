@@ -85,13 +85,13 @@ export const GeneratorComponent = ({ generator, generatorState, gameState, setGa
     playSound(SoundFile.MenuSelectionClick)
   }
 
-  const hasOverlay = !ownsSome || (!generatorState.isManuallyOperating && !generatorState.hasManager)
+  const isOperating = generatorState.isManuallyOperating || generatorState.hasManager;
 
   return (
     <HighlightableElement id={`generator-${generator.id}`} options={HIGHLIGHTABLE_RECTANGLE_OPTIONS}>
       <View style={styles.generatorWrapper} onLayout={setX0AndY0}>
         <Pressable style={styles.generatorLeftWrapper} onPress={startGenerator}>
-          <GeneratorIcon image={generator.image} hasOverlay={hasOverlay} />
+          <GeneratorIcon image={generator.image} ownsSome={ownsSome} isOperating={isOperating}/>
           <UnlockProgressBar generator={generator} owned={generatorState.owned} />
         </Pressable>
         <Pressable style={styles.generatorRightWrapper} onPress={startGenerator}>

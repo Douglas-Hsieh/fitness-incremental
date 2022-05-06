@@ -3,11 +3,21 @@ import { Image, StyleSheet, View } from "react-native";
 import colors from "../../assets/colors/colors";
 
 interface GeneratorIconProps {
-  image: any,
-  hasOverlay: boolean,
+  image: any;
+  ownsSome: boolean;
+  isOperating: boolean;
 }
 
-export const GeneratorIcon = memo(({image, hasOverlay}: GeneratorIconProps) => {
+export const GeneratorIcon = memo(({image, ownsSome, isOperating}: GeneratorIconProps) => {
+  let overlayOpacity;
+  if (ownsSome && isOperating) {
+    overlayOpacity = 0;
+  } else if (ownsSome && !isOperating) {
+    overlayOpacity = .5
+  } else {
+    overlayOpacity = .75;
+  }
+
   return (
     <>
       <View style={styles.iconContainer1}>
@@ -17,9 +27,12 @@ export const GeneratorIcon = memo(({image, hasOverlay}: GeneratorIconProps) => {
           </View>
         </View>
       </View>
-      {hasOverlay &&
-        <View style={styles.overlay}/>
-      }
+      
+      <View style={[
+        styles.overlay,
+        { opacity: overlayOpacity }
+      ]}/>
+      
     </>
 )})
 
@@ -62,6 +75,5 @@ const styles = StyleSheet.create({
     width: ICON_WIDTH,
     borderRadius: ICON_BORDER_RADIUS,
     backgroundColor: colors.black,
-    opacity: .5,
   },
 })
