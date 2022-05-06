@@ -11,7 +11,7 @@ export const getUser = async (userId: string): Promise<User> => {
     .then(res => res.data)
 }
 
-export const createUser = async (idToken: string, serverAuthCode: string | null): Promise<User> => {
+export const createUser = async (idToken: string | null, serverAuthCode: string | null): Promise<User> => {
   return fetch(`${endpoint}`, {
     method: 'POST',
     headers: {

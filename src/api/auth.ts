@@ -5,7 +5,7 @@ import { Platform } from "react-native";
 
 const endpoint = API_URL
 
-export const login = async (idToken: string): Promise<User> => {
+export const login = async (idToken: string | null): Promise<User> => {
   return await fetch(`${endpoint}/login`, {
     method: 'POST',
     headers: {
@@ -28,7 +28,7 @@ export const login = async (idToken: string): Promise<User> => {
 }
 
 interface SignInProps {
-  idToken: string;
+  idToken: string | null;
   serverAuthCode: string | null;
 }
 

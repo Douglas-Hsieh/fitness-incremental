@@ -35,17 +35,21 @@ import { dateToYYYYMMDDFormat } from "./math/formatting";
 import { FitnessReward } from "./rewards";
 import { StepsReward } from "./components/StepsReward";
 import { WorkoutReward } from "./components/WorkoutReward";
-import { isAppleUser, isGoogleUser, SignInAuth } from "./types/SignInAuth";
+import { getSignInAuthCredentials, isAppleUser, isGoogleUser, SignInAuth } from "./types/SignInAuth";
+import { FitnessLocation } from "./shared/fitness-locations.interface";
+import { upsertSavedGame } from "./api/saved-games";
 
 interface GameProps {
   screen: Screen;
   setScreen: React.Dispatch<React.SetStateAction<Screen>>;
   gameState: GameState;
   setGameState: React.Dispatch<React.SetStateAction<GameState>>;
-  userInfo: SignInAuth;
+  fitnessLocation: FitnessLocation | null;
+  setFitnessLocation: React.Dispatch<React.SetStateAction<FitnessLocation>>;
+  signInAuth: SignInAuth;
 }
 
-export const Game = ({ screen, setScreen, gameState, setGameState, userInfo}: GameProps) => {
+export const Game = ({ screen, setScreen, gameState, setGameState, fitnessLocation, setFitnessLocation, signInAuth}: GameProps) => {
 
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
   const [hasForegroundLocationPermission, setHasForegroundLocationPermission] = useState<boolean>()
@@ -63,33 +67,30 @@ export const Game = ({ screen, setScreen, gameState, setGameState, userInfo}: Ga
   const [onScreenPress, setOnScreenPress] = useState<(() => void) | null>(null)
 
   useEffect(() => {
-    if (isLoggedIn || !userInfo) {
+    if (isLoggedIn || !signInAuth) {
       return
     }
 
-    let idToken, serverAuthCode;
-    if (isGoogleUser(userInfo)) {
-      idToken = userInfo.idToken;
-      serverAuthCode = userInfo.serverAuthCode;
-    } else if (isAppleUser(userInfo)){
-      idToken = userInfo.identityToken;
-      serverAuthCode = userInfo.authorizationCode;
-    } else {
-      console.log('Cannot login because user info is not Google or Apple')
+    let creds;
+    try {
+      creds = getSignInAuthCredentials(signInAuth);
+    } catch (error) {
+      console.error(error);
       return
     }
+    
 
-    if (!idToken) {
+    if (!creds.idToken) {
       console.log('Cannot login because idToken is empty')
       return
     }
 
-    signIn({ idToken, serverAuthCode })
+    signIn(creds)
       .then(user => {
         setGameState(prevGameState => ({ ...prevGameState, user: user, }))
         setIsLoggedIn(true)
       })
-  }, [isLoggedIn, userInfo])
+  }, [isLoggedIn, signInAuth])
 
   useEffect(() => {
 
@@ -157,14 +158,15 @@ export const Game = ({ screen, setScreen, gameState, setGameState, userInfo}: Ga
     }
 
     // If user has no fitness location saved, ask api if one exists
-    if (!gameState.fitnessLocation) {
+    if (!fitnessLocation) {
       getFitnessLocations()
         .then(fitnessLocations => {
           const myFitnessLocations = fitnessLocations.filter(fitnessLocation => fitnessLocation.userId === gameState.user!.id)
           if (myFitnessLocations.length <= 0) {
             return;
           }
-          setGameState(prevGameState => ({ ...prevGameState, fitnessLocation: myFitnessLocations[0], }))
+          // setGameState(prevGameState => ({ ...prevGameState, fitnessLocation: myFitnessLocations[0], }))
+          setFitnessLocation(myFitnessLocations[0])
         })
     }
 
@@ -178,7 +180,7 @@ export const Game = ({ screen, setScreen, gameState, setGameState, userInfo}: Ga
   }, [isLoggedIn])
 
   useEffect(() => {
-    if (!gameState.fitnessLocation) {
+    if (!fitnessLocation) {
       return
     }
     if (!hasForegroundLocationPermission) {
@@ -189,7 +191,7 @@ export const Game = ({ screen, setScreen, gameState, setGameState, userInfo}: Ga
         setCurrentLocation(location)
       })
     }
-  }, [gameState.fitnessLocation, hasForegroundLocationPermission])
+  }, [fitnessLocation, hasForegroundLocationPermission])
 
 
   /** When app enters foreground, handle new visit */
@@ -243,10 +245,24 @@ export const Game = ({ screen, setScreen, gameState, setGameState, userInfo}: Ga
 
   useEffect(() => {
     getStepsToday().then(setStepsToday)
+
+    try {
+      const creds = getSignInAuthCredentials(signInAuth);
+      upsertSavedGame(creds.idToken, gameState);
+    } catch (error) {
+      console.error(error);
+    }
   }, [])
 
   useInterval(() => {
     getStepsToday().then(setStepsToday)
+
+    try {
+      const creds = getSignInAuthCredentials(signInAuth);
+      upsertSavedGame(creds.idToken, gameState);
+    } catch (error) {
+      console.error(error);
+    }
   }, 60 * 1000)
 
 
@@ -425,7 +441,7 @@ export const Game = ({ screen, setScreen, gameState, setGameState, userInfo}: Ga
           { onScreenPress && <Pressable style={styles.invisibleScreen} onPress={onScreenPress}/> }
 
           { !showDialogueModal && <StepsReward gameState={gameState} setGameState={setGameState} stepsToday={stepsToday}/> }
-          { !showDialogueModal && <WorkoutReward gameState={gameState} setGameState={setGameState} currentLocation={currentLocation}/> }
+          { !showDialogueModal && <WorkoutReward gameState={gameState} setGameState={setGameState} fitnessLocation={fitnessLocation} currentLocation={currentLocation}/> }
         </>
       )
     case Screen.Upgrades:
@@ -468,6 +484,7 @@ export const Game = ({ screen, setScreen, gameState, setGameState, userInfo}: Ga
           user={gameState.user}
           speed={gameState.speed}
           setGameState={setGameState}
+          fitnessLocation={fitnessLocation}
         />
       )
     case Screen.Workout:
@@ -475,15 +492,14 @@ export const Game = ({ screen, setScreen, gameState, setGameState, userInfo}: Ga
         <WorkoutScreen
           setScreen={setScreen}
           gameState={gameState}
-          setGameState={setGameState}
-          currentLocation={currentLocation}
+          fitnessLocation={fitnessLocation}
+          setFitnessLocation={setFitnessLocation}
         />
       )
     case Screen.FitnessLocationAdmin:
       return (
         <FitnessLocationAdminScreen
           setScreen={setScreen}
-          setGameState={setGameState}
         />
       )
     case Screen.Tasks:
@@ -497,7 +513,7 @@ export const Game = ({ screen, setScreen, gameState, setGameState, userInfo}: Ga
             currentLocation={currentLocation}
           />
           { !showDialogueModal && <StepsReward gameState={gameState} setGameState={setGameState} stepsToday={stepsToday}/> }
-          { !showDialogueModal && <WorkoutReward gameState={gameState} setGameState={setGameState} currentLocation={currentLocation}/> }
+          { !showDialogueModal && <WorkoutReward gameState={gameState} setGameState={setGameState} fitnessLocation={fitnessLocation} currentLocation={currentLocation}/> }
         </>
       )
 
