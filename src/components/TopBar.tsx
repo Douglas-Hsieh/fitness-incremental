@@ -99,7 +99,7 @@ interface TopBarProps {
 export const TopBar = memo(({balance, ticks, speed, buyAmount, setBuyAmount, temporaryMultiplier}: TopBarProps) => {
 
   const [coefficient, scale] = numberToHumanFormat(balance);
-  const ticksText = ticks.toFixed(2)
+  const ticksText = ticks.toFixed(0);
 
   return (
     <View style={styles.topBar}>
