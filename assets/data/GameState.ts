@@ -26,7 +26,6 @@ export class GameState {
   lifetimeSteps: number;
   permanentMultiplier: number;
   temporaryMultipliers: Set<TemporaryMultiplier>;
-  fitnessLocation: FitnessLocation | null;
   lastWorkoutRewardTime: Date;
   lastPushNotificationTime: Date;
   speed: number;  // Tick usage multiplier
@@ -49,7 +48,6 @@ export class GameState {
     lifetimeSteps: number,
     permanentMultiplier: number,
     temporaryMultipliers: Set<TemporaryMultiplier>,
-    fitnessLocation: FitnessLocation | null,
     lastWorkoutRewardTime: Date,
     lastPushNotificationTime: Date,
     speed: number,
@@ -71,7 +69,6 @@ export class GameState {
     this.lifetimeSteps = lifetimeSteps
     this.permanentMultiplier = permanentMultiplier
     this.temporaryMultipliers = temporaryMultipliers
-    this.fitnessLocation = fitnessLocation
     this.lastWorkoutRewardTime = lastWorkoutRewardTime
     this.lastPushNotificationTime = lastPushNotificationTime
     this.speed = speed
@@ -97,7 +94,6 @@ export class GameState {
       obj.lifetimeSteps,
       obj.permanentMultiplier === undefined ? INITIAL_PERMANENT_MULTIPLIER : obj.permanentMultiplier,
       Set(obj.temporaryMultipliers),
-      obj.fitnessLocation,
       obj.lastWorkoutRewardTime === undefined ? INITIAL_LAST_WORKOUT_REWARD_TIME : new Date(obj.lastWorkoutRewardTime),  // handling old saves
       obj.lastPushNotificationTime === undefined ? INITIAL_LAST_PUSH_NOTIFICATION_TIME : new Date(obj.lastPushNotificationTime),
       obj.speed === undefined ? INITIAL_SPEED : obj.speed,
@@ -145,7 +141,6 @@ export const INITIAL_GAME_STATE = new GameState(
   0,
   INITIAL_PERMANENT_MULTIPLIER,
   Set(),
-  null,
   INITIAL_LAST_WORKOUT_REWARD_TIME,
   INITIAL_LAST_PUSH_NOTIFICATION_TIME,
   INITIAL_SPEED,
@@ -174,7 +169,6 @@ export const DEBUG_GAME_STATE = new GameState(
   0,
   INITIAL_PERMANENT_MULTIPLIER,
   Set(),
-  null,
   INITIAL_LAST_WORKOUT_REWARD_TIME,
   INITIAL_LAST_PUSH_NOTIFICATION_TIME,
   INITIAL_SPEED,

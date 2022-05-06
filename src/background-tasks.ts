@@ -8,6 +8,7 @@ import { calculateStepRewardsLeft, canReceiveWorkoutReward } from './rewards';
 import { getStepsBetween } from './fitness-api/fitness-api';
 import allSettled from 'promise.allsettled';
 import { dateToYYYYMMDDFormat } from './math/formatting';
+import { loadFitnessLocation } from './shared/fitness-locations.interface';
 
 export const handleLocationUpdate: TaskManager.TaskManagerTaskExecutor = async ({ data: { locations }, error }) => {
   console.log(`Location Update Task: ${new Date(Date.now()).toISOString()}` );
@@ -24,7 +25,9 @@ export const handleLocationUpdate: TaskManager.TaskManagerTaskExecutor = async (
   const [location] = locations;
   try {
     const gameState = await GameState.load()
-    const { fitnessLocation, lastWorkoutRewardTime, lastPushNotificationTime } = gameState
+    const fitnessLocation = await loadFitnessLocation()
+
+    const { lastWorkoutRewardTime, lastPushNotificationTime } = gameState
     if (!fitnessLocation || !fitnessLocation.isVerified) {
       return
     }
@@ -129,8 +132,9 @@ export const handleWorkoutRewardNotificationTask = async () => {
   }
 
   const gameState = await GameState.load()
+  const fitnessLocation = await loadFitnessLocation()
 
-  const { fitnessLocation, lastPushNotificationTime, lastWorkoutRewardTime} = await GameState.load()
+  const { lastPushNotificationTime, lastWorkoutRewardTime} = gameState
   const twoDaysBefore = new Date(Date.now() - 2 * 86400000)
 
   if (!fitnessLocation) {

@@ -43,12 +43,11 @@ const ExitCameraIcon = ({onPress}: ExitCameraIconProps) => (
 interface WorkoutScreenProps {
   setScreen: React.Dispatch<React.SetStateAction<Screen>>;
   gameState: GameState;
-  setGameState: React.Dispatch<React.SetStateAction<GameState>>;
-  currentLocation: LocationObject | undefined;
+  fitnessLocation: FitnessLocation | null;
+  setFitnessLocation: React.Dispatch<React.SetStateAction<FitnessLocation>>;
 }
 
-export const WorkoutScreen = ({setScreen, gameState, setGameState, currentLocation}: WorkoutScreenProps) => {
-  const { fitnessLocation } = gameState
+export const WorkoutScreen = ({setScreen, gameState, fitnessLocation, setFitnessLocation}: WorkoutScreenProps) => {
   const [hasCameraPermission, setHasCameraPermission] = useState<boolean>();
   const cameraRef = useRef<Camera | null>()
   const [hasForegroundLocationPermission, setHasForegroundLocationPermission] = useState<boolean>();
@@ -107,8 +106,8 @@ export const WorkoutScreen = ({setScreen, gameState, setGameState, currentLocati
       .then(fitnessLocations => {
         const myFitnessLocations = fitnessLocations.filter(fitnessLocation => fitnessLocation.userId === gameState.user!.id)
         if (myFitnessLocations.length > 0)
-        setGameState(prevGameState => ({ ...prevGameState, fitnessLocation: myFitnessLocations[0], })
-      )})
+        setFitnessLocation(myFitnessLocations[0])
+      })
       .catch(error => {
         alert(error)
       })
@@ -126,9 +125,9 @@ export const WorkoutScreen = ({setScreen, gameState, setGameState, currentLocati
       isVerified: null,
     }
 
-    if (gameState.fitnessLocation) {
+    if (fitnessLocation) {
       updateFitnessLocation({
-        id: gameState.fitnessLocation.id,
+        id: fitnessLocation.id,
         ...fitnessLocation,
       })
         .then(getAndSetFitnessLocation)

@@ -17,12 +17,14 @@ import { HighlightableElementProvider } from 'react-native-highlight-overlay';
 import { AndroidLoginScreen } from './src/screens/AndroidLoginScreen';
 import { IosLoginScreen } from './src/screens/IosLoginScreen';
 import { SignInAuth } from './src/types/SignInAuth';
+import { FitnessLocation, loadFitnessLocation } from './src/shared/fitness-locations.interface';
 
 export default function App() {
   const isLoadingComplete = useCachedResources();
   const [screen, setScreen] = useState<Screen>(Screen.Login);
   const [gameState, setGameState] = useState<GameState>();
-  const [userInfo, setUserInfo] = useState<SignInAuth>();
+  const [fitnessLocation, setFitnessLocation] = useState<FitnessLocation | null>(null);
+  const [signInAuth, setSignInAuth] = useState<SignInAuth>();
   const [isAuthorized, setIsAuthorized] = useState<boolean>(false);
 
   useEffect(() => {
@@ -36,12 +38,17 @@ export default function App() {
     }
 
     GameState.load().then(gameState => setGameState(gameState));
+    loadFitnessLocation().then(fitnessLocation => setFitnessLocation(fitnessLocation));
 
     unregisterTasks().finally(registerTasks)
   }, [])
 
   useEffect(() => {
-    if (!userInfo) {
+    console.log('fitnessLocation', fitnessLocation)
+  }, [fitnessLocation])
+
+  useEffect(() => {
+    if (!signInAuth) {
       return
     }
 
@@ -62,7 +69,7 @@ export default function App() {
       })
     }
 
-  }, [userInfo])
+  }, [signInAuth])
 
   useEffect(() => {
     if (!isAuthorized) {
@@ -81,25 +88,23 @@ export default function App() {
     }
   }, [gameState])
 
-  
-  if (!isLoadingComplete || !gameState || !userInfo) {
+  if (!isLoadingComplete || !gameState) {
     return (<Center>
       <Text>isLoadingComplete: {(!!isLoadingComplete).toString()}</Text>
       <Text>gameState: {(!!gameState).toString()}</Text>
-      <Text>user: {(!!userInfo).toString()}</Text>
     </Center>);
   }
 
   if (screen === Screen.Login) {
     if (Platform.OS === 'android') {
       return <AndroidLoginScreen
-        userInfo={userInfo}
-        setUserInfo={setUserInfo}
+        userInfo={signInAuth}
+        setUserInfo={setSignInAuth}
       />
     } else if (Platform.OS === 'ios') {
       return <IosLoginScreen
-        userInfo={userInfo}
-        setUserInfo={setUserInfo}
+        userInfo={signInAuth}
+        setUserInfo={setSignInAuth}
       />
     }
   }
@@ -112,7 +117,9 @@ export default function App() {
           setScreen={setScreen}
           gameState={gameState}
           setGameState={setGameState as React.Dispatch<React.SetStateAction<GameState>>}
-          userInfo={userInfo}
+          fitnessLocation={fitnessLocation}
+          setFitnessLocation={setFitnessLocation}
+          signInAuth={signInAuth}
         />
       </HighlightableElementProvider>
     </GestureHandlerRootView>

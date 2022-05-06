@@ -4,6 +4,7 @@ import { GameState } from "../../assets/data/GameState"
 import { GENERATORS } from "../../assets/data/Generators"
 import { calculateOneTickBaseRevenue } from "../math/revenue"
 import { canReceiveWorkoutReward, displayReward, generateReward, giveReward } from "../rewards"
+import { FitnessLocation } from "../shared/fitness-locations.interface"
 import RewardModalDetails from "../types/RewardModalDetails"
 import { Overlay } from "./Overlay"
 import { RewardModal } from "./RewardModal"
@@ -11,11 +12,11 @@ import { RewardModal } from "./RewardModal"
 interface WorkoutReward {
   gameState: GameState;
   setGameState: React.Dispatch<React.SetStateAction<GameState>>;
+  fitnessLocation: FitnessLocation | null;
   currentLocation: LocationObject | undefined;
 }
 
-export const WorkoutReward = ({gameState, setGameState, currentLocation}: WorkoutReward) => {
-  const { fitnessLocation } = gameState
+export const WorkoutReward = ({gameState, setGameState, fitnessLocation, currentLocation}: WorkoutReward) => {
   const [showOverlay, setShowOverlay] = useState<boolean>(false)
   const [rewardModalDetails, setRewardModalDetails] = useState<RewardModalDetails>()
   const [showRewardModal, setShowRewardModal] = useState<boolean>(false)

@@ -8,6 +8,7 @@ import Center from "../components/Center";
 import { ConfirmationModal } from "../components/ConfirmationModal";
 import { Header } from "../components/Header";
 import Screen from "../enums/Screen";
+import { FitnessLocation } from "../shared/fitness-locations.interface";
 import { User } from "../shared/users.interface";
 
 interface MiscellaneousScreenProps {
@@ -15,9 +16,10 @@ interface MiscellaneousScreenProps {
   user: User | undefined;
   speed: number;
   setGameState: React.Dispatch<React.SetStateAction<GameState>>;
+  fitnessLocation: FitnessLocation | null;
 }
 
-export const MiscellaneousScreen = memo(({setScreen, user, speed, setGameState}: MiscellaneousScreenProps) => {
+export const MiscellaneousScreen = memo(({setScreen, user, speed, setGameState, fitnessLocation}: MiscellaneousScreenProps) => {
   const [showDeleteDataModal, setShowDeleteDataModal] = useState<boolean>(false)
 
   const deleteData = () => {
@@ -35,7 +37,7 @@ export const MiscellaneousScreen = memo(({setScreen, user, speed, setGameState}:
     setGameState(prevGameState => ({
       ...DEBUG_GAME_STATE,
       user: prevGameState.user,
-      fitnessLocation: prevGameState.fitnessLocation,
+      fitnessLocation: fitnessLocation,
       visitHistory: prevGameState.visitHistory,
     }))
   }

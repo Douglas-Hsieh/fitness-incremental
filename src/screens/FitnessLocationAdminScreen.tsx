@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { Image, SafeAreaView, StyleSheet, Text, View } from "react-native";
-import { GameState } from "../../assets/data/GameState";
 import { Background } from "../components/BackgroundImage";
 import { BottomBar } from "../components/BottomBar";
 import { Button } from "../components/Button";
@@ -12,10 +11,9 @@ import { getAllUnverifiedFitnessLocations, updateFitnessLocation } from "../api/
 
 interface FitnessLocationAdminScreen {
   setScreen: React.Dispatch<React.SetStateAction<Screen>>;
-  setGameState: React.Dispatch<React.SetStateAction<GameState>>;
 }
 
-export const FitnessLocationAdminScreen = ({setScreen, setGameState}: FitnessLocationAdminScreen) => {
+export const FitnessLocationAdminScreen = ({setScreen}: FitnessLocationAdminScreen) => {
   const [fitnessLocations, setFitnessLocations] = useState<FitnessLocation[]>([])
 
   const getAndSetFitnessLocations = async () => {
