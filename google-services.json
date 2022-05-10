@@ -14,11 +14,11 @@
       },
       "oauth_client": [
         {
-          "client_id": "449996184337-r8tnpme2ijvn3jholi0o8bckhgf01iua.apps.googleusercontent.com",
+          "client_id": "449996184337-n6ql9h2htl9lva3mr224m6g439r82007.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.randompermutation.fitnessincremental",
-            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
+            "certificate_hash": "487d0ec3de49b9e2263fc5d91d93c8a9da159694"
           }
         },
         {
