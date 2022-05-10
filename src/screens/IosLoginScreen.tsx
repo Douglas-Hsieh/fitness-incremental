@@ -68,7 +68,7 @@ const styles = EStyleSheet.create({
   titleText: {
     fontFamily: 'oleo-script',
     color: colors.black,
-    fontSize: '5rem',
+    fontSize: '4rem',
   },
   button: {
     backgroundColor: colors.white,

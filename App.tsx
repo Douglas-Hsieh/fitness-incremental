@@ -98,8 +98,8 @@ export default function App() {
   if (screen === Screen.Login) {
     if (Platform.OS === 'android') {
       return <AndroidLoginScreen
-        userInfo={signInAuth}
-        setUserInfo={setSignInAuth}
+        signInAuth={signInAuth}
+        setSignInAuth={setSignInAuth}
       />
     } else if (Platform.OS === 'ios') {
       return <IosLoginScreen

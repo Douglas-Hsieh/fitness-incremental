@@ -3,7 +3,7 @@ import { SafeAreaView, View, Text } from "react-native"
 import EStyleSheet from "react-native-extended-stylesheet"
 import colors from "../../assets/colors/colors"
 import { Background } from "../components/BackgroundImage"
-import { APP_NAME, IOS_CLIENT_ID, WEB_CLIENT_ID } from "../../assets/data/Constants"
+import { APP_NAME, WEB_CLIENT_ID } from "../../assets/data/Constants"
 import {
   GoogleSignin,
   GoogleSigninButton,
@@ -13,16 +13,16 @@ import { GOOGLE_FIT_AUTHORIZATION_OPTIONS } from "../fitness-api/google-fit"
 import { isGoogleUser, SignInAuth } from "../types/SignInAuth"
 
 interface AndroidLoginScreenProps {
-  userInfo: SignInAuth | undefined;
-  setUserInfo: React.Dispatch<React.SetStateAction<SignInAuth | undefined>>;
+  signInAuth: SignInAuth | undefined;
+  setSignInAuth: React.Dispatch<React.SetStateAction<SignInAuth | undefined>>;
 }
 
-export const AndroidLoginScreen = ({userInfo, setUserInfo}: AndroidLoginScreenProps) => {
+export const AndroidLoginScreen = ({signInAuth, setSignInAuth}: AndroidLoginScreenProps) => {
 
   const googleSignIn = async () => {
     try {
-      const userInfo = await GoogleSignin.signIn();
-      setUserInfo(userInfo)
+      const googleUser = await GoogleSignin.signIn();
+      setSignInAuth(googleUser)
     } catch (error: any) {
       if (error.code === statusCodes.SIGN_IN_CANCELLED) {
         console.log('googleSignIn cancelled')
@@ -31,7 +31,8 @@ export const AndroidLoginScreen = ({userInfo, setUserInfo}: AndroidLoginScreenPr
       } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
         console.log('googleSignIn play services not available')
       } else {
-        console.log('googleSignIn error')
+        console.log(error.code)
+        console.log("googleSignIn error")
       }
     }
   }
@@ -40,17 +41,16 @@ export const AndroidLoginScreen = ({userInfo, setUserInfo}: AndroidLoginScreenPr
     GoogleSignin.configure({
       scopes: GOOGLE_FIT_AUTHORIZATION_OPTIONS.scopes,
       webClientId: WEB_CLIENT_ID,
-      iosClientId: IOS_CLIENT_ID,
       offlineAccess: true,
     });
   }, [])
 
   useEffect(() => {
-    if (!userInfo || !isGoogleUser(userInfo)) {
+    if (!signInAuth || !isGoogleUser(signInAuth)) {
       return
     }
     
-    const {scopes} = userInfo
+    const {scopes} = signInAuth
     if (!scopes) {
       console.log("This shouldn't happen.")
       alert("You must give permissions for this app to work correctly.")
@@ -62,8 +62,8 @@ export const AndroidLoginScreen = ({userInfo, setUserInfo}: AndroidLoginScreenPr
       }
     })
 
-    console.log('userInfo', userInfo)
-  }, [userInfo])
+    console.log('signInAuth', signInAuth)
+  }, [signInAuth])
 
   return (
     <SafeAreaView style={styles.container}>
@@ -95,7 +95,7 @@ const styles = EStyleSheet.create({
   titleText: {
     fontFamily: 'oleo-script',
     color: colors.black,
-    fontSize: '5rem',
+    fontSize: '4rem',
   },
   button: {
     backgroundColor: colors.white,

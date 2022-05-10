@@ -1,12 +1,10 @@
 import { List } from "immutable"
 import { HighlightOptions } from "react-native-highlight-overlay/lib/typescript/context/context";
 
-export const APP_NAME = 'Fitness Tycoon'
+export const APP_NAME = 'Fitness Incremental'
 
 // Google OAuth Client Ids
-// export const GOOGLE_CLIENT_ID = '449996184337-rrfs2359a4f17i3kcdld35t3fntijl83.apps.googleusercontent.com'
 export const WEB_CLIENT_ID = '449996184337-h3nmg0vln8jeh8u40o2p7bbm4r1oamds.apps.googleusercontent.com'
-export const IOS_CLIENT_ID = '449996184337-q63keadmcksi0b4d15j1kb1grd1e83g7.apps.googleusercontent.com'
 
 export const TICKS_PER_STEP = 15
 export interface TickLevel {
