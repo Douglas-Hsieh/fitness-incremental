@@ -119,7 +119,7 @@ export const WorkoutScreen = ({setScreen, gameState, fitnessLocation, setFitness
     }
 
     const {longitude, latitude} = photoAndLocation.location.coords
-    const fitnessLocation: Partial<FitnessLocation> = {
+    const newFitnessLocation: Partial<FitnessLocation> = {
       coordinates: [longitude, latitude],
       imageUri: photoAndLocation.compressedImageUri,
       isVerified: null,
@@ -128,14 +128,14 @@ export const WorkoutScreen = ({setScreen, gameState, fitnessLocation, setFitness
     if (fitnessLocation) {
       updateFitnessLocation({
         id: fitnessLocation.id,
-        ...fitnessLocation,
+        ...newFitnessLocation,
       })
         .then(getAndSetFitnessLocation)
         .catch(error => {
           alert(error)
         })
     } else {
-      createFitnessLocation(fitnessLocation)
+      createFitnessLocation(newFitnessLocation)
         .then(getAndSetFitnessLocation)
         .catch(error => {
           alert(error)

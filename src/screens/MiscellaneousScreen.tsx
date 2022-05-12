@@ -1,6 +1,7 @@
 import React, { memo, useState } from "react";
 import { SafeAreaView, StyleSheet, View } from "react-native";
 import { DEBUG_GAME_STATE, GameState, INITIAL_GAME_STATE } from "../../assets/data/GameState";
+import { deleteUser } from "../api/users";
 import { Background } from "../components/BackgroundImage";
 import { BottomBar } from "../components/BottomBar";
 import { Button } from "../components/Button";
@@ -24,6 +25,9 @@ export const MiscellaneousScreen = memo(({setScreen, user, speed, setGameState, 
 
   const deleteData = () => {
     setGameState(INITIAL_GAME_STATE)
+    if (user) {
+      deleteUser(user.id);
+    }
   }
 
   const toggleSpeed = () => {

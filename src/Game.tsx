@@ -165,7 +165,6 @@ export const Game = ({ screen, setScreen, gameState, setGameState, fitnessLocati
           if (myFitnessLocations.length <= 0) {
             return;
           }
-          // setGameState(prevGameState => ({ ...prevGameState, fitnessLocation: myFitnessLocations[0], }))
           setFitnessLocation(myFitnessLocations[0])
         })
     }

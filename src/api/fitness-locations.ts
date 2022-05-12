@@ -34,6 +34,12 @@ export const createFitnessLocation = async (fitnessLocation: Partial<FitnessLoca
       isVerified: fitnessLocation.isVerified,
     }),
   })
+    .then(res => {
+      if (!res.ok) {
+        return Promise.reject(`${res.status} error`)
+      }
+      return res;
+    })
     .then(res => res.json())
     .then(res => res.data)
 }
@@ -52,6 +58,12 @@ export const updateFitnessLocation = async (fitnessLocation: Partial<FitnessLoca
       isVerified: fitnessLocation.isVerified,
     }),
   })
+    .then(res => {
+      if (!res.ok) {
+        return Promise.reject(`${res.status} error`)
+      }
+      return res;
+    })
     .then(res => res.json())
     .then(res => res.data)
 }

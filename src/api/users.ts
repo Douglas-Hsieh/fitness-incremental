@@ -42,3 +42,10 @@ export const updateUser = async (user: Partial<User>): Promise<User> => {
   }).then(res => res.json())
     .then(res => res.data)
 }
+
+export async function deleteUser (userId: number) {
+  return fetch(`${endpoint}/${userId}`, {
+    method: 'DELETE',
+  }).then(res => res.json())
+    .then(res => res.data)
+}
