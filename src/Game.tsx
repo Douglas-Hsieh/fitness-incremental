@@ -35,7 +35,7 @@ import { dateToYYYYMMDDFormat } from "./math/formatting";
 import { FitnessReward } from "./rewards";
 import { StepsReward } from "./components/StepsReward";
 import { WorkoutReward } from "./components/WorkoutReward";
-import { getSignInAuthCredentials, isAppleUser, isGoogleUser, SignInAuth } from "./types/SignInAuth";
+import { getSignInAuthCredentials, SignInAuth } from "./types/SignInAuth";
 import { FitnessLocation } from "./shared/fitness-locations.interface";
 import { upsertSavedGame } from "./api/saved-games";
 
