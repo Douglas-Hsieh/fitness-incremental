@@ -9,20 +9,38 @@ import { getStepsBetween } from './fitness-api/fitness-api';
 import allSettled from 'promise.allsettled';
 import { dateToYYYYMMDDFormat } from './math/formatting';
 import { loadFitnessLocation } from './shared/fitness-locations.interface';
+import { LocationObject } from 'expo-location';
 
-export const handleLocationUpdate: TaskManager.TaskManagerTaskExecutor = async ({ data: { locations }, error }) => {
-  console.log(`Location Update Task: ${new Date(Date.now()).toISOString()}` );
+interface LocationData {
+  locations: LocationObject[];
+}
 
+export const handleLocationUpdate: TaskManager.TaskManagerTaskExecutor = async ({ data, error }: TaskManager.TaskManagerTaskBody<LocationData>) => {
   if (AppState.currentState == 'active') {
+    console.log(`Location Update Task: ${new Date(Date.now()).toISOString()}` );
     return
   }
+
+  const [location] = data.locations;
+  const { longitude, latitude } = location.coords;
+
+  // for testing
+  console.log(`Background Location Update Task: ${new Date(Date.now()).toISOString()}, Location: [${longitude}, ${latitude}]`)
+  // Notifications.scheduleNotificationAsync({
+  //   content: {
+  //     title: "Background Location Update Task",
+  //     body: `Location: [${longitude}, ${latitude}]`
+  //   },
+  //   trigger: {
+  //     seconds: 5,
+  //   }
+  // })
 
   if (error) {
     console.error(error);
     return;
   }
 
-  const [location] = locations;
   try {
     const gameState = await GameState.load()
     const fitnessLocation = await loadFitnessLocation()
@@ -63,11 +81,21 @@ export const handleLocationUpdate: TaskManager.TaskManagerTaskExecutor = async (
 }
 
 export const handleStepRewardNotificationTask = async () => {  
-  console.log(`Step Reward Notification Task: ${new Date(Date.now()).toISOString()}`)
-
   if (AppState.currentState == 'active') {
+    console.log(`Step Reward Notification Task: ${new Date(Date.now()).toISOString()}`)
     return
   }
+
+  // for testing
+  console.log(`Background Step Reward Notification Task: ${new Date(Date.now()).toISOString()}`)
+  // Notifications.scheduleNotificationAsync({
+  //   content: {
+  //     title: 'Background Step Reward Notification Task',
+  //   },
+  //   trigger: {
+  //     seconds: 5,
+  //   }
+  // })
 
   const gameState = await GameState.load()
   const lastVisit = gameState.visitHistory.last()
@@ -125,11 +153,12 @@ export const handleStepRewardNotificationTask = async () => {
 }
 
 export const handleWorkoutRewardNotificationTask = async () => {
-  console.log(`Workout Reward Notification Task: ${new Date(Date.now()).toISOString()}`)
-
   if (AppState.currentState == 'active') {
+    console.log(`Workout Reward Notification Task: ${new Date(Date.now()).toISOString()}`)
     return
   }
+
+  console.log(`Background Reward Notification Task: ${new Date(Date.now()).toISOString()}`)
 
   const gameState = await GameState.load()
   const fitnessLocation = await loadFitnessLocation()
@@ -174,12 +203,13 @@ export const handleWorkoutRewardNotificationTask = async () => {
 }
 
 export const handleHighBalanceNotificationTask = async () => {
-  console.log(`High Balance Notification Task: ${new Date(Date.now()).toISOString()}`)
-  
   if (AppState.currentState == 'active') {
+    console.log(`High Balance Notification Task: ${new Date(Date.now()).toISOString()}`)
     return
   }
-  
+
+  console.log(`Background High Balance Notification Task: ${new Date(Date.now()).toISOString()}`)
+
   const gameState = await GameState.load()
 
   const { lastPushNotificationTime } = await GameState.load()

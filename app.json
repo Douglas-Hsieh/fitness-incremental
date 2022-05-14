@@ -27,10 +27,7 @@
         "backgroundColor": "#FFFFFF"
       },
       "package": "com.randompermutation.fitnessincremental",
-      "googleServicesFile": "./google-services.json",
-      "permissions": [
-        "ACCESS_BACKGROUND_LOCATION"
-      ]
+      "googleServicesFile": "./google-services.json"
     },
     "web": {
       "favicon": "./assets/favicon.png",

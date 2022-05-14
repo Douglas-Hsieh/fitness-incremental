@@ -40,7 +40,8 @@ export default function App() {
     GameState.load().then(gameState => setGameState(gameState));
     loadFitnessLocation().then(fitnessLocation => setFitnessLocation(fitnessLocation));
 
-    unregisterTasks().finally(registerTasks)
+    // Disable local push notifications in favor of remote push notifications.
+    // unregisterTasks().finally(registerTasks)
   }, [])
 
   useEffect(() => {

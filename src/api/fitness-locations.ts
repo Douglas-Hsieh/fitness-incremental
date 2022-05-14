@@ -45,7 +45,6 @@ export const createFitnessLocation = async (fitnessLocation: Partial<FitnessLoca
 }
 
 export const updateFitnessLocation = async (fitnessLocation: Partial<FitnessLocation>): Promise<FitnessLocation> => {
-  console.log('fitnessLocation', Object.keys(fitnessLocation))
   return fetch(`${endpoint}/${fitnessLocation.id}`, {
     method: 'PUT',
     headers: {

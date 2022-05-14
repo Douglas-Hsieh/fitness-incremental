@@ -51,7 +51,7 @@ export const WorkoutScreen = ({setScreen, gameState, fitnessLocation, setFitness
   const [hasCameraPermission, setHasCameraPermission] = useState<boolean>();
   const cameraRef = useRef<Camera | null>()
   const [hasForegroundLocationPermission, setHasForegroundLocationPermission] = useState<boolean>();
-  const [hasBackgroundLocationPermission, setHasBackgroundLocationPermission] = useState<boolean>(true);
+  const [hasBackgroundLocationPermission, setHasBackgroundLocationPermission] = useState<boolean>();
 
   const [isTakingPicture, setIsTakingPicture] = useState<boolean>(false);
   const [photoAndLocation, setPhotoAndLocation] = useState<PhotoAndLocation>();
@@ -74,7 +74,8 @@ export const WorkoutScreen = ({setScreen, gameState, fitnessLocation, setFitness
   const requestPermissions = (async () => {
     await requestAndSetCameraPermission()
     await requestAndSetForegroundLocationPermission()
-    await requestAndSetBackgroundLocationPermission()
+    // Disable local push notifications in favor of remote push notifications.
+    // await requestAndSetBackgroundLocationPermission()
   })
 
   const takePicture = () => {
