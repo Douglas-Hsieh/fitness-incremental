@@ -36,8 +36,8 @@ export const GeneratorIcon = memo(({image, ownsSome, isOperating}: GeneratorIcon
     </>
 )})
 
-const ICON_HEIGHT = 80
-const ICON_WIDTH = 80
+const ICON_HEIGHT = 90
+const ICON_WIDTH = 90
 const ICON_BORDER_RADIUS = 60
 
 const styles = StyleSheet.create({

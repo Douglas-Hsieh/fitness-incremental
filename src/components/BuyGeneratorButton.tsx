@@ -67,8 +67,8 @@ const styles = EStyleSheet.create({
   // Buy Button
   buyGeneratorButton1: {
     marginTop: 4,
-    width: 200,
-    height: 40,
+    width: 225,
+    height: 45,
     backgroundColor: colors.orange5,
     borderRadius: 10,
     alignItems: 'center',
@@ -81,6 +81,7 @@ const styles = EStyleSheet.create({
     borderRadius: 9,
     flexDirection: 'row',
     justifyContent: 'space-between',
+    paddingHorizontal: 5,
   },
   buyGeneratorBuyAmountWrapper: {
     alignItems: 'center',
@@ -99,6 +100,6 @@ const styles = EStyleSheet.create({
     fontSize: 15,
   },
   buyGeneratorPriceScaleText: {
-    fontSize: 10,
+    fontSize: 12,
   },
 })

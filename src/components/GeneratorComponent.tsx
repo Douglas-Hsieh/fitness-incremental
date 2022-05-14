@@ -9,7 +9,6 @@ import { BuyGeneratorButton } from "./BuyGeneratorButton";
 import { GeneratorState } from "../../assets/data/GeneratorState";
 import { Projectile } from "./Projectile";
 import EStyleSheet from "react-native-extended-stylesheet";
-import colors from "../../assets/colors/colors";
 import { playSound, SoundFile } from "../util/sounds";
 import { HighlightableElement } from 'react-native-highlight-overlay';
 import { TutorialState } from "../../assets/data/TutorialState";
@@ -128,43 +127,5 @@ const styles = EStyleSheet.create({
   generatorRightWrapper: {
     flexDirection: 'column',
     marginLeft: 10,
-  },
-
-  // Buy Button
-  buyGeneratorButton1: {
-    marginTop: 4,
-    width: 200,
-    height: 40,
-    backgroundColor: colors.orange5,
-    borderRadius: 10,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  buyGeneratorButton2: {
-    width: '99%',
-    height: '95%',
-    backgroundColor: colors.orange3,
-    borderRadius: 9,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  buyGeneratorBuyAmountWrapper: {
-    alignItems: 'center',
-  },
-  buyGeneratorBuyText: {
-    color: colors.white,
-  },
-  buyGeneratorAmountText: {
-    color: colors.white,
-  },
-  buyGeneratorPriceWrapper: {
-    alignItems: 'center',
-  },
-  buyGeneratorPriceText: {
-    color: colors.white,
-    fontSize: 15,
-  },
-  buyGeneratorPriceScaleText: {
-    fontSize: 10,
   },
 })
