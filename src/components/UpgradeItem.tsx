@@ -1,4 +1,4 @@
-import React, { memo } from "react";
+import React, { memo, useEffect, useState } from "react";
 import { View, TouchableOpacity, Image, Text } from "react-native";
 import EStyleSheet from "react-native-extended-stylesheet";
 import { HighlightableElement } from "react-native-highlight-overlay";
@@ -10,6 +10,7 @@ import { Currency } from "../enums/Currency";
 import { HighlightId } from "../enums/HightlightId";
 import { numberToHumanFormat } from "../math/formatting";
 import { playSound, SoundFile } from "../util/sounds";
+import { ConfirmationModalProps, DEFAULT_CONFIRMATION_MODAL_PROPS } from "./ConfirmationModal";
 
 export interface UpgradeItemProps {
   upgradeType: UpgradeType;
@@ -20,17 +21,47 @@ export interface UpgradeItemProps {
   currency: Currency;
   image: any;
   isDisabled: boolean;
+  isExpensive: boolean;
+  setModalProps: React.Dispatch<React.SetStateAction<ConfirmationModalProps>>;
   setGameState: React.Dispatch<React.SetStateAction<GameState>>;
 }
 
-export const UpgradeItem = memo(({upgradeType, upgrade, title, description, price, currency, image, isDisabled, setGameState}: UpgradeItemProps) => {
+export const UpgradeItem = memo(({upgradeType, upgrade, title, description, price, currency, image, isDisabled, isExpensive, setModalProps, setGameState}: UpgradeItemProps) => {
   const upgradeId = getUpgradeId(upgrade)
   const [coefficient, scale] = numberToHumanFormat(price, 0, 0);
   const currencyText = currency === Currency.Cash
     ? 'steps'
     : 'trainers'
+  const [showModal, setShowModal] = useState<boolean>(false);
 
-  const buyUpgrade = () => {
+  useEffect(() => {
+    if (showModal) {
+      setModalProps({
+        visible: true,
+        setVisible: setShowModal,
+        title: `Warning`,
+        body: `This upgrade is very expensive. Are you sure you want to buy it?`,
+        onConfirm: buyUpgrade,
+        onCancel: () => {},
+      })
+    } else {
+      setModalProps(DEFAULT_CONFIRMATION_MODAL_PROPS)
+    }
+  }, [showModal])
+
+  function handleBuyUpgrade() {
+    if (isExpensive) {
+      handleBuyExpensiveUpgrade()
+    } else {
+      buyUpgrade()
+    }
+  }
+
+  function handleBuyExpensiveUpgrade() {
+    setShowModal(true)
+  }
+
+  function buyUpgrade() {
     if (!isDisabled) {
       if (upgradeType === UpgradeType.GeneratorMultiplierCashUpgrade) {
         setGameState(prevGameState => {
@@ -90,7 +121,7 @@ export const UpgradeItem = memo(({upgradeType, upgrade, title, description, pric
         <Text style={styles.upgradeDescription}>{description}</Text>
         <Text style={styles.upgradePrice}>{coefficient} {scale} {currencyText}</Text>
       </View>
-      <TouchableOpacity style={[styles.buyUpgradeButton, isDisabled ? {backgroundColor: colors.gray4} : {}]} activeOpacity={.8} onPress={buyUpgrade} disabled={isDisabled}>
+      <TouchableOpacity style={[styles.buyUpgradeButton, isDisabled ? {backgroundColor: colors.gray4} : {}]} activeOpacity={.8} onPress={handleBuyUpgrade} disabled={isDisabled}>
         <Text style={styles.buyUpgradeText}>Buy!</Text>
       </TouchableOpacity>
     </View>

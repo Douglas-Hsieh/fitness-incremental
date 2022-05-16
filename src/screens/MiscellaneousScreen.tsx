@@ -1,5 +1,5 @@
 import React, { memo, useState } from "react";
-import { SafeAreaView, StyleSheet, View } from "react-native";
+import { SafeAreaView, StyleSheet, Text, View } from "react-native";
 import { DEBUG_GAME_STATE, GameState, INITIAL_GAME_STATE } from "../../assets/data/GameState";
 import { deleteUser } from "../api/users";
 import { Background } from "../components/BackgroundImage";
@@ -16,11 +16,12 @@ interface MiscellaneousScreenProps {
   setScreen: React.Dispatch<React.SetStateAction<Screen>>;
   user: User | undefined;
   speed: number;
+  gameState: GameState;
   setGameState: React.Dispatch<React.SetStateAction<GameState>>;
   fitnessLocation: FitnessLocation | null;
 }
 
-export const MiscellaneousScreen = memo(({setScreen, user, speed, setGameState, fitnessLocation}: MiscellaneousScreenProps) => {
+export const MiscellaneousScreen = memo(({setScreen, user, speed, gameState, setGameState, fitnessLocation}: MiscellaneousScreenProps) => {
   const [showDeleteDataModal, setShowDeleteDataModal] = useState<boolean>(false)
 
   const deleteData = () => {
@@ -46,6 +47,22 @@ export const MiscellaneousScreen = memo(({setScreen, user, speed, setGameState, 
     }))
   }
 
+  const addMultiplier = () => {
+    setGameState(prevGameState => ({
+      ...prevGameState,
+      permanentMultiplier: prevGameState.permanentMultiplier * 3,
+    }))
+  }
+
+  const addTicks = () => {
+    setGameState(prevGameState => ({
+      ...prevGameState,
+      ticks: prevGameState.ticks + 1e+6,
+    }))
+  }
+
+  const permanentMultiplierCount = Math.round(Math.log(gameState.permanentMultiplier) / Math.log(3));
+
   return (
     <SafeAreaView style={styles.container}>
       <Background/>
@@ -57,6 +74,10 @@ export const MiscellaneousScreen = memo(({setScreen, user, speed, setGameState, 
             <Button text={'Fitness Locations'} onPress={() => setScreen(Screen.FitnessLocationAdmin)}/>
             <Button text={`Speed x${speed}`} onPress={toggleSpeed}/>
             <Button text={'Debug GameState'} onPress={debug}/>
+            <Text>{permanentMultiplierCount}</Text>
+            <Button text={'Add x3 Multiplier'} onPress={addMultiplier}/>
+            <Button text={'Add ticks'} onPress={addTicks}/>
+
           </Center>
         }
         <Center>
@@ -68,13 +89,13 @@ export const MiscellaneousScreen = memo(({setScreen, user, speed, setGameState, 
 
       <ConfirmationModal
         visible={showDeleteDataModal}
+        setVisible={setShowDeleteDataModal}
         title={'Confirm Deletion'}
         body={'Are you sure you want to delete all data and progress?'}
         onConfirm={() => {
           deleteData()
-          setShowDeleteDataModal(false)
         }}
-        onCancel={() => {setShowDeleteDataModal(false)}}
+        onCancel={() => {}}
       />
     </SafeAreaView>
   )

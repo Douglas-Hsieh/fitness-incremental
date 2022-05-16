@@ -9,7 +9,6 @@ import { Game } from './src/Game';
 import { GOOGLE_FIT_AUTHORIZATION_OPTIONS } from './src/fitness-api/google-fit';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { Platform, Text } from 'react-native';
-import { registerTasks, unregisterTasks } from './src/background-tasks';
 import Center from './src/components/Center';
 import { APPLE_HEALTH_AUTHORIZATION_PERMISSIONS } from './src/fitness-api/apple-health-kit';
 import AppleHealthKit from 'react-native-health';

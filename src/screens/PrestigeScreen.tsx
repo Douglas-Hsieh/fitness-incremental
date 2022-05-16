@@ -71,6 +71,8 @@ export const PrestigeScreen = ({setScreen, gameState, setGameState}: PrestigeScr
         unlockIds: Set(),
       }
     })
+
+    setScreen(Screen.Home);
   }
 
   return (
@@ -118,13 +120,11 @@ export const PrestigeScreen = ({setScreen, gameState, setGameState}: PrestigeScr
 
       <ConfirmationModal
         visible={showClaimPrestigeModal}
+        setVisible={setShowClaimPrestigeModal}
         title={`You can hire ${earnedPrestigeCoeff} ${earnedPrestigeScale} trainers!`}
         body={"Hiring requires resetting your follower count, upgrades, and balance."}
-        onConfirm={() => {
-          resetGame()
-          setShowClaimPrestigeModal(false)
-        }}
-        onCancel={() => {setShowClaimPrestigeModal(false)}}
+        onConfirm={resetGame}
+        onCancel={() => {}}
       />
     </SafeAreaView>
   )

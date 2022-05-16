@@ -175,7 +175,7 @@ const styles = EStyleSheet.create({
   },
   valueText: {
     fontFamily: 'oleo-script',
-    fontSize: '1rem',
+    fontSize: '.9rem',
   }
 
 })

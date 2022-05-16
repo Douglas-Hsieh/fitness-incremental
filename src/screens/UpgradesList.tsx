@@ -6,14 +6,16 @@ import { GameState } from "../../assets/data/GameState";
 import { UpgradeItem, UpgradeItemProps } from "../components/UpgradeItem";
 import { Set } from "immutable";
 import { Currency } from "../enums/Currency";
+import { ConfirmationModalProps } from "../components/ConfirmationModal";
 
 interface UpgradesListProps {
   gameState: GameState;
   setGameState: React.Dispatch<React.SetStateAction<GameState>>;
   upgradeType: UpgradeType;
+  setModalProps: React.Dispatch<React.SetStateAction<ConfirmationModalProps>>;
 }
 
-const UpgradesList = ({ gameState, setGameState, upgradeType }: UpgradesListProps) => {
+const UpgradesList = ({ gameState, setGameState, upgradeType, setModalProps }: UpgradesListProps) => {
 
   let upgrades;
   let ownedUpgrades: Set<string>;
@@ -55,6 +57,9 @@ const UpgradesList = ({ gameState, setGameState, upgradeType }: UpgradesListProp
     const isDisabled = upgrade.priceCurrency === Currency.Cash
       ? upgrade.price > gameState.balance
       : upgrade.price > gameState.prestige
+    
+    const isExpensive = upgrade.priceCurrency === Currency.Prestige
+      && 10 * upgrade.price > gameState.prestige
 
     return {
       upgradeType: upgradeType,
@@ -65,6 +70,8 @@ const UpgradesList = ({ gameState, setGameState, upgradeType }: UpgradesListProp
       currency: upgrade.priceCurrency,
       image: image,
       isDisabled: isDisabled,
+      isExpensive: isExpensive,
+      setModalProps: setModalProps,
       setGameState: setGameState,
     };
   });

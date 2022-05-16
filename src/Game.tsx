@@ -482,6 +482,7 @@ export const Game = ({ screen, setScreen, gameState, setGameState, fitnessLocati
           setScreen={setScreen}
           user={gameState.user}
           speed={gameState.speed}
+          gameState={gameState}
           setGameState={setGameState}
           fitnessLocation={fitnessLocation}
         />

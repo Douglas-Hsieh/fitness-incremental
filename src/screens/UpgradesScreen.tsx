@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { SafeAreaView, View} from "react-native";
 import EStyleSheet from "react-native-extended-stylesheet";
 import colors from "../../assets/colors/colors";
@@ -11,6 +11,7 @@ import { Header } from "../components/Header";
 import Screen from "../enums/Screen";
 import UpgradesList from "./UpgradesList";
 import { UpgradeIconList } from "./UpgradeIconList";
+import { ConfirmationModal, ConfirmationModalProps, DEFAULT_CONFIRMATION_MODAL_PROPS } from "../components/ConfirmationModal";
 
 interface UpgradesScreenProps {
   setScreen: React.Dispatch<React.SetStateAction<Screen>>;
@@ -22,6 +23,8 @@ interface UpgradesScreenProps {
 
 export const UpgradesScreen = ({setScreen, gameState, setGameState, upgradeType, setUpgradeType}: UpgradesScreenProps) => {
 
+  const [modalProps, setModalProps] = useState<ConfirmationModalProps>(DEFAULT_CONFIRMATION_MODAL_PROPS)
+  
   return (
     <SafeAreaView style={styles.container}>
       <Background/>
@@ -46,7 +49,12 @@ export const UpgradesScreen = ({setScreen, gameState, setGameState, upgradeType,
           gameState={gameState}
           setGameState={setGameState}
           upgradeType={upgradeType}
+          setModalProps={setModalProps}
         />
+
+        { modalProps && 
+          <ConfirmationModal {...modalProps}/>
+        }
       </View>
 
       <BottomBar screen={Screen.Upgrades} setScreen={setScreen}/>

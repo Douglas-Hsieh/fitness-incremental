@@ -49,6 +49,6 @@ const styles = EStyleSheet.create({
   text: {
     position: 'absolute',
     alignSelf: 'center',
-    fontSize: '1rem',
+    fontSize: '.9rem',
   },
 })
