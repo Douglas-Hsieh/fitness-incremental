@@ -74,7 +74,12 @@ export const AndroidLoginScreen = ({signInAuth, setSignInAuth}: AndroidLoginScre
           <Text style={styles.titleText}>{APP_NAME}</Text>
         </View>
 
-        <GoogleSigninButton onPress={googleSignIn}/>
+        <GoogleSigninButton
+          style={{ width: 312, height: 48 }}
+          size={GoogleSigninButton.Size.Wide}
+          color={GoogleSigninButton.Color.Light}
+          onPress={googleSignIn}
+        />
 
       </View> 
 
