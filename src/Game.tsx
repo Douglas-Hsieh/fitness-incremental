@@ -169,32 +169,35 @@ export const Game = ({ screen, setScreen, gameState, setGameState, fitnessLocati
    * @param isForeground Whether or not progress was made while app was in foreground
    * @returns 
    */
-  async function handleStepProgress(isForeground: boolean) {
-    const { stepProgressHistory } = gameState
-    const lastVisit = stepProgressHistory.last()
+  function handleStepProgress(isForeground: boolean) {
+    setGameState(prevGameState => {
+      // Hacky solution required to use previous game state and getStepsBetween together
+      setGameStepProgress(prevGameState, isForeground)
+      return prevGameState
+    })
+  }
+  async function setGameStepProgress(prevGameState: GameState, isForeground: boolean) {
+    const { stepProgressHistory } = prevGameState
+    const stepProgress = stepProgressHistory.last()
 
-    const isFirstVisit = !lastVisit
+    const isFirstVisit = !stepProgress
     if (isFirstVisit) {
-      setGameState(prevGameState => ({
+      setGameState({
         ...prevGameState,
         stepProgressHistory: stepProgressHistory.push(new StepProgress())
-      }))
+      })
       return
     }
 
     const now = new Date()
-    const steps = await getStepsBetween({start: lastVisit.time, end: now})
+    const steps = await getStepsBetween({start: stepProgress.time, end: now})
     const ticksEarned = TICKS_PER_STEP * steps
 
-    if (steps <= 0) {
-      return
-    }
-
-    setGameState(prevGameState => ({
+    setGameState({
       ...prevGameState,
       ticks: prevGameState.ticks + ticksEarned,
       stepProgressHistory: prevGameState.stepProgressHistory.push(new StepProgress(now, steps, isForeground)),
-    }))
+    })
 
     if (!isForeground) {
       setLastVisitStats(prevStats => ({
@@ -284,7 +287,9 @@ export const Game = ({ screen, setScreen, gameState, setGameState, fitnessLocati
   }, 60 * 1000)
 
   useEffect(() => {
-    setScreen(Screen.WelcomeBack)
+    if (screen !== Screen.WelcomeBack) {
+      setScreen(Screen.WelcomeBack)
+    }
   }, [lastVisitStats])
 
   /** Update fitness rewards */
