@@ -1,7 +1,6 @@
 import { Generator, GENERATORS_BY_ID } from "../../assets/data/Generators";
 import { GameState } from "../../assets/data/GameState";
 import { calculateMultipliersFromUpgrades, calculateMultipliersFromUnlocks, calculateTemporaryMultipliers, calculateTicksNeededByGeneratorId } from "./multipliers";
-import { Visit } from "../../assets/data/Visit";
 import { TICK_LEVELS, TICK_THRESHOLDS, TICKS_TO_USE } from "../../assets/data/Constants";
 
 export const calculateGeneratorBaseRevenue = (
@@ -89,8 +88,8 @@ export function calculateSecondsUntilAllTicksUsed(ticks: number, speed: number) 
   return seconds
 }
 
-export function calculateTicksUsedSinceLastVisit(now: Date, lastVisit: Visit, gameState: GameState) {
-  let seconds = (now.getTime() - lastVisit.time.getTime()) / 1000;
+export function calculateTicksUsedSinceLastProgress(now: Date, gameState: GameState) {
+  let seconds = (now.getTime() - gameState.lastRevenueProgress.getTime()) / 1000;
   let ticks = gameState.ticks;
   let ticksUsed = 0;
 

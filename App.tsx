@@ -44,10 +44,6 @@ export default function App() {
   }, [])
 
   useEffect(() => {
-    console.log('fitnessLocation', fitnessLocation)
-  }, [fitnessLocation])
-
-  useEffect(() => {
     if (!signInAuth) {
       return
     }

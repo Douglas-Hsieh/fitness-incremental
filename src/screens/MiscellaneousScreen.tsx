@@ -43,7 +43,7 @@ export const MiscellaneousScreen = memo(({setScreen, user, speed, gameState, set
       ...DEBUG_GAME_STATE,
       user: prevGameState.user,
       fitnessLocation: fitnessLocation,
-      visitHistory: prevGameState.visitHistory,
+      stepProgressHistory: prevGameState.stepProgressHistory,
     }))
   }
 

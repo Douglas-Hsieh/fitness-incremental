@@ -5,7 +5,7 @@ import { GeneratorState, INITIAL_GENERATOR_STATE_BY_ID } from './GeneratorState'
 import { User } from '../../src/shared/users.interface';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { K } from '../../src/math/prestige';
-import { Visit } from './Visit';
+import { StepProgress } from './StepProgress';
 import { TICKS_PER_STEP } from './Constants';
 import { INITIAL_UPGRADE_STATE, UpgradeState } from './UpgradeState';
 import { INITIAL_TUTORIAL_STATE, TutorialState } from './TutorialState';
@@ -29,7 +29,8 @@ export class GameState {
   lastWorkoutRewardTime: Date;
   lastPushNotificationTime: Date;
   speed: number;  // Tick usage multiplier
-  visitHistory: List<Visit>;
+  lastRevenueProgress: Date;
+  stepProgressHistory: List<StepProgress>;
   tutorialState: TutorialState;
   fitnessRewardsByDate: Map<string, FitnessReward>;  // YYYY-MM-DD formatted date
 
@@ -51,7 +52,8 @@ export class GameState {
     lastWorkoutRewardTime: Date,
     lastPushNotificationTime: Date,
     speed: number,
-    visitHistory: List<Visit>,
+    lastRevenueProgress: Date,
+    stepProgressHistory: List<StepProgress>,
     tutorialState: TutorialState,
     fitnessHistory: Map<string, FitnessReward>
   ) {
@@ -72,7 +74,8 @@ export class GameState {
     this.lastWorkoutRewardTime = lastWorkoutRewardTime
     this.lastPushNotificationTime = lastPushNotificationTime
     this.speed = speed
-    this.visitHistory = visitHistory
+    this.lastRevenueProgress = lastRevenueProgress
+    this.stepProgressHistory = stepProgressHistory
     this.tutorialState = tutorialState
     this.fitnessRewardsByDate = fitnessHistory
   }
@@ -97,7 +100,8 @@ export class GameState {
       obj.lastWorkoutRewardTime === undefined ? INITIAL_LAST_WORKOUT_REWARD_TIME : new Date(obj.lastWorkoutRewardTime),  // handling old saves
       obj.lastPushNotificationTime === undefined ? INITIAL_LAST_PUSH_NOTIFICATION_TIME : new Date(obj.lastPushNotificationTime),
       obj.speed === undefined ? INITIAL_SPEED : obj.speed,
-      obj.visitHistory === undefined ? INITIAL_VISIT_HISTORY : List(obj.visitHistory).map(visit => Visit.fromJson(visit)),
+      obj.lastRevenueProgress === undefined ? INITIAL_LAST_REVENUE_PROGRESS : new Date(obj.lastRevenueProgress),
+      obj.stepProgressHistory === undefined ? INITIAL_STEP_PROGRESS_HISTORY : List(obj.stepProgressHistory).map(visit => StepProgress.fromJson(visit)),
       obj.tutorialState === undefined ? INITIAL_TUTORIAL_STATE : obj.tutorialState,
       obj.fitnessRewardsByDate === undefined ? INITIAL_FITNESS_REWARDS_BY_DATE : Map(obj.fitnessRewardsByDate).map(fr => FitnessReward.fromJson(fr)),
     )
@@ -106,6 +110,7 @@ export class GameState {
   static load = async () => {
     const gameStateString = await AsyncStorage.getItem('gameState')
     const gameState = gameStateString ? GameState.fromJson(gameStateString) : INITIAL_GAME_STATE
+    console.log('gameState.lastRevenueProgress', gameState.lastRevenueProgress)
     return gameState
   }
 
@@ -123,7 +128,8 @@ const INITIAL_PERMANENT_MULTIPLIER = 1
 const INITIAL_LAST_WORKOUT_REWARD_TIME = new Date(0)
 const INITIAL_LAST_PUSH_NOTIFICATION_TIME = new Date(0)
 const INITIAL_SPEED = 1
-const INITIAL_VISIT_HISTORY = List<Visit>()
+const INITIAL_LAST_REVENUE_PROGRESS = new Date()
+const INITIAL_STEP_PROGRESS_HISTORY = List<StepProgress>()
 const INITIAL_FITNESS_REWARDS_BY_DATE = Map<string, FitnessReward>()
 
 export const INITIAL_GAME_STATE = new GameState(
@@ -144,13 +150,14 @@ export const INITIAL_GAME_STATE = new GameState(
   INITIAL_LAST_WORKOUT_REWARD_TIME,
   INITIAL_LAST_PUSH_NOTIFICATION_TIME,
   INITIAL_SPEED,
-  INITIAL_VISIT_HISTORY,
+  INITIAL_LAST_REVENUE_PROGRESS,
+  INITIAL_STEP_PROGRESS_HISTORY,
   INITIAL_TUTORIAL_STATE,
   INITIAL_FITNESS_REWARDS_BY_DATE,
 )
 
 const DEBUG_BALANCE = 0
-const DEBUG_PRESTIGE = 1e+7
+const DEBUG_PRESTIGE = 1e+35  // 100 decillion
 const DEBUG_LAST_SESSION_EARNINGS = K * Math.pow(DEBUG_PRESTIGE, 2)
 const DEBUG_TICKS = 1e+6
 
@@ -172,7 +179,8 @@ export const DEBUG_GAME_STATE = new GameState(
   INITIAL_LAST_WORKOUT_REWARD_TIME,
   INITIAL_LAST_PUSH_NOTIFICATION_TIME,
   INITIAL_SPEED,
-  INITIAL_VISIT_HISTORY,
+  INITIAL_LAST_REVENUE_PROGRESS,
+  INITIAL_STEP_PROGRESS_HISTORY,
   INITIAL_TUTORIAL_STATE,
   INITIAL_FITNESS_REWARDS_BY_DATE,
 )

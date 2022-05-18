@@ -24,6 +24,8 @@ const colors = {
 
   lightgoldenrodyellow: '#FAFAD2',
   gold: '#FFD700',
+
+  red: '#FF0000',
 };
 
 export default colors;

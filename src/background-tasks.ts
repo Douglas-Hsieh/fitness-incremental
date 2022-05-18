@@ -98,7 +98,7 @@ export const handleStepRewardNotificationTask = async () => {
   // })
 
   const gameState = await GameState.load()
-  const lastVisit = gameState.visitHistory.last()
+  const lastVisit = gameState.stepProgressHistory.last()
   if (!lastVisit) {
     return
   }
@@ -213,7 +213,7 @@ export const handleHighBalanceNotificationTask = async () => {
   const gameState = await GameState.load()
 
   const { lastPushNotificationTime } = await GameState.load()
-  const lastVisit = gameState.visitHistory.last()
+  const lastVisit = gameState.stepProgressHistory.last()
   if (!lastVisit) {
     return
   }

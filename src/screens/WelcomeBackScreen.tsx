@@ -1,10 +1,10 @@
 import React, { memo } from 'react'
 import { Image, SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import colors from '../../assets/colors/colors'
-import { TICKS_PER_STEP } from '../../assets/data/Constants'
-import { GameState } from '../../assets/data/GameState'
 import { FancyBackground } from "../components/BackgroundImage"
 import Screen from '../enums/Screen'
+import { numberToHumanFormat } from '../math/formatting'
+import { LastVisitStats } from '../types/LastVisitStats'
 
 const WelcomeBackHeader = memo(() => (
   <View style={styles.welcomeBackHeaderWrapper}>
@@ -14,20 +14,12 @@ const WelcomeBackHeader = memo(() => (
 
 interface WelcomeBackScreenProps {
   setScreen: React.Dispatch<React.SetStateAction<Screen>>;
-  gameState: GameState;
+  lastVisitStats: LastVisitStats;
 }
 
-export const WelcomeBackScreen = ({setScreen, gameState}: WelcomeBackScreenProps) => {
-
-  const { visitHistory } = gameState
-  const lastVisit = visitHistory.last()
-
-  let lastVisitSteps = 0
-  let lastVisitTicks = 0
-  if (lastVisit) {
-    lastVisitSteps = lastVisit.steps
-    lastVisitTicks = TICKS_PER_STEP * lastVisit.steps
-  }
+export const WelcomeBackScreen = ({setScreen, lastVisitStats}: WelcomeBackScreenProps) => {
+  const { steps, ticks, revenue, ticksUsed } = lastVisitStats
+  const [revenueCoefficient, revenueScale] = numberToHumanFormat(revenue, 0, 2);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -35,20 +27,31 @@ export const WelcomeBackScreen = ({setScreen, gameState}: WelcomeBackScreenProps
 
       <WelcomeBackHeader/>
 
-      <View style={styles.personalStepsWrapper}>
-        <Text style={styles.personalStepsText}>
-          You've taken
-          <Text style={{color: colors.blue2}}> {lastVisitSteps} steps </Text>
-          since your last visit.
+      <View style={styles.descriptionWrapper}>
+        <Text style={styles.descriptionText}>
+          You have taken
+          {'\n'}
+          <Text style={{color: colors.blue2}}>{steps} steps</Text>
+          {'\n'}
+          which has generated
+          {'\n'}
+          <Text style={{color: colors.green3}}>{ticks}</Text> <Image source={require('../../assets/images/lightning.png')} style={styles.icon}/>
         </Text>
       </View>
 
-      <View style={styles.stepsWrapper}>
-        <Text style={styles.stepsText}>Your actions have given your followers</Text>
-        <Text style={[styles.stepsText, {color: colors.green3}]}>
-          {lastVisitTicks} <Image source={require('../../assets/images/lightning.png')} style={styles.icon}/>
+      <View style={styles.descriptionWrapper}>
+        <Text style={styles.descriptionText}>
+          Your followers <Image source={require('../../assets/images/puppy.png')} style={styles.icon}/> produced
+          {'\n'}
+          <Text style={{color: colors.green3}}>{revenueCoefficient} {revenueScale}</Text> <Image source={require('../../assets/images/steps.png')} style={styles.icon}/>
+          {'\n'}
+          and consumed
+          {'\n'}
+          <Text style={{color: colors.red}}>{ticksUsed}</Text>
+          <Image source={require('../../assets/images/lightning.png')} style={styles.icon}/>
         </Text>
       </View>
+
 
       <TouchableOpacity style={styles.continueButton} onPress={() => setScreen(Screen.Home)}>
         <Text style={styles.continueText}>Continue</Text>
@@ -76,26 +79,14 @@ const styles = StyleSheet.create({
     color: colors.white,
   },
 
-  personalStepsWrapper: {
-    marginTop: '10%',
-    width: '90%',
-    alignItems: 'center',
-  },
-  personalStepsText: {
-    fontSize: 25,
-    color: colors.white,
-    textAlign: 'center',
-    fontFamily: 'oleo-script',
-  },
-
-  stepsWrapper: {
-    marginTop: '15%',
+  descriptionWrapper: {
+    marginTop: '5%',
     width: '90%',
     backgroundColor: colors.white,
     borderRadius: 10,
     padding: '5%',
   },
-  stepsText: {
+  descriptionText: {
     fontSize: 25,
     fontFamily: 'oleo-script',
     textAlign: 'center',

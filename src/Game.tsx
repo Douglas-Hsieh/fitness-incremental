@@ -16,10 +16,10 @@ import { getFitnessLocations } from "./api/fitness-locations";
 import { updateUser } from "./api/users";
 import { signIn } from "./api/auth";
 import BuyAmount from "./enums/BuyAmount";
-import { calculateTicksToUse, calculateTicksUsedSinceLastVisit, hasWorkingGenerator, progressGenerators } from "./math/revenue";
+import { calculateTicksToUse, calculateTicksUsedSinceLastProgress, hasWorkingGenerator, progressGenerators } from "./math/revenue";
 import { TICKS_PER_STEP } from "../assets/data/Constants";
 import { AppState, AppStateStatus, Pressable, StyleSheet } from "react-native";
-import { Visit } from "../assets/data/Visit";
+import { StepProgress } from "../assets/data/StepProgress";
 import { calculateTemporaryMultipliers } from "./math/multipliers";
 import { TasksScreen } from "./screens/TasksScreen";
 import { getStepsBetween, getStepsToday } from "./fitness-api/fitness-api";
@@ -38,6 +38,7 @@ import { WorkoutReward } from "./components/WorkoutReward";
 import { getSignInAuthCredentials, SignInAuth } from "./types/SignInAuth";
 import { FitnessLocation } from "./shared/fitness-locations.interface";
 import { upsertSavedGame } from "./api/saved-games";
+import { DEFAULT_LAST_VISIT_STATS, LastVisitStats } from "./types/LastVisitStats";
 
 interface GameProps {
   screen: Screen;
@@ -56,7 +57,6 @@ export const Game = ({ screen, setScreen, gameState, setGameState, fitnessLocati
   const [currentLocation, setCurrentLocation] = useState<LocationObject>();
   const [buyAmount, setBuyAmount] = useState<BuyAmount>(BuyAmount.One);
   const [upgradeType, setUpgradeType] = useState<UpgradeType>(UpgradeType.GeneratorMultiplierCashUpgrade)
-  const [visitTime, setVisitTime] = useState<Date>();
   const [temporaryMultiplier, setTemporaryMultiplier] = useState<number>(1);
 
   const [stepsToday, setStepsToday] = useState<number>(0)
@@ -65,7 +65,10 @@ export const Game = ({ screen, setScreen, gameState, setGameState, fitnessLocati
   const [highlightId, setHighlightId] = useState<string | null>(null)
   const [generatorsHighlightId, setGeneratorsHighlightId] = useState<string | null>(null)
   const [onScreenPress, setOnScreenPress] = useState<(() => void) | null>(null)
+  const [lastVisitStats, setLastVisitStats] = useState<LastVisitStats>(DEFAULT_LAST_VISIT_STATS);
 
+
+  /** Login to server */
   useEffect(() => {
     if (isLoggedIn || !signInAuth) {
       return
@@ -78,7 +81,6 @@ export const Game = ({ screen, setScreen, gameState, setGameState, fitnessLocati
       console.error(error);
       return
     }
-    
 
     if (!creds.idToken) {
       console.log('Cannot login because idToken is empty')
@@ -91,66 +93,6 @@ export const Game = ({ screen, setScreen, gameState, setGameState, fitnessLocati
         setIsLoggedIn(true)
       })
   }, [isLoggedIn, signInAuth])
-
-  useEffect(() => {
-
-    const { visitHistory } = gameState
-    const lastVisit = visitHistory.last()
-    if (!lastVisit) {
-      // First visit
-      setGameState(prevGameState => ({
-        ...prevGameState,
-        visitHistory: visitHistory.push(new Visit())
-      }))
-      return
-    }
-    const now = new Date()
-
-    getStepsBetween({start: lastVisit.time, end: now})
-      .then(steps => {
-        const ticksEarned = TICKS_PER_STEP * steps
-
-        // Generators progressed from ticks since last visit
-        let ticksUsed = calculateTicksUsedSinceLastVisit(now, lastVisit, gameState);
-        const {generatorStateById, revenue} = progressGenerators(gameState, ticksUsed)
-        console.log(`Since last visit - Ticks used: ${ticksUsed}, Revenue: ${revenue}`)
-
-        setGameState(prevGameState => ({
-          ...prevGameState,
-          ticks: gameState.ticks + ticksEarned - ticksUsed,
-          generatorStateById: generatorStateById,
-          balance: gameState.balance + revenue,
-          sessionEarnings: gameState.sessionEarnings + revenue,
-          visitHistory: visitHistory.push(new Visit(now, steps)),
-        }))
-      })
-  }, [])
-
-  useInterval(() => {
-    // // Dangerous: can stop the game loop
-    // if (showDialogueModal) {
-    //   return
-    // }
-
-    if (!hasWorkingGenerator(gameState)) {
-      return
-    }
-
-    // Generators progress and generate revenue using ticks
-    const ticksToUse = calculateTicksToUse(gameState.ticks, gameState.speed)
-    if (ticksToUse <= 0) return;
-    const {generatorStateById, revenue} = progressGenerators(gameState, ticksToUse)
-
-    setGameState(prevGameState => ({
-      ...prevGameState,
-      ticks: gameState.ticks - ticksToUse,
-      generatorStateById: generatorStateById,
-      balance: gameState.balance + revenue,
-      sessionEarnings: gameState.sessionEarnings + revenue,
-    }))
-
-    // console.log(`Ticks used: ${ticksToUse}, Revenue: ${revenue}`)
-  }, 1000)
 
   useEffect(() => {
     if (!isLoggedIn) {
@@ -192,26 +134,54 @@ export const Game = ({ screen, setScreen, gameState, setGameState, fitnessLocati
     }
   }, [fitnessLocation, hasForegroundLocationPermission])
 
-
-  /** When app enters foreground, handle new visit */
-  useEffect(() => {
-    AppState.addEventListener('change', handleAppStateChange)
-    return () => {
-      AppState.removeEventListener('change', handleAppStateChange)
-    }
-  }, [])
-
-  const handleAppStateChange = (nextAppState: AppStateStatus) => {
-    if (nextAppState === 'active') {
-      setVisitTime(new Date())
-    }
+  
+  function handleProgress() {
+    handleRevenueProgress()
+    handleStepProgress(false)
   }
 
-  const handleNewVisit = async () => {
-    if (gameState.visitHistory.isEmpty()) {
+  function handleRevenueProgress() {
+    setGameState(prevGameState => {
+      const now = new Date()
+      const ticksUsed = calculateTicksUsedSinceLastProgress(now, prevGameState)
+      const {generatorStateById, revenue} = progressGenerators(prevGameState, ticksUsed)
+      console.log(`Since last progress - Ticks used: ${ticksUsed}, Revenue: ${revenue}`)
+
+      setLastVisitStats(prevStats => ({
+        ...prevStats,
+        revenue: revenue,
+        ticksUsed: ticksUsed,
+      }))
+
+      return {
+        ...prevGameState,
+        ticks: prevGameState.ticks - ticksUsed,
+        generatorStateById: generatorStateById,
+        balance: prevGameState.balance + revenue,
+        sessionEarnings: prevGameState.sessionEarnings + revenue,
+        lastRevenueProgress: now,
+      }
+    })
+  }
+
+  /**
+   * 
+   * @param isForeground Whether or not progress was made while app was in foreground
+   * @returns 
+   */
+  async function handleStepProgress(isForeground: boolean) {
+    const { stepProgressHistory } = gameState
+    const lastVisit = stepProgressHistory.last()
+
+    const isFirstVisit = !lastVisit
+    if (isFirstVisit) {
+      setGameState(prevGameState => ({
+        ...prevGameState,
+        stepProgressHistory: stepProgressHistory.push(new StepProgress())
+      }))
       return
     }
-    const lastVisit = gameState.visitHistory.last()!
+
     const now = new Date()
     const steps = await getStepsBetween({start: lastVisit.time, end: now})
     const ticksEarned = TICKS_PER_STEP * steps
@@ -219,23 +189,72 @@ export const Game = ({ screen, setScreen, gameState, setGameState, fitnessLocati
     if (steps <= 0) {
       return
     }
-    setGameState(prevGameState => {
-      const newVisitHistory = prevGameState.visitHistory.push(new Visit(now, steps))
-      return {
-        ...prevGameState,
-        ticks: prevGameState.ticks + ticksEarned,
-        visitHistory: newVisitHistory,
-      }
-    })
-    setScreen(Screen.WelcomeBack)
+
+    setGameState(prevGameState => ({
+      ...prevGameState,
+      ticks: prevGameState.ticks + ticksEarned,
+      stepProgressHistory: prevGameState.stepProgressHistory.push(new StepProgress(now, steps, isForeground)),
+    }))
+
+    if (!isForeground) {
+      setLastVisitStats(prevStats => ({
+        ...prevStats,
+        steps: steps,
+        ticks: ticksEarned,
+      }))
+    }
   }
 
   useEffect(() => {
-    if (!visitTime) {
+    // Handle progress since app termination
+    handleProgress()
+    getStepsToday().then(setStepsToday)
+  }, [])
+
+  // Handle background progress
+  function handleAppStateChange (nextAppState: AppStateStatus) {
+    if (nextAppState === 'active') {
+      console.log('App entered foreground from background')
+      handleProgress()
+    }
+  }
+  useEffect(() => {
+    AppState.addEventListener('change', handleAppStateChange)
+    return () => {
+      AppState.removeEventListener('change', handleAppStateChange)
+    }
+  }, [])
+
+  // Handle foreground revenue progress
+  useInterval(() => {
+    // // Dangerous: can stop the game loop
+    // if (showDialogueModal) {
+    //   return
+    // }
+
+    if (!hasWorkingGenerator(gameState)) {
       return
     }
-    handleNewVisit()
-  }, [visitTime])
+
+    // Generators progress and generate revenue using ticks
+    setGameState(prevGameState => {
+      const ticksToUse = calculateTicksToUse(gameState.ticks, gameState.speed)
+      if (ticksToUse <= 0) return prevGameState;
+      const {generatorStateById, revenue} = progressGenerators(gameState, ticksToUse)
+      const now = new Date()
+
+      return {
+        ...prevGameState,
+        ticks: prevGameState.ticks - ticksToUse,
+        generatorStateById: generatorStateById,
+        balance: prevGameState.balance + revenue,
+        sessionEarnings: prevGameState.sessionEarnings + revenue,
+        lastRevenueProgress: now,
+      }
+    })
+
+    // console.log(`Ticks used: ${ticksToUse}, Revenue: ${revenue}`)
+  }, 1000)
 
   useInterval(() => {
     const temporaryMultiplier = calculateTemporaryMultipliers(gameState.temporaryMultipliers)
@@ -243,8 +262,6 @@ export const Game = ({ screen, setScreen, gameState, setGameState, fitnessLocati
   }, 1000)
 
   useEffect(() => {
-    getStepsToday().then(setStepsToday)
-
     try {
       const creds = getSignInAuthCredentials(signInAuth);
       upsertSavedGame(creds.idToken, gameState);
@@ -254,6 +271,8 @@ export const Game = ({ screen, setScreen, gameState, setGameState, fitnessLocati
   }, [])
 
   useInterval(() => {
+    // Handle foreground step progress
+    handleStepProgress(true)
     getStepsToday().then(setStepsToday)
 
     try {
@@ -264,6 +283,9 @@ export const Game = ({ screen, setScreen, gameState, setGameState, fitnessLocati
     }
   }, 60 * 1000)
 
+  useEffect(() => {
+    setScreen(Screen.WelcomeBack)
+  }, [lastVisitStats])
 
   /** Update fitness rewards */
   useEffect(() => {
@@ -415,7 +437,7 @@ export const Game = ({ screen, setScreen, gameState, setGameState, fitnessLocati
       return (
         <WelcomeBackScreen
           setScreen={setScreen}
-          gameState={gameState}
+          lastVisitStats={lastVisitStats}
         />
       )
     case Screen.Home:

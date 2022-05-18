@@ -61,8 +61,6 @@ export const AndroidLoginScreen = ({signInAuth, setSignInAuth}: AndroidLoginScre
         alert(`You must give permission for: ${scope}`)
       }
     })
-
-    console.log('signInAuth', signInAuth)
   }, [signInAuth])
 
   return (
