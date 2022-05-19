@@ -5,6 +5,7 @@ import { FancyBackground } from "../components/BackgroundImage"
 import Screen from '../enums/Screen'
 import { numberToHumanFormat } from '../math/formatting'
 import { LastVisitStats } from '../types/LastVisitStats'
+import { ScrollView } from "react-native-gesture-handler"
 
 const WelcomeBackHeader = memo(() => (
   <View style={styles.welcomeBackHeaderWrapper}>
@@ -26,6 +27,13 @@ export const WelcomeBackScreen = ({setScreen, lastVisitStats}: WelcomeBackScreen
       <FancyBackground/>
 
       <WelcomeBackHeader/>
+
+      <ScrollView
+        style={styles.scroll}
+        contentInsetAdjustmentBehavior='automatic'
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.scrollContentContainer}
+      >
 
       <View style={styles.descriptionWrapper}>
         <Text style={styles.descriptionText}>
@@ -56,6 +64,9 @@ export const WelcomeBackScreen = ({setScreen, lastVisitStats}: WelcomeBackScreen
       <TouchableOpacity style={styles.continueButton} onPress={() => setScreen(Screen.Home)}>
         <Text style={styles.continueText}>Continue</Text>
       </TouchableOpacity>
+
+      </ScrollView>
+
     </SafeAreaView>
   )
 }
@@ -80,7 +91,7 @@ const styles = StyleSheet.create({
   },
 
   descriptionWrapper: {
-    marginTop: '5%',
+    marginTop: '3%',
     width: '90%',
     backgroundColor: colors.white,
     borderRadius: 10,
@@ -93,7 +104,7 @@ const styles = StyleSheet.create({
   },
 
   continueButton: {
-    marginTop: '30%',
+    marginTop: '15%',
     backgroundColor: colors.blue2,
     paddingHorizontal: '10%',
     paddingVertical: '5%',
@@ -108,5 +119,14 @@ const styles = StyleSheet.create({
   icon: {
     width: 25,
     height: 25,
+  },
+
+  scroll: {
+    width: '100%',
+  },
+  scrollContentContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-around',
   },
 })
