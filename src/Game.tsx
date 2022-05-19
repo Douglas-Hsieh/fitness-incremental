@@ -142,6 +142,10 @@ export const Game = ({ screen, setScreen, gameState, setGameState, fitnessLocati
 
   function handleRevenueProgress() {
     setGameState(prevGameState => {
+      if (!hasWorkingGenerator(prevGameState)) {
+        return prevGameState
+      }
+
       const now = new Date()
       const ticksUsed = calculateTicksUsedSinceLastProgress(now, prevGameState)
       const {generatorStateById, revenue} = progressGenerators(prevGameState, ticksUsed)
@@ -287,7 +291,7 @@ export const Game = ({ screen, setScreen, gameState, setGameState, fitnessLocati
   }, 60 * 1000)
 
   useEffect(() => {
-    if (screen !== Screen.WelcomeBack) {
+    if (screen !== Screen.WelcomeBack && screen !== Screen.Workout) {
       setScreen(Screen.WelcomeBack)
     }
   }, [lastVisitStats])
