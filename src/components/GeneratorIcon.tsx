@@ -1,6 +1,34 @@
 import React, { memo } from "react";
 import { Image, StyleSheet, View } from "react-native";
+import Animated, { Easing, useAnimatedStyle, withRepeat, withSequence, withTiming } from "react-native-reanimated";
 import colors from "../../assets/colors/colors";
+
+interface AnimatedOverlayProps {
+  low: number;
+  high: number;
+}
+
+const AnimatedOverlay = ({low, high}: AnimatedOverlayProps) => {
+  const animatedStyle = useAnimatedStyle(() => {
+    return {
+      opacity: withRepeat(
+          withSequence(
+            withTiming(high, {duration: 800, easing: Easing.linear}),
+            withTiming(low , {duration: 800, easing: Easing.linear}),
+            withTiming(high, {duration: 800, easing: Easing.linear}),
+          ), -1
+        )
+    }
+  })
+
+  return (
+    <Animated.View style={[
+        styles.overlay,
+        animatedStyle,
+      ]}
+    />
+  )
+}
 
 interface GeneratorIconProps {
   image: any;
@@ -9,13 +37,17 @@ interface GeneratorIconProps {
 }
 
 export const GeneratorIcon = memo(({image, ownsSome, isOperating}: GeneratorIconProps) => {
-  let overlayOpacity;
+  let low: number;
+  let high: number;
   if (ownsSome && isOperating) {
-    overlayOpacity = 0;
+    low = 0;
+    high = 0;
   } else if (ownsSome && !isOperating) {
-    overlayOpacity = .5
+    low = .25
+    high = .75
   } else {
-    overlayOpacity = .75;
+    low = .75;
+    high = .75
   }
 
   return (
@@ -28,10 +60,12 @@ export const GeneratorIcon = memo(({image, ownsSome, isOperating}: GeneratorIcon
         </View>
       </View>
       
-      <View style={[
-        styles.overlay,
-        { opacity: overlayOpacity }
-      ]}/>
+      { low === high &&
+        <View style={[styles.overlay, {opacity: low}]}/>
+      }
+      { low != high &&
+        <AnimatedOverlay low={low} high={high}/>
+      }
       
     </>
 )})
