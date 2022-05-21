@@ -426,10 +426,13 @@ export const Game = ({ screen, setScreen, gameState, setGameState, fitnessLocati
   }, [screen, upgradeType])
 
   useEffect(() => {
-    if (!dialogueText) return
-
-    if (dialogueText === tutorialState.manager3.message && gameState.upgradeState.managerUpgradeIds.contains(getUpgradeId(MANAGER_UPGRADES[0]))) {
-      hideAndCompleteTutorial('manager3')
+    if (gameState.upgradeState.managerUpgradeIds.contains(getUpgradeId(MANAGER_UPGRADES[0]))) {
+      completeTutorial('firstGenerator1')
+      completeTutorial('firstGenerator2')
+      completeTutorial('firstGenerator3')
+      completeTutorial('manager1')
+      completeTutorial('manager2')
+      completeTutorial('manager3')
     }
   }, [gameState.upgradeState.managerUpgradeIds])
 
