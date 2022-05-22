@@ -70,7 +70,7 @@ export const calculateOneTickBaseRevenue = (
 };
 
 export const calculateTicksToUse = (ticksRemaining: number, speed: number): number => {
-  const ticksToUse = TICK_LEVELS.find(t => ticksRemaining < t.threshold)!.ticksToUse
+  const ticksToUse = TICK_LEVELS.find(t => ticksRemaining <= t.threshold)!.ticksToUse
   return ticksToUse * speed
 }
 
