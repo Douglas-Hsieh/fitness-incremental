@@ -32,7 +32,7 @@ import { HighlightType } from "./enums/HighlightType";
 import { HighlightOverlay } from "react-native-highlight-overlay";
 import { DialogueModal } from "./components/DialogueModal";
 import { dateToYYYYMMDDFormat } from "./math/formatting";
-import { FitnessReward } from "./rewards";
+import { calculateStepRewardsLeft, FitnessReward } from "./rewards";
 import { StepsReward } from "./components/StepsReward";
 import { WorkoutReward } from "./components/WorkoutReward";
 import { getSignInAuthCredentials, SignInAuth } from "./types/SignInAuth";
@@ -323,6 +323,11 @@ export const Game = ({ screen, setScreen, gameState, setGameState, fitnessLocati
     setShowDialogueModal(true)
   }
 
+  function showDialogue(text: string) {
+    setDialogueText(text)
+    setShowDialogueModal(true)
+  }
+
   function hideTutorial() {
     setHighlightId(null)
     setGeneratorsHighlightId(null)
@@ -465,6 +470,7 @@ export const Game = ({ screen, setScreen, gameState, setGameState, fitnessLocati
             stepsToday={stepsToday}
             currentLocation={currentLocation}
             generatorsHighlightId={generatorsHighlightId}
+            showDialogue={showDialogue}
           />
           <HighlightOverlay
             highlightedElementId={highlightId}

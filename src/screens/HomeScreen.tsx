@@ -28,9 +28,10 @@ interface HomeScreenProps {
   stepsToday: number;
   currentLocation: LocationObject | undefined;
   generatorsHighlightId: string | null;
+  showDialogue: (text: string) => void;
 }
 
-export const HomeScreen = ({setScreen, gameState, setGameState, buyAmount, setBuyAmount, temporaryMultiplier, stepsToday, currentLocation, generatorsHighlightId}: HomeScreenProps) => {
+export const HomeScreen = ({setScreen, gameState, setGameState, buyAmount, setBuyAmount, temporaryMultiplier, generatorsHighlightId, showDialogue}: HomeScreenProps) => {
   const [maxBuyByGeneratorId, setMaxBuyByGeneratorId] = useState<Map<string,number>>(Map());
   const [priceByGeneratorId, setPriceByGeneratorId] = useState<Map<string,number>>(Map());
   const [newUnlocks, setNewUnlocks] = useState<Set<GeneratorUnlock>>(Set())
@@ -95,6 +96,12 @@ export const HomeScreen = ({setScreen, gameState, setGameState, buyAmount, setBu
       setNewUnlocks(newUnlocks)
     }
   }, [JSON.stringify(Array.from(gameState.generatorStateById.values()).map(generatorState => generatorState.owned))])
+
+  useEffect(() => {
+    if (gameState.ticks <= 0) {
+      showDialogue('Your followers have ran out of motivation and have given up.\n\nMove around to create more motivation!')
+    }
+  }, [])
 
   return (
     <SafeAreaView style={styles.container}>
