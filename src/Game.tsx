@@ -23,7 +23,7 @@ import { StepProgress } from "../assets/data/StepProgress";
 import { calculateTemporaryMultipliers } from "./math/multipliers";
 import { TasksScreen } from "./screens/TasksScreen";
 import { getStepsBetween, getStepsToday } from "./fitness-api/fitness-api";
-import { getUpgradeId, MANAGER_UPGRADES, UpgradeType } from "../assets/data/Upgrades";
+import { GeneratorMultiplierUpgrade, GENERATOR_MULTIPLIER_CASH_UPGRADES, GENERATOR_MULTIPLIER_PRESTIGE_UPGRADES, getUpgradeId, ManagerUpgrade, MANAGER_UPGRADES, UpgradeType } from "../assets/data/Upgrades";
 import { calculatePrice } from "./math/prices";
 import { GENERATORS } from "../assets/data/Generators";
 import { TutorialState } from "../assets/data/TutorialState";
@@ -470,6 +470,30 @@ export const Game = ({ screen, setScreen, gameState, setGameState, fitnessLocati
     }
 
   }, [gameState.fitnessRewardsByDate, currentLocation])
+
+  useEffect(() => {
+    const { generatorMultiplierCashUpgradeIds, managerUpgradeIds, generatorMultiplierPrestigeUpgradeIds } = gameState.upgradeState
+
+    const ownedCashUpgrades = generatorMultiplierCashUpgradeIds.concat(managerUpgradeIds)
+    const unownedCashUpgrades = (GENERATOR_MULTIPLIER_CASH_UPGRADES as Array<GeneratorMultiplierUpgrade | ManagerUpgrade>).concat(MANAGER_UPGRADES)
+      .filter(upgrade => !ownedCashUpgrades.has(getUpgradeId(upgrade)))
+    const cheapestUnownedCashUpgradePrice = Math.min(...unownedCashUpgrades.map(upgrade => upgrade.price))
+    const shouldBuyCashUpgrade = cheapestUnownedCashUpgradePrice !== undefined
+      ? gameState.balance > cheapestUnownedCashUpgradePrice
+      : false
+    
+    const ownedPrestigeUpgrades = generatorMultiplierPrestigeUpgradeIds
+    const unownedPrestigeUpgrades = GENERATOR_MULTIPLIER_PRESTIGE_UPGRADES
+      .filter(upgrade => !ownedPrestigeUpgrades.has(getUpgradeId(upgrade)))
+    const cheapestUnownedPrestigeUpgradePrice = Math.min(...unownedPrestigeUpgrades.map(upgrade => upgrade.price))
+    const shouldBuyPrestigeUpgrade = cheapestUnownedPrestigeUpgradePrice !== undefined
+      ? gameState.prestige * 10 > cheapestUnownedPrestigeUpgradePrice
+      : false
+
+    const shouldBuyUpgrade = shouldBuyCashUpgrade || shouldBuyPrestigeUpgrade
+    setUpgradeIconHasBadge(shouldBuyUpgrade)
+
+  }, [gameState.balance])
 
   switch(screen) {
     case Screen.WelcomeBack:
