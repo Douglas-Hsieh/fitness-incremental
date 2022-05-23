@@ -44,19 +44,17 @@ export const BuyGeneratorButton = memo(({setGameState, generator, amount, price,
   return (
     <TouchableOpacity activeOpacity={.8} disabled={isDisabled} onPress={handleBuy} touchSoundDisabled={true}>
       <View style={[
-        styles.buyGeneratorButton1,
-        isLarge ? { height: styles.buyGeneratorButton1.height * 1.5 } : {},
-        isDisabled ? {backgroundColor: colors.gray5} : {},
+        styles.buyGeneratorButton,
+        isLarge ? { height: styles.buyGeneratorButton.height * 1.5 } : {},
+        isDisabled ? {backgroundColor: colors.gray4, borderColor: colors.gray5} : {},
       ]}>
-        <View style={[styles.buyGeneratorButton2, isDisabled ? {backgroundColor: colors.gray4} : {}]}>
-          <View style={styles.buyGeneratorBuyAmountWrapper}>
-            <Text style={styles.buyGeneratorBuyText}>Buy</Text>
-            <Text style={styles.buyGeneratorAmountText}>{`x${amount}`}</Text>
-          </View>
-          <View style={styles.buyGeneratorPriceWrapper}>
-            <Text style={styles.buyGeneratorPriceText}>{coefficient}</Text>
-            <Text style={styles.buyGeneratorPriceScaleText}>{scale}</Text>
-          </View>
+        <View style={styles.buyGeneratorBuyAmountWrapper}>
+          <Text style={styles.buyGeneratorBuyText}>Buy</Text>
+          <Text style={styles.buyGeneratorAmountText}>{`x${amount}`}</Text>
+        </View>
+        <View style={styles.buyGeneratorPriceWrapper}>
+          <Text style={styles.buyGeneratorPriceText}>{coefficient}</Text>
+          <Text style={styles.buyGeneratorPriceScaleText}>{scale}</Text>
         </View>
       </View>
     </TouchableOpacity>
@@ -65,21 +63,16 @@ export const BuyGeneratorButton = memo(({setGameState, generator, amount, price,
 
 const styles = EStyleSheet.create({
   // Buy Button
-  buyGeneratorButton1: {
+  buyGeneratorButton: {
     marginTop: 4,
     width: 225,
     height: 45,
-    backgroundColor: colors.orange5,
-    borderRadius: 10,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  buyGeneratorButton2: {
-    width: '99%',
-    height: '95%',
     backgroundColor: colors.orange3,
-    borderRadius: 9,
+    borderWidth: 1.5,
+    borderColor: colors.orange5,
+    borderRadius: 10,
     flexDirection: 'row',
+    alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 5,
   },

@@ -76,7 +76,7 @@ const styles = StyleSheet.create({
     width: '100%',
     overflow: 'hidden',
     borderRadius: 100,
-    borderWidth: 1,
+    borderWidth: 1.5,
   },
   svgContainer: {
     ...StyleSheet.absoluteFillObject,
