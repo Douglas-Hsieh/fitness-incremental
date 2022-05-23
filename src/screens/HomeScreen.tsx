@@ -99,7 +99,7 @@ export const HomeScreen = ({setScreen, gameState, setGameState, buyAmount, setBu
 
   useEffect(() => {
     if (gameState.ticks <= 0) {
-      showDialogue('Your followers have ran out of motivation and have given up.\n\nMove around to create more motivation!')
+      showDialogue('Your followers ran out of motivation and gave up :(\n\nMove around to create motivation!')
     }
   }, [])
 
