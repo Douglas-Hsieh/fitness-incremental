@@ -23,7 +23,7 @@ export const WorkoutReward = ({gameState, setGameState, fitnessLocation, current
   const [rewardsLeft, setRewardsLeft] = useState<number>(0)
 
   useEffect(() => {
-    if (!fitnessLocation || !fitnessLocation.isVerified || !currentLocation) {
+    if (!fitnessLocation || !currentLocation) {
       return
     }
     const now = new Date()

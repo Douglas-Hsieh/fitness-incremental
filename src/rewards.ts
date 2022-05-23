@@ -127,6 +127,10 @@ export const canReceiveWorkoutReward = (
   lastWorkoutRewardTime: Date,
   currentTime: Date
 ) => {
+  if (!fitnessLocation.isVerified) {
+    return false
+  }
+
   const fitnessLocationLatLng = toLatLng(fitnessLocation);
   const isNearFitnessLocation = haversine(fitnessLocationLatLng, currentLocation.coords, { unit: 'mile', threshold: 0.25})
   const EIGHT_HOURS_MS = 8 * 60 * 60 * 1000
