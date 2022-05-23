@@ -19,13 +19,15 @@ interface MiscellaneousScreenProps {
   gameState: GameState;
   setGameState: React.Dispatch<React.SetStateAction<GameState>>;
   fitnessLocation: FitnessLocation | null;
+  setFitnessLocation: React.Dispatch<React.SetStateAction<FitnessLocation | null>>;
 }
 
-export const MiscellaneousScreen = memo(({setScreen, user, speed, gameState, setGameState, fitnessLocation}: MiscellaneousScreenProps) => {
+export const MiscellaneousScreen = memo(({setScreen, user, speed, gameState, setGameState, fitnessLocation, setFitnessLocation}: MiscellaneousScreenProps) => {
   const [showDeleteDataModal, setShowDeleteDataModal] = useState<boolean>(false)
 
   const deleteData = () => {
     setGameState(INITIAL_GAME_STATE)
+    setFitnessLocation(null)
     if (user) {
       deleteUser(user.id);
     }

@@ -44,7 +44,7 @@ interface WorkoutScreenProps {
   setScreen: React.Dispatch<React.SetStateAction<Screen>>;
   gameState: GameState;
   fitnessLocation: FitnessLocation | null;
-  setFitnessLocation: React.Dispatch<React.SetStateAction<FitnessLocation>>;
+  setFitnessLocation: React.Dispatch<React.SetStateAction<FitnessLocation | null>>;
 }
 
 export const WorkoutScreen = ({setScreen, gameState, fitnessLocation, setFitnessLocation}: WorkoutScreenProps) => {

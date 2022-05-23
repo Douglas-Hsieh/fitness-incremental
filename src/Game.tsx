@@ -45,7 +45,7 @@ interface GameProps {
   gameState: GameState;
   setGameState: React.Dispatch<React.SetStateAction<GameState>>;
   fitnessLocation: FitnessLocation | null;
-  setFitnessLocation: React.Dispatch<React.SetStateAction<FitnessLocation>>;
+  setFitnessLocation: React.Dispatch<React.SetStateAction<FitnessLocation | null>>;
   signInAuth: SignInAuth;
 }
 
@@ -536,6 +536,7 @@ export const Game = ({ screen, setScreen, gameState, setGameState, fitnessLocati
           gameState={gameState}
           setGameState={setGameState}
           fitnessLocation={fitnessLocation}
+          setFitnessLocation={setFitnessLocation}
         />
       )
     case Screen.Workout:
