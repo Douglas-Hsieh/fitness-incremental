@@ -114,9 +114,10 @@ export const StepsTask = memo(({fitnessRewardsByDate, steps, setIsClaimingStepsR
     const highestRewardSteps = STEP_REWARDS.map(stepReward => stepReward.steps).max()
     progressBarText = `${steps} / ${highestRewardSteps}`
   }
-
   const rewardsLeft = calculateStepRewardsLeftToday(fitnessRewardsByDate)
-  const rewardImages = new Array(rewardsLeft).fill(<RewardImage/>)
+  const rewardImages = rewardsLeft > 0
+    ? new Array(rewardsLeft).fill(<RewardImage/>)
+    : new Array()
 
   return (
     <View style={styles.taskContainer}>
