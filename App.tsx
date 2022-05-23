@@ -17,6 +17,7 @@ import { AndroidLoginScreen } from './src/screens/AndroidLoginScreen';
 import { IosLoginScreen } from './src/screens/IosLoginScreen';
 import { SignInAuth } from './src/types/SignInAuth';
 import { FitnessLocation, loadFitnessLocation } from './src/shared/fitness-locations.interface';
+import AppContextProvider from './contexts/AppContext';
 
 export default function App() {
   const isLoadingComplete = useCachedResources();
@@ -108,15 +109,17 @@ export default function App() {
   return (
     <GestureHandlerRootView style={{flex: 1}}>
       <HighlightableElementProvider>
-        <Game
-          screen={screen}
-          setScreen={setScreen}
-          gameState={gameState}
-          setGameState={setGameState as React.Dispatch<React.SetStateAction<GameState>>}
-          fitnessLocation={fitnessLocation}
-          setFitnessLocation={setFitnessLocation}
-          signInAuth={signInAuth}
-        />
+        <AppContextProvider>
+          <Game
+            screen={screen}
+            setScreen={setScreen}
+            gameState={gameState}
+            setGameState={setGameState as React.Dispatch<React.SetStateAction<GameState>>}
+            fitnessLocation={fitnessLocation}
+            setFitnessLocation={setFitnessLocation}
+            signInAuth={signInAuth}
+          />
+        </AppContextProvider>
       </HighlightableElementProvider>
     </GestureHandlerRootView>
   )

@@ -2,6 +2,7 @@ import { memo } from "react";
 import { GestureResponderEvent, Image, Pressable, Text, View } from "react-native"
 import EStyleSheet from "react-native-extended-stylesheet"
 import colors from "../../assets/colors/colors"
+import { BOTTOM_BAR_HEIGHT } from "./BottomBar";
 
 const AvatarImage = memo(() => (
   <Image source={require('../../assets/images/trainer.png')} style={styles.avatarIcon}/>
@@ -28,7 +29,7 @@ const styles = EStyleSheet.create({
     position: 'absolute',
     width: '90%',
     height: '25%',
-    bottom: 50,
+    bottom: BOTTOM_BAR_HEIGHT + 10,
     backgroundColor: colors.white,
     borderRadius: 10,
     alignItems: 'center',

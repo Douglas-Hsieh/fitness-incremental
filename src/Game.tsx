@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { GameState } from "../assets/data/GameState";
 import Screen from "./enums/Screen";
 import { HomeScreen } from "./screens/HomeScreen";
@@ -33,12 +33,11 @@ import { HighlightOverlay } from "react-native-highlight-overlay";
 import { DialogueModal } from "./components/DialogueModal";
 import { dateToYYYYMMDDFormat } from "./math/formatting";
 import { calculateStepRewardsLeft, FitnessReward } from "./rewards";
-import { StepsReward } from "./components/StepsReward";
-import { WorkoutReward } from "./components/WorkoutReward";
 import { getSignInAuthCredentials, SignInAuth } from "./types/SignInAuth";
 import { FitnessLocation } from "./shared/fitness-locations.interface";
 import { upsertSavedGame } from "./api/saved-games";
 import { DEFAULT_LAST_VISIT_STATS, LastVisitStats } from "./types/LastVisitStats";
+import { AppContext } from "../contexts/AppContext";
 
 interface GameProps {
   screen: Screen;
@@ -67,6 +66,8 @@ export const Game = ({ screen, setScreen, gameState, setGameState, fitnessLocati
   const [onScreenPress, setOnScreenPress] = useState<(() => void) | null>(null)
   const [lastVisitStats, setLastVisitStats] = useState<LastVisitStats>(DEFAULT_LAST_VISIT_STATS);
 
+  const context = useContext(AppContext)!
+  const { setUpgradeIconHasBadge, setTaskIconHasBadge } = context
 
   /** Login to server */
   useEffect(() => {
@@ -449,6 +450,19 @@ export const Game = ({ screen, setScreen, gameState, setGameState, fitnessLocati
     }
   }, [screen])
 
+  useEffect(() => {
+    const today = dateToYYYYMMDDFormat(new Date())
+    const fitnessRewards = gameState.fitnessRewardsByDate.get(today)
+    if (!fitnessRewards) return
+    const rewardsLeft = calculateStepRewardsLeft(fitnessRewards.steps, fitnessRewards.stepRewards)
+
+    if (rewardsLeft > 0) {
+      setTaskIconHasBadge(true)
+    } else {
+      setTaskIconHasBadge(false)
+    }
+  }, [gameState.fitnessRewardsByDate])
+
   switch(screen) {
     case Screen.WelcomeBack:
       return (
@@ -478,9 +492,6 @@ export const Game = ({ screen, setScreen, gameState, setGameState, fitnessLocati
           />
           { showDialogueModal && <DialogueModal onPress={() => setShowDialogueModal(false)} body={dialogueText}/> }
           { onScreenPress && <Pressable style={styles.invisibleScreen} onPress={onScreenPress}/> }
-
-          { !showDialogueModal && <StepsReward gameState={gameState} setGameState={setGameState} stepsToday={stepsToday}/> }
-          { !showDialogueModal && <WorkoutReward gameState={gameState} setGameState={setGameState} fitnessLocation={fitnessLocation} currentLocation={currentLocation}/> }
         </>
       )
     case Screen.Upgrades:
@@ -551,9 +562,8 @@ export const Game = ({ screen, setScreen, gameState, setGameState, fitnessLocati
             setGameState={setGameState}
             stepsToday={stepsToday}
             currentLocation={currentLocation}
+            fitnessLocation={fitnessLocation}
           />
-          { !showDialogueModal && <StepsReward gameState={gameState} setGameState={setGameState} stepsToday={stepsToday}/> }
-          { !showDialogueModal && <WorkoutReward gameState={gameState} setGameState={setGameState} fitnessLocation={fitnessLocation} currentLocation={currentLocation}/> }
         </>
       )
 

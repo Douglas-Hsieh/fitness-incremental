@@ -2,7 +2,7 @@ import { GestureResponderEvent, LayoutChangeEvent, Pressable, StyleProp, Text, T
 import EStyleSheet from "react-native-extended-stylesheet"
 import colors from "../../assets/colors/colors"
 
-interface ButtonProps {
+export interface ButtonProps {
   text: string;
   onPress?: (((event: GestureResponderEvent) => void) & (() => void)) | undefined;
   onLayout?: ((event: LayoutChangeEvent) => void) | undefined;

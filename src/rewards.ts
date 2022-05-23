@@ -1,9 +1,9 @@
 import { LocationObject } from "expo-location";
 import haversine from "haversine";
-import { Record } from "immutable"
+import { Map, Record } from "immutable"
 import { STEP_REWARDS } from "../assets/data/Constants"
 import { GameState } from "../assets/data/GameState";
-import { numberToHumanFormat } from "./math/formatting"
+import { dateToYYYYMMDDFormat, numberToHumanFormat } from "./math/formatting"
 import { FitnessLocation, toLatLng } from "./shared/fitness-locations.interface";
 import RewardModalDetails from "./types/RewardModalDetails";
 
@@ -114,6 +114,13 @@ export const calculateStepRewardsLeft = (steps: number, rewardsGiven: number) =>
   return rewardsTotal - rewardsGiven
 }
 
+export function calculateStepRewardsLeftToday(fitnessRewardsByDate: Map<string, FitnessReward>) {
+  const today = dateToYYYYMMDDFormat(new Date())
+  const fitnessRewards = fitnessRewardsByDate.get(today)
+  if (!fitnessRewards) return 0
+  return calculateStepRewardsLeft(fitnessRewards.steps, fitnessRewards.stepRewards)
+}
+
 export const canReceiveWorkoutReward = (
   fitnessLocation: FitnessLocation,
   currentLocation: LocationObject,
@@ -122,7 +129,6 @@ export const canReceiveWorkoutReward = (
 ) => {
   const fitnessLocationLatLng = toLatLng(fitnessLocation);
   const isNearFitnessLocation = haversine(fitnessLocationLatLng, currentLocation.coords, { unit: 'mile', threshold: 0.25})
-
   const EIGHT_HOURS_MS = 8 * 60 * 60 * 1000
   const diffTime = Math.abs(currentTime.getTime() - lastWorkoutRewardTime.getTime())
   const enoughTimeSinceLastReward = diffTime > EIGHT_HOURS_MS

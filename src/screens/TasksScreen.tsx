@@ -9,11 +9,17 @@ import { Header } from "../components/Header";
 import { Button } from "../components/Button";
 import EStyleSheet from "react-native-extended-stylesheet";
 import { Description } from "../components/Description";
-import { memo } from "react";
+import React, { memo, useState } from "react";
 import { dateToYYYYMMDDFormat } from "../math/formatting";
 import { LocationObject } from "expo-location";
 import { STEP_REWARDS } from "../../assets/data/Constants";
 import { ScrollView } from "react-native-gesture-handler";
+import { calculateStepRewardsLeftToday, canReceiveWorkoutReward, FitnessReward } from "../rewards";
+import { Map } from "immutable";
+import { StepsReward } from "../components/StepsReward";
+import { WorkoutReward } from "../components/WorkoutReward";
+import { FitnessLocation } from "../shared/fitness-locations.interface";
+import { FlashingButton } from "../components/FlashingButton";
 
 const RewardImage = memo(() => (
   <Image source={require('../../assets/images/present.png')} style={styles.rewardIcon}/>
@@ -25,9 +31,20 @@ interface TasksScreenProps {
   setGameState: React.Dispatch<React.SetStateAction<GameState>>;
   stepsToday: number;
   currentLocation: LocationObject | undefined;
+  fitnessLocation: FitnessLocation | null;
 }
 
-export const TasksScreen = ({setScreen, gameState, setGameState, stepsToday, currentLocation}: TasksScreenProps) => {
+export const TasksScreen = ({setScreen, gameState, setGameState, stepsToday, currentLocation, fitnessLocation}: TasksScreenProps) => {
+  const [isClaimingStepsReward, setIsClaimingStepsReward] = useState<boolean>(false)
+  const [isClaimingWorkoutReward, setIsClaimingWorkoutReward] = useState<boolean>(false)
+
+  let deservesWorkoutReward
+  if (!fitnessLocation || !currentLocation) {
+    deservesWorkoutReward = false
+  } else {
+    deservesWorkoutReward = canReceiveWorkoutReward(fitnessLocation, currentLocation, gameState.lastWorkoutRewardTime, new Date())
+  }
+
   return (
     <SafeAreaView style={styles.container}>
       <Background/>
@@ -45,23 +62,37 @@ export const TasksScreen = ({setScreen, gameState, setGameState, stepsToday, cur
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.scrollContainer}
         >
-          <StepsTask steps={stepsToday}/>
-          <WorkoutTask setScreen={setScreen} lastWorkoutRewardTime={gameState.lastWorkoutRewardTime}/>
-          <View style={{width: '100%', height: 10}}/>
+          <StepsTask
+            fitnessRewardsByDate={gameState.fitnessRewardsByDate}
+            steps={stepsToday}
+            setIsClaimingStepsReward={setIsClaimingStepsReward}
+          />
+          <WorkoutTask
+            setScreen={setScreen}
+            lastWorkoutRewardTime={gameState.lastWorkoutRewardTime}
+            setIsClaimingWorkoutReward={setIsClaimingWorkoutReward}
+            deservesWorkoutReward={deservesWorkoutReward}
+          />
+
+         <View style={{width: '100%', height: 10}}/>
         </ScrollView>
 
       </View>
       <BottomBar screen={Screen.Tasks} setScreen={setScreen}/>
 
+      { isClaimingStepsReward && <StepsReward gameState={gameState} setGameState={setGameState} stepsToday={stepsToday}/>}
+      { isClaimingWorkoutReward && <WorkoutReward gameState={gameState} setGameState={setGameState} fitnessLocation={fitnessLocation} currentLocation={currentLocation}/> }
     </SafeAreaView>
   )
 }
 
 interface StepsTaskProps {
+  fitnessRewardsByDate: Map<string, FitnessReward>;
   steps: number;
+  setIsClaimingStepsReward: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-export const StepsTask = memo(({steps}: StepsTaskProps) => {
+export const StepsTask = memo(({fitnessRewardsByDate, steps, setIsClaimingStepsReward}: StepsTaskProps) => {
   const targetSteps = STEP_REWARDS
     .filter(stepReward => steps < stepReward.steps)
     .map(stepReward => stepReward.steps)
@@ -83,7 +114,10 @@ export const StepsTask = memo(({steps}: StepsTaskProps) => {
     const highestRewardSteps = STEP_REWARDS.map(stepReward => stepReward.steps).max()
     progressBarText = `${steps} / ${highestRewardSteps}`
   }
-  
+
+  const rewardsLeft = calculateStepRewardsLeftToday(fitnessRewardsByDate)
+  const rewardImages = new Array(rewardsLeft).fill(<RewardImage/>)
+
   return (
     <View style={styles.taskContainer}>
       <Text style={styles.titleText}>Steps Today</Text>
@@ -98,6 +132,15 @@ export const StepsTask = memo(({steps}: StepsTaskProps) => {
       </>
       }
 
+      { rewardsLeft > 0 &&
+        <>
+          <Text style={styles.rewardText}>Unopened rewards</Text>
+          <View style={styles.rewardLine}>
+            {rewardImages}
+          </View>
+          <FlashingButton text={'Claim'} onPress={() => setIsClaimingStepsReward(true)} style={styles.button}/>
+        </>
+      }
     </View>
   )
 })
@@ -105,10 +148,11 @@ export const StepsTask = memo(({steps}: StepsTaskProps) => {
 interface WorkoutTaskProps {
   setScreen: React.Dispatch<React.SetStateAction<Screen>>;
   lastWorkoutRewardTime: Date;
+  setIsClaimingWorkoutReward: React.Dispatch<React.SetStateAction<boolean>>;
+  deservesWorkoutReward: boolean;
 }
 
-export const WorkoutTask = memo(({setScreen, lastWorkoutRewardTime}: WorkoutTaskProps) => {
-
+export const WorkoutTask = memo(({setScreen, lastWorkoutRewardTime, setIsClaimingWorkoutReward, deservesWorkoutReward}: WorkoutTaskProps) => {
   const hasWorkedOutToday = dateToYYYYMMDDFormat(lastWorkoutRewardTime) === dateToYYYYMMDDFormat(new Date())
   const progress = hasWorkedOutToday ? 1 : 0
   const descriptionText = hasWorkedOutToday
@@ -133,9 +177,15 @@ export const WorkoutTask = memo(({setScreen, lastWorkoutRewardTime}: WorkoutTask
         </>
       }
 
-      <View style={styles.buttonWrapper}>
-        <Button text={'Workout'} onPress={() => {setScreen(Screen.Workout)}}/>
-      </View>
+      { deservesWorkoutReward &&
+        <>
+          <FlashingButton text={'Claim'} onPress={() => setIsClaimingWorkoutReward(true)} style={styles.button}/>
+        </>
+      }
+      { !deservesWorkoutReward &&
+        <Button text={'Workout'} onPress={() => {setScreen(Screen.Workout)}} style={styles.button}/>
+      }
+
     </View>
   )
 })
@@ -197,7 +247,7 @@ const styles = EStyleSheet.create({
     alignSelf: 'center',
     fontSize: '1.1rem',
   },
-  buttonWrapper: {
+  button: {
     marginTop: 10,
   },
 })
