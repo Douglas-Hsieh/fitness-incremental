@@ -14,7 +14,7 @@ const AvatarImage = memo(() => (
   <Image source={require('../../assets/images/male-avatar.png')} style={styles.avatarIcon}/>
 ));
 
-const TicksImage = memo(() => (
+export const TicksImage = memo(() => (
   <Image source={require('../../assets/images/lightning.png')} style={styles.ticksIcon}/>
 ));
 

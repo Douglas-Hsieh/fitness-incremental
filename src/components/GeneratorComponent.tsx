@@ -13,6 +13,7 @@ import { playSound, SoundFile } from "../util/sounds";
 import { HighlightableElement } from 'react-native-highlight-overlay';
 import { TutorialState } from "../../assets/data/TutorialState";
 import { HIGHLIGHTABLE_RECTANGLE_OPTIONS } from "../../assets/data/Constants";
+import { StepsImage, TicksImage } from "./TopBar";
 
 interface GeneratorComponentProps {
   generator: Generator;
@@ -29,18 +30,26 @@ interface GeneratorComponentProps {
 
 export const GeneratorComponent = ({ generator, generatorState, gameState, setGameState, price, amount, isDisabled, ticksNeeded, isGold, ownsSome }: GeneratorComponentProps) => {
   const [projectiles, setProjectiles] = useState<JSX.Element[]>([])
-  const [x0, setX0] = useState<number>(0)
-  const [y0, setY0] = useState<number>(0)
+  const [buyButtonX0, setBuyButtonX0] = useState<number>(0)
+  const [buyButtonY0, setBuyButtonY0] = useState<number>(0)
+  const [iconX0, setIconX0] = useState<number>(0)
+  const [iconY0, setIconY0] = useState<number>(0)
   const [timeoutId, setTimeoutId] = useState<NodeJS.Timeout>()
 
-  function setX0AndY0(event: LayoutChangeEvent) {
+  function setLayout(event: LayoutChangeEvent, setX0: React.Dispatch<React.SetStateAction<number>>, setY0: React.Dispatch<React.SetStateAction<number>>) {
     const {x, y, width, height} = event.nativeEvent.layout;
     setX0(x + (width / 2))
     setY0(y + (height / 2))
   }
+  function setBuyButtonLayout(event: LayoutChangeEvent) {
+    setLayout(event, setBuyButtonX0, setBuyButtonY0)
+  }
+  function setIconLayout(event: LayoutChangeEvent) {
+    setLayout(event, setIconX0, setIconY0)
+  }
 
-  function spawnProjectiles() {
-    const newProjectile = <Projectile x0={x0} y0={y0}/>
+  function spawnProjectiles(x0: number, y0: number, image: JSX.Element) {
+    const newProjectile = <Projectile x0={x0} y0={y0} image={image}/>
     setProjectiles([...projectiles].concat(new Array(4).fill(newProjectile)))
     if (timeoutId) {
       clearTimeout(timeoutId)
@@ -50,7 +59,10 @@ export const GeneratorComponent = ({ generator, generatorState, gameState, setGa
     }, 5000)
     setTimeoutId(newTimeoutId)
   }
-  const memoizedSpawnProjectiles = useCallback(spawnProjectiles, [x0, y0, projectiles])
+  
+  const memoizedSpawnProjectiles = useCallback((x0: number, y0: number, image: JSX.Element) => spawnProjectiles(x0, y0, image), [buyButtonX0, buyButtonY0, projectiles])
+  const spawnCash = () => memoizedSpawnProjectiles(buyButtonX0, buyButtonY0, <StepsImage/>)
+  const spawnTicks = () => memoizedSpawnProjectiles(iconX0, iconY0, <TicksImage/>)
 
   function completeTutorial(key: keyof TutorialState) {
     setGameState(prevGameState => ({
@@ -82,14 +94,15 @@ export const GeneratorComponent = ({ generator, generatorState, gameState, setGa
     setGameState(prevGameState => ({ ...prevGameState, generatorStateById: generatorStateById, }))
 
     playSound(SoundFile.MenuSelectionClick)
+    spawnTicks()
   }
 
   const isOperating = generatorState.isManuallyOperating || generatorState.hasManager;
 
   return (
     <HighlightableElement id={`generator-${generator.id}`} options={HIGHLIGHTABLE_RECTANGLE_OPTIONS}>
-      <View style={styles.generatorWrapper} onLayout={setX0AndY0}>
-        <Pressable style={styles.generatorLeftWrapper} onPress={startGenerator}>
+      <View style={styles.generatorWrapper} onLayout={setBuyButtonLayout}>
+        <Pressable style={styles.generatorLeftWrapper} onPress={startGenerator} onLayout={setIconLayout}>
           <GeneratorIcon image={generator.image} ownsSome={ownsSome} isOperating={isOperating}/>
           <UnlockProgressBar generator={generator} owned={generatorState.owned} />
         </Pressable>
@@ -104,7 +117,7 @@ export const GeneratorComponent = ({ generator, generatorState, gameState, setGa
             amount={amount}
             isDisabled={isDisabled}
             isLarge={!ownsSome}
-            onClick={memoizedSpawnProjectiles}
+            onClick={spawnCash}
           />
         </Pressable>
       </View>

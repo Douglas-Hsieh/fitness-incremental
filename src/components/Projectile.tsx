@@ -6,9 +6,10 @@ import { StepsImage } from "./TopBar"
 interface ProjectileProps {
   x0: number;
   y0: number;
+  image: JSX.Element
 }
 
-export const Projectile = ({x0, y0}: ProjectileProps) => {
+export const Projectile = ({x0, y0, image}: ProjectileProps) => {
   const [direction] = useState<number>(Math.random() > 0.5 ? 1 : -1)
   const [v0] = useState<number>(direction * (Math.random() * 20))
   const [θ0] = useState<number>((-direction * Math.random() * -Math.PI / 2))
@@ -41,7 +42,7 @@ export const Projectile = ({x0, y0}: ProjectileProps) => {
 
   return (
     <Animated.View style={[styles.projectile, animatedStyle]}>
-      <StepsImage/>
+      {image}
     </Animated.View>
   )
 }
