@@ -14,7 +14,7 @@ import { dateToYYYYMMDDFormat } from "../math/formatting";
 import { LocationObject } from "expo-location";
 import { STEP_REWARDS } from "../../assets/data/Constants";
 import { ScrollView } from "react-native-gesture-handler";
-import { calculateStepRewardsLeftToday, canReceiveWorkoutReward, FitnessReward } from "../rewards";
+import { calculateStepRewardsLeftToday, calculateCanReceiveWorkoutReward, FitnessReward } from "../rewards";
 import { Map } from "immutable";
 import { StepsReward } from "../components/StepsReward";
 import { WorkoutReward } from "../components/WorkoutReward";
@@ -38,11 +38,11 @@ export const TasksScreen = ({setScreen, gameState, setGameState, stepsToday, cur
   const [isClaimingStepsReward, setIsClaimingStepsReward] = useState<boolean>(false)
   const [isClaimingWorkoutReward, setIsClaimingWorkoutReward] = useState<boolean>(false)
 
-  let deservesWorkoutReward
+  let canReceiveWorkoutReward
   if (!fitnessLocation || !currentLocation) {
-    deservesWorkoutReward = false
+    canReceiveWorkoutReward = false
   } else {
-    deservesWorkoutReward = canReceiveWorkoutReward(fitnessLocation, currentLocation, gameState.lastWorkoutRewardTime, new Date())
+    canReceiveWorkoutReward = calculateCanReceiveWorkoutReward(fitnessLocation, currentLocation, gameState.lastWorkoutRewardTime, new Date())
   }
 
   return (
@@ -71,7 +71,7 @@ export const TasksScreen = ({setScreen, gameState, setGameState, stepsToday, cur
             setScreen={setScreen}
             lastWorkoutRewardTime={gameState.lastWorkoutRewardTime}
             setIsClaimingWorkoutReward={setIsClaimingWorkoutReward}
-            deservesWorkoutReward={deservesWorkoutReward}
+            canReceiveWorkoutReward={canReceiveWorkoutReward}
           />
 
          <View style={{width: '100%', height: 10}}/>
@@ -150,10 +150,10 @@ interface WorkoutTaskProps {
   setScreen: React.Dispatch<React.SetStateAction<Screen>>;
   lastWorkoutRewardTime: Date;
   setIsClaimingWorkoutReward: React.Dispatch<React.SetStateAction<boolean>>;
-  deservesWorkoutReward: boolean;
+  canReceiveWorkoutReward: boolean;
 }
 
-export const WorkoutTask = memo(({setScreen, lastWorkoutRewardTime, setIsClaimingWorkoutReward, deservesWorkoutReward}: WorkoutTaskProps) => {
+export const WorkoutTask = memo(({setScreen, lastWorkoutRewardTime, setIsClaimingWorkoutReward, canReceiveWorkoutReward}: WorkoutTaskProps) => {
   const hasWorkedOutToday = dateToYYYYMMDDFormat(lastWorkoutRewardTime) === dateToYYYYMMDDFormat(new Date())
   const progress = hasWorkedOutToday ? 1 : 0
   const descriptionText = hasWorkedOutToday
@@ -178,12 +178,12 @@ export const WorkoutTask = memo(({setScreen, lastWorkoutRewardTime, setIsClaimin
         </>
       }
 
-      { deservesWorkoutReward &&
+      { canReceiveWorkoutReward &&
         <>
           <FlashingButton text={'Claim'} onPress={() => setIsClaimingWorkoutReward(true)} style={styles.button}/>
         </>
       }
-      { !deservesWorkoutReward &&
+      { !canReceiveWorkoutReward &&
         <Button text={'Workout'} onPress={() => {setScreen(Screen.Workout)}} style={styles.button}/>
       }
 

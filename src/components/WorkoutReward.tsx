@@ -2,8 +2,9 @@ import { LocationObject } from "expo-location"
 import React, { useState, useEffect } from "react"
 import { GameState } from "../../assets/data/GameState"
 import { GENERATORS } from "../../assets/data/Generators"
+import { dateToYYYYMMDDFormat } from "../math/formatting"
 import { calculateOneTickBaseRevenue } from "../math/revenue"
-import { canReceiveWorkoutReward, displayReward, generateReward, giveReward } from "../rewards"
+import { calculateCanReceiveWorkoutReward, displayReward, FitnessReward, generateReward, giveReward } from "../rewards"
 import { FitnessLocation } from "../shared/fitness-locations.interface"
 import RewardModalDetails from "../types/RewardModalDetails"
 import { Overlay } from "./Overlay"
@@ -27,7 +28,7 @@ export const WorkoutReward = ({gameState, setGameState, fitnessLocation, current
       return
     }
     const now = new Date()
-    if (!canReceiveWorkoutReward(fitnessLocation, currentLocation, gameState.lastWorkoutRewardTime, now)) {
+    if (!calculateCanReceiveWorkoutReward(fitnessLocation, currentLocation, gameState.lastWorkoutRewardTime, now)) {
       return
     }
 
@@ -50,6 +51,21 @@ export const WorkoutReward = ({gameState, setGameState, fitnessLocation, current
     const reward = generateReward(oneTickBaseRevenue)
     const { title, body } = reward
 
+    setGameState(prevGameState => {
+      const today = dateToYYYYMMDDFormat(new Date())
+      let fitnessRewards = prevGameState.fitnessRewardsByDate.get(today)
+      if (!fitnessRewards) {
+        fitnessRewards = new FitnessReward()
+      }
+
+      return ({
+        ...prevGameState,
+        fitnessRewardsByDate: prevGameState.fitnessRewardsByDate.set(
+          today,
+          fitnessRewards.set("gymVisits", fitnessRewards.get("gymVisits") + 1)
+        )
+      })
+    })
     giveReward(reward, setGameState)
     displayReward(setRewardModalDetails, reward, `Workout Reward: ${title}`, body, setShowOverlay, setShowRewardModal)
 

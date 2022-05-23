@@ -4,7 +4,7 @@ import { GameState } from "../assets/data/GameState";
 import { BackgroundTask } from './types/BackgroundTask';
 import * as TaskManager from 'expo-task-manager';
 import { AppState } from 'react-native';
-import { calculateStepRewardsLeft, canReceiveWorkoutReward } from './rewards';
+import { calculateStepRewardsLeft, calculateCanReceiveWorkoutReward } from './rewards';
 import { getStepsBetween } from './fitness-api/fitness-api';
 import allSettled from 'promise.allsettled';
 import { dateToYYYYMMDDFormat } from './math/formatting';
@@ -55,7 +55,7 @@ export const handleLocationUpdate: TaskManager.TaskManagerTaskExecutor = async (
       return
     }
 
-    if (canReceiveWorkoutReward(fitnessLocation, location, lastWorkoutRewardTime, new Date())) {
+    if (calculateCanReceiveWorkoutReward(fitnessLocation, location, lastWorkoutRewardTime, new Date())) {
       return
     }
 

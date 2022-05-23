@@ -32,7 +32,7 @@ import { HighlightType } from "./enums/HighlightType";
 import { HighlightOverlay } from "react-native-highlight-overlay";
 import { DialogueModal } from "./components/DialogueModal";
 import { dateToYYYYMMDDFormat } from "./math/formatting";
-import { calculateStepRewardsLeft, FitnessReward } from "./rewards";
+import { calculateStepRewardsLeft, calculateCanReceiveWorkoutReward, FitnessReward } from "./rewards";
 import { getSignInAuthCredentials, SignInAuth } from "./types/SignInAuth";
 import { FitnessLocation } from "./shared/fitness-locations.interface";
 import { upsertSavedGame } from "./api/saved-games";
@@ -454,14 +454,22 @@ export const Game = ({ screen, setScreen, gameState, setGameState, fitnessLocati
     const today = dateToYYYYMMDDFormat(new Date())
     const fitnessRewards = gameState.fitnessRewardsByDate.get(today)
     if (!fitnessRewards) return
-    const rewardsLeft = calculateStepRewardsLeft(fitnessRewards.steps, fitnessRewards.stepRewards)
+    const canReceiveStepsReward = calculateStepRewardsLeft(fitnessRewards.steps, fitnessRewards.stepRewards) > 0
 
-    if (rewardsLeft > 0) {
+    let canReceiveWorkoutReward
+    if (!fitnessLocation || !currentLocation) {
+      canReceiveWorkoutReward = false
+    } else {
+      canReceiveWorkoutReward = calculateCanReceiveWorkoutReward(fitnessLocation, currentLocation, gameState.lastWorkoutRewardTime, new Date())
+    }
+
+    if (canReceiveStepsReward || canReceiveWorkoutReward) {
       setTaskIconHasBadge(true)
     } else {
       setTaskIconHasBadge(false)
     }
-  }, [gameState.fitnessRewardsByDate])
+
+  }, [gameState.fitnessRewardsByDate, currentLocation])
 
   switch(screen) {
     case Screen.WelcomeBack:

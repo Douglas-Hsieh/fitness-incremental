@@ -121,7 +121,7 @@ export function calculateStepRewardsLeftToday(fitnessRewardsByDate: Map<string, 
   return calculateStepRewardsLeft(fitnessRewards.steps, fitnessRewards.stepRewards)
 }
 
-export const canReceiveWorkoutReward = (
+export const calculateCanReceiveWorkoutReward = (
   fitnessLocation: FitnessLocation,
   currentLocation: LocationObject,
   lastWorkoutRewardTime: Date,
