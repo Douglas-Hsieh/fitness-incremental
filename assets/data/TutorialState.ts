@@ -18,7 +18,7 @@ export interface TutorialState {
 
 export const INITIAL_TUTORIAL_STATE: TutorialState = {
   firstGenerator1: {
-    message: 'Exercise is easy! Touch the puppy to make it run.',
+    message: 'Exercise is easy! Touch your puppy to make it run.',
     isCompleted: false,
   },
   firstGenerator2: {
@@ -26,15 +26,15 @@ export const INITIAL_TUTORIAL_STATE: TutorialState = {
     isCompleted: false,
   },
   firstGenerator3: {
-    message: 'Everyone knows that two puppers run faster than one.',
+    message: 'Two puppies produce more steps than one!',
     isCompleted: false,
   },
   ticks1: {
-    message: "This is your motivation. Your followers need motivation to move.",
+    message: "Your followers use motivation in order to move.",
     isCompleted: false,
   },
   ticks2: {
-    message: 'You motivate your followers whenever you take a step.',
+    message: 'You earn motivation for your followers whenever you move in real life!',
     isCompleted: false,
   },
   secondGenerator: {
@@ -46,7 +46,7 @@ export const INITIAL_TUTORIAL_STATE: TutorialState = {
     isCompleted: false,
   },
   manager2: {
-    message: "Click here!",
+    message: "Click on the third icon!",
     isCompleted: false,
   },
   manager3: {
