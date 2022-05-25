@@ -8,6 +8,7 @@ import Screen from "../enums/Screen"
 import { HighlightId } from "../enums/HightlightId"
 import { HIGHLIGHTABLE_RECTANGLE_OPTIONS } from "../../assets/data/Constants"
 import { AppContext } from "../../contexts/AppContext"
+import { playSound, SoundFile } from "../util/sounds"
 
 const ICON_SIZE = 36
 const BADGE_SIZE = 6
@@ -23,6 +24,12 @@ export const BottomBar = memo(({ screen, setScreen }: BottomBarProps) => {
   const context = useContext(AppContext)!
   const { upgradeIconHasBadge, taskIconHasBadge } = context
   
+  function setScreenAndPlaySound(newScreen: Screen) {
+    if (newScreen !== screen) {
+      setScreen(newScreen)
+      playSound(SoundFile.SwitchOn)
+    }
+  }
 
   return (
     <View style={styles.bottomBar}>
@@ -45,16 +52,16 @@ export const BottomBar = memo(({ screen, setScreen }: BottomBarProps) => {
       </View>
 
       <View style={[{ position: 'absolute' }, styles.bottomBarWrapper]}>
-        <TouchableOpacity style={styles.touchableIcon} onPress={() => setScreen(Screen.Home)} />
+        <TouchableOpacity style={styles.touchableIcon} onPress={() => {setScreenAndPlaySound(Screen.Home)}} />
         <HighlightableElement id={HighlightId.UpgradesTab} options={HIGHLIGHTABLE_RECTANGLE_OPTIONS}>
-          <TouchableOpacity style={styles.touchableIcon} onPress={() => setScreen(Screen.Upgrades)} />
+          <TouchableOpacity style={styles.touchableIcon} onPress={() => setScreenAndPlaySound(Screen.Upgrades)} />
         </HighlightableElement>
-        <TouchableOpacity style={styles.touchableIcon} onPress={() => setScreen(Screen.Unlocks)} />
+        <TouchableOpacity style={styles.touchableIcon} onPress={() => setScreenAndPlaySound(Screen.Unlocks)} />
         <HighlightableElement id={HighlightId.PrestigeTab} options={HIGHLIGHTABLE_RECTANGLE_OPTIONS}>
-          <TouchableOpacity style={styles.touchableIcon} onPress={() => setScreen(Screen.Prestige)} />
+          <TouchableOpacity style={styles.touchableIcon} onPress={() => setScreenAndPlaySound(Screen.Prestige)} />
         </HighlightableElement>
-        <TouchableOpacity style={styles.touchableIcon} onPress={() => setScreen(Screen.Tasks)} />
-        <TouchableOpacity style={styles.touchableIcon} onPress={() => setScreen(Screen.Miscellaneous)} />
+        <TouchableOpacity style={styles.touchableIcon} onPress={() => setScreenAndPlaySound(Screen.Tasks)} />
+        <TouchableOpacity style={styles.touchableIcon} onPress={() => setScreenAndPlaySound(Screen.Miscellaneous)} />
       </View>
 
     </View>
