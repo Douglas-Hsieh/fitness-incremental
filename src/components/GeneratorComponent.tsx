@@ -106,9 +106,9 @@ export const GeneratorComponent = ({ generator, generatorState, gameState, setGa
           <GeneratorIcon image={generator.image} ownsSome={ownsSome} isOperating={isOperating}/>
           <UnlockProgressBar generator={generator} owned={generatorState.owned} />
         </Pressable>
-        <Pressable style={styles.generatorRightWrapper} onPress={startGenerator}>
+        <View style={styles.generatorRightWrapper}>
           {ownsSome &&
-            <GeneratorProgressBar generator={generator} gameState={gameState} ticksNeeded={ticksNeeded} isGold={isGold} />
+            <GeneratorProgressBar generator={generator} gameState={gameState} ticksNeeded={ticksNeeded} isGold={isGold} onPress={startGenerator}/>
           }
           <BuyGeneratorButton
             setGameState={setGameState}
@@ -119,7 +119,7 @@ export const GeneratorComponent = ({ generator, generatorState, gameState, setGa
             isLarge={!ownsSome}
             onClick={spawnCash}
           />
-        </Pressable>
+        </View>
       </View>
       {projectiles}
     </HighlightableElement>

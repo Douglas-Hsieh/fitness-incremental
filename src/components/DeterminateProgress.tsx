@@ -2,7 +2,7 @@ import { Rect } from 'react-native-svg'
 import colors from "../../assets/colors/colors";
 import Animated, { Easing, useAnimatedStyle, useSharedValue, withSequence, withTiming } from "react-native-reanimated";
 import { useEffect, useRef, useState } from 'react';
-import { LayoutChangeEvent, StyleSheet, View } from 'react-native';
+import { GestureResponderEvent, LayoutChangeEvent, Pressable, StyleSheet } from 'react-native';
 import { window } from '../util/Window';
 
 const AnimatedRect = Animated.createAnimatedComponent(Rect)
@@ -10,9 +10,10 @@ const AnimatedRect = Animated.createAnimatedComponent(Rect)
 interface DeterminateProgressProps {
   progress: number;
   isGold?: boolean;
+  onPress?: ((event: GestureResponderEvent) => void) | null;
 }
 
-export const DeterminateProgress = ({progress, isGold}: DeterminateProgressProps) => {
+export const DeterminateProgress = ({progress, isGold, onPress}: DeterminateProgressProps) => {
 
   const [colorUsed, setColorUsed] = useState<string>(colors.green3)
   const [startX, setStartX] = useState<number>(-window.width)
@@ -59,11 +60,11 @@ export const DeterminateProgress = ({progress, isGold}: DeterminateProgressProps
 
   return (
     <>
-      <View style={styles.bar} onLayout={onLayout}>
+      <Pressable style={styles.bar} onLayout={onLayout} onPress={onPress}>
         <Animated.View style={[styles.svgContainer, animatedStyle]}>
           <AnimatedRect height={'100%'} width={'100%'} fill={'green'}/>
         </Animated.View>
-      </View>
+      </Pressable>
     </>
 
   )

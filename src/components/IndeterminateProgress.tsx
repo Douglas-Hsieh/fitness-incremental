@@ -2,15 +2,16 @@ import Svg, { Defs, Rect, LinearGradient, Stop } from 'react-native-svg'
 import colors from "../../assets/colors/colors";
 import Animated, { Easing, useAnimatedStyle, useSharedValue, withRepeat, withSequence, withTiming } from "react-native-reanimated";
 import { useEffect, useState } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { GestureResponderEvent, Pressable, StyleSheet } from 'react-native';
 
 const AnimatedRect = Animated.createAnimatedComponent(Rect)
 
 interface IndeterminateProgressProps {
   isGold: boolean;
+  onPress?: ((event: GestureResponderEvent) => void) | null;
 }
 
-export const IndeterminateProgress = ({ isGold }: IndeterminateProgressProps) => {
+export const IndeterminateProgress = ({ isGold, onPress }: IndeterminateProgressProps) => {
   const [colorsUsed, setColorsUsed] = useState<string[]>([colors.green3, colors.green1])
 
   const startX = -200
@@ -49,7 +50,7 @@ export const IndeterminateProgress = ({ isGold }: IndeterminateProgressProps) =>
 
   return (
     <>
-      <View style={styles.bar}>
+      <Pressable style={styles.bar} onPress={onPress}>
         <Animated.View style={[styles.svgContainer, animatedStyle]}>
           <Svg>
             <Defs>
@@ -64,7 +65,7 @@ export const IndeterminateProgress = ({ isGold }: IndeterminateProgressProps) =>
             <AnimatedRect height={'100%'} width={'100%'} fill="url(#grad)"/>
           </Svg>
         </Animated.View>
-      </View>
+      </Pressable>
     </>
 
   )

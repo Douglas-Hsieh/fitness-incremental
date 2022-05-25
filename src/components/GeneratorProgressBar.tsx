@@ -1,5 +1,5 @@
 import React from "react"
-import { Text } from "react-native"
+import { GestureResponderEvent, Text } from "react-native"
 import { Generator } from "../../assets/data/Generators"
 import { GameState } from "../../assets/data/GameState"
 import { numberToHumanFormat } from "../math/formatting"
@@ -13,9 +13,10 @@ interface GeneratorProgressBarProps {
   gameState: GameState;
   ticksNeeded: number;
   isGold: boolean;
+  onPress?: ((event: GestureResponderEvent) => void) | null;
 }
 
-export const GeneratorProgressBar = ({generator, gameState, ticksNeeded, isGold}: GeneratorProgressBarProps) => {
+export const GeneratorProgressBar = ({generator, gameState, ticksNeeded, isGold, onPress}: GeneratorProgressBarProps) => {
 
   // Calculate progress
   const generatorState = gameState.generatorStateById.get(generator.id)!
@@ -28,7 +29,7 @@ export const GeneratorProgressBar = ({generator, gameState, ticksNeeded, isGold}
     const text = `${coefficient} ${scale}`
     return (
       <>
-        <DeterminateProgress progress={progress} isGold={isGold}/>
+        <DeterminateProgress progress={progress} isGold={isGold} onPress={onPress}/>
         <Text style={styles.text}>{text}</Text>
       </>
     )
@@ -38,7 +39,7 @@ export const GeneratorProgressBar = ({generator, gameState, ticksNeeded, isGold}
     const text = `${coefficient} ${scale} / sec`
     return (
       <>
-        <IndeterminateProgress isGold={isGold}/>
+        <IndeterminateProgress isGold={isGold} onPress={onPress}/>
         <Text style={styles.text}>{text}</Text>
       </>
     )
