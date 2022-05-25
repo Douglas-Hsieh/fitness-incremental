@@ -67,7 +67,12 @@ export const Game = ({ screen, setScreen, gameState, setGameState, fitnessLocati
   const [lastVisitStats, setLastVisitStats] = useState<LastVisitStats>(DEFAULT_LAST_VISIT_STATS);
 
   const context = useContext(AppContext)!
-  const { setUpgradeIconHasBadge, setTaskIconHasBadge } = context
+  const {
+    setTaskIconHasBadge,
+    setCashUpgradeHasBadge,
+    setPrestigeUpgradeHasBadge,
+    setManagerUpgradeHasBadge
+  } = context
 
   /** Login to server */
   useEffect(() => {
@@ -450,6 +455,7 @@ export const Game = ({ screen, setScreen, gameState, setGameState, fitnessLocati
     }
   }, [screen])
 
+  // Task badges
   useEffect(() => {
     const today = dateToYYYYMMDDFormat(new Date())
     const fitnessRewards = gameState.fitnessRewardsByDate.get(today)
@@ -471,15 +477,24 @@ export const Game = ({ screen, setScreen, gameState, setGameState, fitnessLocati
 
   }, [gameState.fitnessRewardsByDate, currentLocation])
 
+  // Upgrade badges
   useEffect(() => {
     const { generatorMultiplierCashUpgradeIds, managerUpgradeIds, generatorMultiplierPrestigeUpgradeIds } = gameState.upgradeState
 
-    const ownedCashUpgrades = generatorMultiplierCashUpgradeIds.concat(managerUpgradeIds)
-    const unownedCashUpgrades = (GENERATOR_MULTIPLIER_CASH_UPGRADES as Array<GeneratorMultiplierUpgrade | ManagerUpgrade>).concat(MANAGER_UPGRADES)
-      .filter(upgrade => !ownedCashUpgrades.has(getUpgradeId(upgrade)))
-    const cheapestUnownedCashUpgradePrice = Math.min(...unownedCashUpgrades.map(upgrade => upgrade.price))
-    const shouldBuyCashUpgrade = cheapestUnownedCashUpgradePrice !== undefined
-      ? gameState.balance > cheapestUnownedCashUpgradePrice
+    const ownedGenMultCashUpgrades = generatorMultiplierCashUpgradeIds
+    const unownedGenMultCashUpgrades = GENERATOR_MULTIPLIER_CASH_UPGRADES
+      .filter(upgrade => !ownedGenMultCashUpgrades.has(getUpgradeId(upgrade)))
+    const cheapestGenMultCashUpgradePrice = Math.min(...unownedGenMultCashUpgrades.map(upgrade => upgrade.price))
+    const shouldBuyGenMultCashUpgrade = cheapestGenMultCashUpgradePrice !== undefined
+      ? gameState.balance > cheapestGenMultCashUpgradePrice
+      : false
+
+    const ownedManagerUpgrades = managerUpgradeIds
+    const unownedManagerUpgrades = MANAGER_UPGRADES
+      .filter(upgrade => !ownedManagerUpgrades.has(getUpgradeId(upgrade)))
+    const cheapestManagerUpgradePrice = Math.min(...unownedManagerUpgrades.map(upgrade => upgrade.price))
+    const shouldBuyManagerUpgrade = cheapestManagerUpgradePrice !== undefined
+      ? gameState.balance > cheapestManagerUpgradePrice
       : false
     
     const ownedPrestigeUpgrades = generatorMultiplierPrestigeUpgradeIds
@@ -490,8 +505,9 @@ export const Game = ({ screen, setScreen, gameState, setGameState, fitnessLocati
       ? gameState.prestige * 10 > cheapestUnownedPrestigeUpgradePrice
       : false
 
-    const shouldBuyUpgrade = shouldBuyCashUpgrade || shouldBuyPrestigeUpgrade
-    setUpgradeIconHasBadge(shouldBuyUpgrade)
+    setCashUpgradeHasBadge(shouldBuyGenMultCashUpgrade)
+    setPrestigeUpgradeHasBadge(shouldBuyPrestigeUpgrade)
+    setManagerUpgradeHasBadge(shouldBuyManagerUpgrade)
 
   }, [gameState.balance])
 

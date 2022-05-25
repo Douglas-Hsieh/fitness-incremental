@@ -22,7 +22,8 @@ interface BottomBarProps {
 export const BottomBar = memo(({ screen, setScreen }: BottomBarProps) => {
 
   const context = useContext(AppContext)!
-  const { upgradeIconHasBadge, taskIconHasBadge } = context
+  const { taskIconHasBadge, cashUpgradeHasBadge, prestigeUpgradeHasBadge, managerUpgradeHasBadge } = context
+  const upgradeIconHasBadge = cashUpgradeHasBadge || prestigeUpgradeHasBadge || managerUpgradeHasBadge
   
   function setScreenAndPlaySound(newScreen: Screen) {
     if (newScreen !== screen) {

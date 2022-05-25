@@ -1,21 +1,22 @@
 import React, { memo } from "react";
-import { Image, StyleSheet, View } from "react-native";
+import { Image, StyleProp, StyleSheet, View, ViewStyle } from "react-native";
 import Animated, { Easing, useAnimatedStyle, withRepeat, withSequence, withTiming } from "react-native-reanimated";
 import colors from "../../assets/colors/colors";
 
 interface AnimatedOverlayProps {
+  style?: StyleProp<ViewStyle>;
   low: number;
   high: number;
 }
 
-const AnimatedOverlay = ({low, high}: AnimatedOverlayProps) => {
+export const AnimatedOverlay = ({style, low, high}: AnimatedOverlayProps) => {
   const animatedStyle = useAnimatedStyle(() => {
     return {
       opacity: withRepeat(
           withSequence(
-            withTiming(high, {duration: 800, easing: Easing.linear}),
-            withTiming(low , {duration: 800, easing: Easing.linear}),
-            withTiming(high, {duration: 800, easing: Easing.linear}),
+            withTiming(high, {duration: 1000, easing: Easing.linear}),
+            withTiming(low , {duration: 1000, easing: Easing.linear}),
+            withTiming(high, {duration: 1000, easing: Easing.linear}),
           ), -1
         )
     }
@@ -23,8 +24,8 @@ const AnimatedOverlay = ({low, high}: AnimatedOverlayProps) => {
 
   return (
     <Animated.View style={[
-        styles.overlay,
         animatedStyle,
+        style,
       ]}
     />
   )
@@ -64,7 +65,7 @@ export const GeneratorIcon = memo(({image, ownsSome, isOperating}: GeneratorIcon
         <View style={[styles.overlay, {opacity: low}]}/>
       }
       { low != high &&
-        <AnimatedOverlay low={low} high={high}/>
+        <AnimatedOverlay style={styles.overlay} low={low} high={high}/>
       }
       
     </>

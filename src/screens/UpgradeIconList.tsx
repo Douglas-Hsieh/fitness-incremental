@@ -1,9 +1,11 @@
-import React, { memo } from "react";
+import React, { memo, useContext } from "react";
 import { View, Image, StyleSheet, TouchableOpacity } from "react-native";
 import { HighlightableElement } from "react-native-highlight-overlay";
 import colors from "../../assets/colors/colors";
 import { HIGHLIGHTABLE_RECTANGLE_OPTIONS } from "../../assets/data/Constants";
 import { UpgradeType } from "../../assets/data/Upgrades";
+import { AppContext } from "../../contexts/AppContext";
+import { AnimatedOverlay } from "../components/GeneratorIcon";
 import { HighlightId } from "../enums/HightlightId";
 import { playSound, SoundFile } from "../util/sounds";
 
@@ -13,6 +15,9 @@ interface UpgradeIconListProps {
 }
 
 export const UpgradeIconList = memo(({upgradeType, setUpgradeType}: UpgradeIconListProps) => {
+
+  const context = useContext(AppContext)!
+  const {cashUpgradeHasBadge, prestigeUpgradeHasBadge, managerUpgradeHasBadge} = context
 
   return (
     <View style={styles.upgradeIconList}>
@@ -27,6 +32,9 @@ export const UpgradeIconList = memo(({upgradeType, setUpgradeType}: UpgradeIconL
           playSound(SoundFile.SwitchOn);
         }}
       >
+        {upgradeType !== UpgradeType.GeneratorMultiplierCashUpgrade && cashUpgradeHasBadge &&
+          <AnimatedOverlay low={0} high={.5} style={styles.upgradeIconContainerOverlay}/>
+        }
         <Image source={require('../../assets/images/steps.png')} style={styles.upgradeIcon} />
       </TouchableOpacity>
 
@@ -39,6 +47,9 @@ export const UpgradeIconList = memo(({upgradeType, setUpgradeType}: UpgradeIconL
           setUpgradeType(UpgradeType.GeneratorMultiplierPrestigeUpgrade);
           playSound(SoundFile.SwitchOn);
       }}>
+        {upgradeType !== UpgradeType.GeneratorMultiplierPrestigeUpgrade && prestigeUpgradeHasBadge &&
+          <AnimatedOverlay low={0} high={.5} style={styles.upgradeIconContainerOverlay}/>
+        }
         <Image source={require('../../assets/images/trainer.png')} style={styles.upgradeIcon} />
       </TouchableOpacity>
 
@@ -53,7 +64,10 @@ export const UpgradeIconList = memo(({upgradeType, setUpgradeType}: UpgradeIconL
             playSound(SoundFile.SwitchOn);
           }}
         >
-          <Image source={require('../../assets/images/puppy.png')} style={styles.upgradeIcon} />
+        {upgradeType !== UpgradeType.ManagerUpgrade && managerUpgradeHasBadge &&
+          <AnimatedOverlay low={0} high={.5} style={styles.upgradeIconContainerOverlay}/>
+        }
+        <Image source={require('../../assets/images/puppy.png')} style={styles.upgradeIcon} />
         </TouchableOpacity>
       </HighlightableElement>
       
@@ -84,4 +98,11 @@ const styles = StyleSheet.create({
     height: 50,
     width: 50,
   },
+  upgradeIconContainerOverlay: {
+    position: 'absolute',
+    height: 80,
+    width: 80,
+    borderRadius: 80,
+    backgroundColor: colors.orange3,
+  }
 })
