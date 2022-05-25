@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useRef, useState } from "react";
 import { LayoutChangeEvent, Pressable, View } from "react-native";
 import { Generator } from "../../assets/data/Generators";
 import { GameState } from "../../assets/data/GameState";
@@ -14,6 +14,10 @@ import { HighlightableElement } from 'react-native-highlight-overlay';
 import { TutorialState } from "../../assets/data/TutorialState";
 import { HIGHLIGHTABLE_RECTANGLE_OPTIONS } from "../../assets/data/Constants";
 import { StepsImage, TicksImage } from "./TopBar";
+
+export interface ProgressBarRef {
+  fillAndEmptyBar: () => void;
+}
 
 interface GeneratorComponentProps {
   generator: Generator;
@@ -35,6 +39,7 @@ export const GeneratorComponent = ({ generator, generatorState, gameState, setGa
   const [iconX0, setIconX0] = useState<number>(0)
   const [iconY0, setIconY0] = useState<number>(0)
   const [timeoutId, setTimeoutId] = useState<NodeJS.Timeout>()
+  const progressBarRef = useRef<ProgressBarRef>(null)
 
   function setLayout(event: LayoutChangeEvent, setX0: React.Dispatch<React.SetStateAction<number>>, setY0: React.Dispatch<React.SetStateAction<number>>) {
     const {x, y, width, height} = event.nativeEvent.layout;
@@ -87,6 +92,12 @@ export const GeneratorComponent = ({ generator, generatorState, gameState, setGa
       isManuallyOperating: true,
     })
 
+    if (ticksNeeded <= 1) {  // Progress bar needs to use ref to progress
+      if (progressBarRef.current) {
+        progressBarRef.current.fillAndEmptyBar()
+      }
+    }
+
     // Complete tutorial
     if (generator.id === '1' && !gameState.tutorialState.firstGenerator1.isCompleted) {
       completeTutorial("firstGenerator1")
@@ -108,7 +119,7 @@ export const GeneratorComponent = ({ generator, generatorState, gameState, setGa
         </Pressable>
         <View style={styles.generatorRightWrapper}>
           {ownsSome &&
-            <GeneratorProgressBar generator={generator} gameState={gameState} ticksNeeded={ticksNeeded} isGold={isGold} onPress={startGenerator}/>
+            <GeneratorProgressBar ref={progressBarRef} generator={generator} gameState={gameState} ticksNeeded={ticksNeeded} isGold={isGold} onPress={startGenerator}/>
           }
           <BuyGeneratorButton
             setGameState={setGameState}

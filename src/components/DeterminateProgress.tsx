@@ -1,9 +1,10 @@
 import { Rect } from 'react-native-svg'
 import colors from "../../assets/colors/colors";
 import Animated, { Easing, useAnimatedStyle, useSharedValue, withSequence, withTiming } from "react-native-reanimated";
-import { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useImperativeHandle, useRef, useState } from 'react';
 import { GestureResponderEvent, LayoutChangeEvent, Pressable, StyleSheet } from 'react-native';
 import { window } from '../util/Window';
+import { ProgressBarRef } from './GeneratorComponent';
 
 const AnimatedRect = Animated.createAnimatedComponent(Rect)
 
@@ -13,7 +14,7 @@ interface DeterminateProgressProps {
   onPress?: ((event: GestureResponderEvent) => void) | null;
 }
 
-export const DeterminateProgress = ({progress, isGold, onPress}: DeterminateProgressProps) => {
+export const DeterminateProgress = React.forwardRef<ProgressBarRef, DeterminateProgressProps>(({progress, isGold, onPress}, ref) => {
 
   const [colorUsed, setColorUsed] = useState<string>(colors.green3)
   const [startX, setStartX] = useState<number>(-window.width)
@@ -32,15 +33,23 @@ export const DeterminateProgress = ({progress, isGold, onPress}: DeterminateProg
 
   const prevProgress = useRef({ progress }).current
 
+  function fillAndEmptyBar() {
+    translateX.value = withSequence(
+      withTiming(0, { duration: 1000, easing: Easing.linear }),
+      withTiming(startX, { duration: 0 }),
+    )
+  }
+  useImperativeHandle(ref, () => ({ fillAndEmptyBar }))
+
   useEffect(() => {
-    if (progress < prevProgress.progress) {
-      translateX.value = withSequence(
-        withTiming(endX, { duration: 250, easing: Easing.linear}),
-        withTiming(startX, { duration: 0 }),
-        withTiming(startX * (1 - progress), { duration: 250 })
-      )
+    if (prevProgress.progress <= progress) {
+      translateX.value = withTiming(startX * (1 - progress), { duration: 1000, easing: Easing.linear })
     } else {
-      translateX.value = withTiming(startX * (1 - progress), { duration: 500, easing: Easing.linear })
+      translateX.value = withSequence(
+        withTiming(endX, { duration: 500, easing: Easing.linear}),
+        withTiming(startX, { duration: 0 }),
+        withTiming(startX * (1 - progress), { duration: 500 })
+      )
     }
     prevProgress.progress = progress
   }, [progress, startX])
@@ -68,7 +77,7 @@ export const DeterminateProgress = ({progress, isGold, onPress}: DeterminateProg
     </>
 
   )
-}
+})
 
 const styles = StyleSheet.create({
   bar: {

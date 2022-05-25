@@ -3,10 +3,11 @@ import { GestureResponderEvent, Text } from "react-native"
 import { Generator } from "../../assets/data/Generators"
 import { GameState } from "../../assets/data/GameState"
 import { numberToHumanFormat } from "../math/formatting"
-import { calculateGeneratorProductivity, calculateGeneratorRevenue, calculateTicksToUse } from "../math/revenue"
+import { calculateGeneratorProductivity, calculateGeneratorRevenue } from "../math/revenue"
 import EStyleSheet from "react-native-extended-stylesheet"
 import { IndeterminateProgress } from "./IndeterminateProgress"
 import { DeterminateProgress } from "./DeterminateProgress"
+import { ProgressBarRef } from "./GeneratorComponent"
 
 interface GeneratorProgressBarProps {
   generator: Generator;
@@ -16,20 +17,19 @@ interface GeneratorProgressBarProps {
   onPress?: ((event: GestureResponderEvent) => void) | null;
 }
 
-export const GeneratorProgressBar = ({generator, gameState, ticksNeeded, isGold, onPress}: GeneratorProgressBarProps) => {
+export const GeneratorProgressBar = React.forwardRef<ProgressBarRef, GeneratorProgressBarProps>(({generator, gameState, ticksNeeded, isGold, onPress}, ref) => {
 
   // Calculate progress
   const generatorState = gameState.generatorStateById.get(generator.id)!
   const progress = generatorState.ticks / ticksNeeded
 
-  const ticksToUse = calculateTicksToUse(gameState.ticks, gameState.speed)
-  if (ticksToUse <= ticksNeeded || (!generatorState.hasManager && !generatorState.isManuallyOperating)) {
+  if (!generatorState.hasManager) {
     const revenue = calculateGeneratorRevenue(generator, gameState)
     const [coefficient, scale] = numberToHumanFormat(revenue)
     const text = `${coefficient} ${scale}`
     return (
       <>
-        <DeterminateProgress progress={progress} isGold={isGold} onPress={onPress}/>
+        <DeterminateProgress ref={ref} progress={progress} isGold={isGold} onPress={onPress}/>
         <Text style={styles.text}>{text}</Text>
       </>
     )
@@ -44,7 +44,7 @@ export const GeneratorProgressBar = ({generator, gameState, ticksNeeded, isGold,
       </>
     )
   }
-}
+})
 
 const styles = EStyleSheet.create({
   text: {
