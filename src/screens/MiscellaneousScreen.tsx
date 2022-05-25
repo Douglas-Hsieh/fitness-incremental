@@ -1,5 +1,6 @@
 import React, { memo, useState } from "react";
 import { SafeAreaView, StyleSheet, Text, View } from "react-native";
+import colors from "../../assets/colors/colors";
 import { DEBUG_GAME_STATE, GameState, INITIAL_GAME_STATE } from "../../assets/data/GameState";
 import { deleteUser } from "../api/users";
 import { Background } from "../components/BackgroundImage";
@@ -23,7 +24,12 @@ interface MiscellaneousScreenProps {
 }
 
 export const MiscellaneousScreen = memo(({setScreen, user, speed, gameState, setGameState, fitnessLocation, setFitnessLocation}: MiscellaneousScreenProps) => {
+  const [showResetProgressModal, setShowResetProgressModal] = useState<boolean>(false)
   const [showDeleteDataModal, setShowDeleteDataModal] = useState<boolean>(false)
+
+  const resetProgress = () => {
+    setGameState(INITIAL_GAME_STATE)
+  }
 
   const deleteData = () => {
     setGameState(INITIAL_GAME_STATE)
@@ -72,28 +78,37 @@ export const MiscellaneousScreen = memo(({setScreen, user, speed, gameState, set
       <View style={styles.screenWrapper}>
         <Header title={'Miscellaneous'}/>
         { user && user.roles.includes('ROLE_ADMIN') &&
-          <Center>
-            <Button text={'Fitness Locations'} onPress={() => setScreen(Screen.FitnessLocationAdmin)}/>
-            <Button text={`Speed x${speed}`} onPress={toggleSpeed}/>
-            <Button text={'Debug GameState'} onPress={debug}/>
+          <>
+            <Button style={styles.button} text={'Fitness Locations'} onPress={() => setScreen(Screen.FitnessLocationAdmin)}/>
+            <Button style={styles.button} text={`Speed x${speed}`} onPress={toggleSpeed}/>
+            <Button style={styles.button} text={'Debug GameState'} onPress={debug}/>
             <Text>{permanentMultiplierCount}</Text>
-            <Button text={'Add x3 Multiplier'} onPress={addMultiplier}/>
-            <Button text={'Add ticks'} onPress={addTicks}/>
-
-          </Center>
+            <Button style={styles.button} text={'Add x3 Multiplier'} onPress={addMultiplier}/>
+            <Button style={styles.button} text={'Add ticks'} onPress={addTicks}/>
+          </>
         }
-        <Center>
-          <Button text={'Delete Data'} style={{backgroundColor: 'red'}} onPress={() => setShowDeleteDataModal(true)}/>
-        </Center>
+          <Button text={'Reset Progress'} style={[styles.button, {backgroundColor: 'red'}]} onPress={() => setShowResetProgressModal(true)}/>
+          <Button text={'Delete All Data'} style={[styles.button, {backgroundColor: 'red'}]} onPress={() => setShowDeleteDataModal(true)}/>
       </View>
 
       <BottomBar screen={Screen.Miscellaneous} setScreen={setScreen}/>
 
       <ConfirmationModal
+        visible={showResetProgressModal}
+        setVisible={setShowResetProgressModal}
+        title={'Confirm Reset Progress'}
+        body={'Are you sure you want to reset all progress?'}
+        onConfirm={() => {
+          resetProgress()
+        }}
+        onCancel={() => {}}
+      />
+
+      <ConfirmationModal
         visible={showDeleteDataModal}
         setVisible={setShowDeleteDataModal}
-        title={'Confirm Deletion'}
-        body={'Are you sure you want to delete all data and progress?'}
+        title={'Confirm Delete All Data'}
+        body={'Are you sure you want to delete all data including personal information?'}
         onConfirm={() => {
           deleteData()
         }}
@@ -111,4 +126,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
   },
+  button: {
+    marginTop: 20,
+  }
 })
