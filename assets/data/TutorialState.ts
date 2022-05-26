@@ -18,11 +18,11 @@ export interface TutorialState {
 
 export const INITIAL_TUTORIAL_STATE: TutorialState = {
   firstGenerator1: {
-    message: 'Exercise is easy! Touch your puppy to make it run.',
+    message: 'Exercise is easy! Touch your puppy to make it run 1 step.',
     isCompleted: false,
   },
   firstGenerator2: {
-    message: 'You can now afford to buy another puppy!',
+    message: 'Your puppy has produced enough steps for you to recruit another puppy!',
     isCompleted: false,
   },
   firstGenerator3: {
