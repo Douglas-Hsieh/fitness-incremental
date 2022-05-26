@@ -16,8 +16,8 @@ export interface GeneratorUnlock {
 export const getUnlockId = (unlock: GeneratorUnlock) => JSON.stringify({generatorId: unlock.generatorId, count: unlock.count})
 
 export const GENERATOR_UNLOCKS_BY_ID: Map<string, GeneratorUnlock> = Map([
-  [JSON.stringify({ generatorId: '1', count: 25 }), { generatorId: '1', count:25, targetGeneratorId: '1', value: 2, reward: UnlockReward.Speed }],
-  [JSON.stringify({ generatorId: '1', count: 50 }), { generatorId: '1', count:50, targetGeneratorId: '1', value: 2, reward: UnlockReward.Speed }],
+  [JSON.stringify({ generatorId: '1', count: 25 }), { generatorId: '1', count:25, targetGeneratorId: '1', value: 2, reward: UnlockReward.Multiplier }],
+  [JSON.stringify({ generatorId: '1', count: 50 }), { generatorId: '1', count:50, targetGeneratorId: '1', value: 2, reward: UnlockReward.Multiplier }],
   [JSON.stringify({ generatorId: '1', count: 100 }), { generatorId: '1', count:100, targetGeneratorId: '1', value: 2, reward: UnlockReward.Speed }],
   [JSON.stringify({ generatorId: '1', count: 200 }), { generatorId: '1', count:200, targetGeneratorId: '1', value: 2, reward: UnlockReward.Speed }],
   [JSON.stringify({ generatorId: '1', count: 300 }), { generatorId: '1', count:300, targetGeneratorId: '1', value: 2, reward: UnlockReward.Speed }],
