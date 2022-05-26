@@ -104,7 +104,7 @@ export const GeneratorComponent = ({ generator, generatorState, gameState, setGa
     }
     setGameState(prevGameState => ({ ...prevGameState, generatorStateById: generatorStateById, }))
 
-    playSound(SoundFile.MenuSelectionClick)
+    playSound(SoundFile.Click)
     spawnTicks()
   }
 
