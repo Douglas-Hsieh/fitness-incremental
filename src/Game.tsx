@@ -502,7 +502,7 @@ export const Game = ({ screen, setScreen, gameState, setGameState, fitnessLocati
       .filter(upgrade => !ownedPrestigeUpgrades.has(getUpgradeId(upgrade)))
     const cheapestUnownedPrestigeUpgradePrice = Math.min(...unownedPrestigeUpgrades.map(upgrade => upgrade.price))
     const shouldBuyPrestigeUpgrade = cheapestUnownedPrestigeUpgradePrice !== undefined
-      ? gameState.prestige * 10 > cheapestUnownedPrestigeUpgradePrice
+      ? gameState.prestige > cheapestUnownedPrestigeUpgradePrice * 10
       : false
 
     setCashUpgradeHasBadge(shouldBuyGenMultCashUpgrade)
