@@ -46,9 +46,9 @@ export const DeterminateProgress = React.forwardRef<ProgressBarRef, DeterminateP
       translateX.value = withTiming(startX * (1 - progress), { duration: 1000, easing: Easing.linear })
     } else {
       translateX.value = withSequence(
-        withTiming(endX, { duration: 500, easing: Easing.linear}),
+        withTiming(endX, { duration: 250, easing: Easing.linear}),
         withTiming(startX, { duration: 0 }),
-        withTiming(startX * (1 - progress), { duration: 500 })
+        withTiming(startX * (1 - progress), { duration: 750 })
       )
     }
     prevProgress.progress = progress
