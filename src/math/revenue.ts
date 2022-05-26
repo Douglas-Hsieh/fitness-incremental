@@ -122,20 +122,21 @@ export const progressGenerators = (
         const ticksNeeded = ticksNeededByGeneratorId.get(generator.id)!
 
         if (newTicks >= ticksNeeded) {
-          const timesProduced = Math.floor(newTicks / ticksNeeded)
           if (genState.isManuallyOperating) {
             genStateById.set(id, {
               ...genState,
               ticks: 0,
               isManuallyOperating: false,
             })
+            revenue += calculateGeneratorRevenue(generator, gameState)
           } else {
             genStateById.set(id, {
               ...genState,
               ticks: newTicks % ticksNeeded,
             })
+            const timesProduced = Math.floor(newTicks / ticksNeeded)
+            revenue += timesProduced * calculateGeneratorRevenue(generator, gameState)
           }
-          revenue += timesProduced * calculateGeneratorRevenue(generator, gameState)
         } else {
           genStateById.set(id, {
             ...genState,
