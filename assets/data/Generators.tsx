@@ -1,4 +1,7 @@
 import { Map } from "immutable"
+import { memo } from "react";
+import { Image } from "react-native";
+import EStyleSheet from "react-native-extended-stylesheet";
 
 export interface Generator {
   id: string;
@@ -121,3 +124,18 @@ export const EVERYONE_GENERATOR = {
   name: 'All Followers',
   image: require('../images/cities.png')
 }
+
+export const Generator1Image = memo(() => (
+  <Image style={styles.icon} source={require('../images/puppy.png')}/>
+));
+
+export const Generator2Image = memo(() => (
+  <Image style={styles.icon} source={require('../images/friend.png')}/>
+));
+
+const styles = EStyleSheet.create({
+  icon: {
+    width: 25,
+    height: 25,
+  },
+})

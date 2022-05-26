@@ -1,4 +1,4 @@
-import { memo } from "react";
+import React, { memo } from "react";
 import { GestureResponderEvent, Image, Pressable, Text, View } from "react-native"
 import EStyleSheet from "react-native-extended-stylesheet"
 import colors from "../../assets/colors/colors"
@@ -10,17 +10,26 @@ const AvatarImage = memo(() => (
 
 interface DialogueModalProps {
   onPress?: ((event: GestureResponderEvent) => void) | null | undefined
-  body: string;
+  body: string | JSX.Element;
 }
 
-export const DialogueModal = memo(({ onPress, body }: DialogueModalProps) => (
-  <Pressable onPress={onPress} style={styles.modal}>
-    <Text style={styles.body}>{body}</Text>
-    <View style={{flex: .25, flexDirection: 'row'}}>
-      <AvatarImage/>
-    </View>
-  </Pressable>
-))
+export const DialogueModal = memo(({ onPress, body }: DialogueModalProps) => {
+  let content: JSX.Element
+  if (typeof body === 'string') {
+    content = <Text style={styles.body}>{body}</Text>
+  } else {
+    content = React.cloneElement(body, {style: styles.body})
+  }
+
+  return (
+    <Pressable onPress={onPress} style={styles.modal}>
+      {content}
+      <View style={{ flex: .25, flexDirection: 'row' }}>
+        <AvatarImage />
+      </View>
+    </Pressable>
+  );
+})
 
 const styles = EStyleSheet.create({
   modal: {
@@ -42,7 +51,7 @@ const styles = EStyleSheet.create({
     height: '100%',
   },
   body: {
-    fontSize: '1rem',
+    fontSize: '1.3rem',
     flex: .7,
   },
   avatarIcon: {

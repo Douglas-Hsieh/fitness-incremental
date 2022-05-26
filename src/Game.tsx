@@ -23,7 +23,7 @@ import { StepProgress } from "../assets/data/StepProgress";
 import { calculateTemporaryMultipliers } from "./math/multipliers";
 import { TasksScreen } from "./screens/TasksScreen";
 import { getStepsBetween, getStepsToday } from "./fitness-api/fitness-api";
-import { GeneratorMultiplierUpgrade, GENERATOR_MULTIPLIER_CASH_UPGRADES, GENERATOR_MULTIPLIER_PRESTIGE_UPGRADES, getUpgradeId, ManagerUpgrade, MANAGER_UPGRADES, UpgradeType } from "../assets/data/Upgrades";
+import { GENERATOR_MULTIPLIER_CASH_UPGRADES, GENERATOR_MULTIPLIER_PRESTIGE_UPGRADES, getUpgradeId, MANAGER_UPGRADES, UpgradeType } from "../assets/data/Upgrades";
 import { calculatePrice } from "./math/prices";
 import { GENERATORS } from "../assets/data/Generators";
 import { TutorialState } from "../assets/data/TutorialState";
@@ -38,6 +38,7 @@ import { FitnessLocation } from "./shared/fitness-locations.interface";
 import { upsertSavedGame } from "./api/saved-games";
 import { DEFAULT_LAST_VISIT_STATS, LastVisitStats } from "./types/LastVisitStats";
 import { AppContext } from "../contexts/AppContext";
+import { TUTORIAL } from "../assets/data/Tutorial";
 
 interface GameProps {
   screen: Screen;
@@ -60,7 +61,7 @@ export const Game = ({ screen, setScreen, gameState, setGameState, fitnessLocati
 
   const [stepsToday, setStepsToday] = useState<number>(0)
   const [showDialogueModal, setShowDialogueModal] = useState<boolean>(false)
-  const [dialogueText, setDialogueText] = useState<string>('')
+  const [dialogueBody, setDialogueBody] = useState<string | JSX.Element>('')
   const [highlightId, setHighlightId] = useState<string | null>(null)
   const [generatorsHighlightId, setGeneratorsHighlightId] = useState<string | null>(null)
   const [onScreenPress, setOnScreenPress] = useState<(() => void) | null>(null)
@@ -298,7 +299,7 @@ export const Game = ({ screen, setScreen, gameState, setGameState, fitnessLocati
 
   useEffect(() => {
     if (screen !== Screen.WelcomeBack && screen !== Screen.Workout) {
-      setScreen(Screen.WelcomeBack)
+      // setScreen(Screen.WelcomeBack)
     }
   }, [lastVisitStats])
 
@@ -319,25 +320,25 @@ export const Game = ({ screen, setScreen, gameState, setGameState, fitnessLocati
   }, [stepsToday])
 
 
-  function showTutorial(highlightId: HighlightId | null, highlightType: HighlightType, text: string) {
+  function showTutorial(highlightId: HighlightId | null, highlightType: HighlightType, body: string | JSX.Element) {
     // if (highlightType === HighlightType.All) {
     //   setHighlightId(highlightId)
     // } else if (highlightType === HighlightType.Generators) {
     //   setGeneratorsHighlightId(highlightId)
     // }
-    setDialogueText(text)
+    setDialogueBody(body)
     setShowDialogueModal(true)
   }
 
-  function showDialogue(text: string) {
-    setDialogueText(text)
+  function showDialogue(body: string | JSX.Element) {
+    setDialogueBody(body)
     setShowDialogueModal(true)
   }
 
   function hideTutorial() {
     setHighlightId(null)
     setGeneratorsHighlightId(null)
-    setDialogueText('')
+    setDialogueBody('')
     setShowDialogueModal(false)
   }
   function completeTutorial(key: keyof TutorialState) {
@@ -345,10 +346,7 @@ export const Game = ({ screen, setScreen, gameState, setGameState, fitnessLocati
       ...prevGameState,
       tutorialState: {
         ...prevGameState.tutorialState,
-        [key]: {
-          ...prevGameState.tutorialState[key],
-          isCompleted: true,
-        }
+        [key]: true,
       }
     }))
   }
@@ -379,59 +377,59 @@ export const Game = ({ screen, setScreen, gameState, setGameState, fitnessLocati
       return
     }
 
-    if (!tutorialState.firstGenerator1.isCompleted) {
-      showTutorial(HighlightId.Generator1, HighlightType.Generators, tutorialState.firstGenerator1.message)
-    } else if (!tutorialState.firstGenerator2.isCompleted && gameState.balance >= calculatePrice(1, GENERATORS[0].initialPrice, GENERATORS[0].growthRate, 1)) {
-      showTutorial(HighlightId.Generator1, HighlightType.Generators, tutorialState.firstGenerator2.message)
-    } else if (!tutorialState.firstGenerator3.isCompleted && tutorialState.firstGenerator2.isCompleted) {
-      showTutorial(null, HighlightType.Generators, tutorialState.firstGenerator3.message)
+    if (!tutorialState.firstGenerator1) {
+      showTutorial(HighlightId.Generator1, HighlightType.Generators, TUTORIAL.firstGenerator1)
+    } else if (!tutorialState.firstGenerator2 && gameState.balance >= calculatePrice(1, GENERATORS[0].initialPrice, GENERATORS[0].growthRate, 1)) {
+      showTutorial(HighlightId.Generator1, HighlightType.Generators, TUTORIAL.firstGenerator2)
+    } else if (!tutorialState.firstGenerator3 && tutorialState.firstGenerator2) {
+      showTutorial(null, HighlightType.Generators, TUTORIAL.firstGenerator3)
       setOnFirstScreenPress(() => hideAndCompleteTutorial('firstGenerator3'))
-    } else if (!tutorialState.ticks1.isCompleted && gameState.balance > 250) {
-      showTutorial(HighlightId.Ticks, HighlightType.All, tutorialState.ticks1.message)
+    } else if (!tutorialState.ticks1 && gameState.balance > 250) {
+      showTutorial(HighlightId.Ticks, HighlightType.All, TUTORIAL.ticks1)
       setOnFirstScreenPress(() => hideAndCompleteTutorial('ticks1'))
-    } else if (!tutorialState.ticks2.isCompleted && tutorialState.ticks1.isCompleted) {
-      showTutorial(HighlightId.Ticks, HighlightType.All, tutorialState.ticks2.message)
+    } else if (!tutorialState.ticks2 && tutorialState.ticks1) {
+      showTutorial(HighlightId.Ticks, HighlightType.All, TUTORIAL.ticks2)
       setOnFirstScreenPress(() => hideAndCompleteTutorial('ticks2'))
-    } else if (!tutorialState.manager1.isCompleted && gameState.balance >= MANAGER_UPGRADES[0].price) {
-      showTutorial(HighlightId.UpgradesTab, HighlightType.All, tutorialState.manager1.message)
-    } else if (!tutorialState.manager2.isCompleted && tutorialState.manager1.isCompleted) {
-      showTutorial(HighlightId.ManagerUpgrades, HighlightType.All, tutorialState.manager2.message)
-    } else if (!tutorialState.manager3.isCompleted && tutorialState.manager2.isCompleted) {
-      showTutorial(HighlightId.ManagerUpgrade1, HighlightType.All, tutorialState.manager3.message)
-    } else if (!tutorialState.prestige.isCompleted && gameState.prestige >= 100) {
-      showTutorial(HighlightId.PrestigeTab, HighlightType.All, tutorialState.prestige.message)
+    } else if (!tutorialState.manager1 && gameState.balance >= MANAGER_UPGRADES[0].price) {
+      showTutorial(HighlightId.UpgradesTab, HighlightType.All, TUTORIAL.manager1)
+    } else if (!tutorialState.manager2 && tutorialState.manager1) {
+      showTutorial(HighlightId.ManagerUpgrades, HighlightType.All, TUTORIAL.manager2)
+    } else if (!tutorialState.manager3 && tutorialState.manager2) {
+      showTutorial(HighlightId.ManagerUpgrade1, HighlightType.All, TUTORIAL.manager3)
+    } else if (!tutorialState.prestige && gameState.prestige >= 100) {
+      showTutorial(HighlightId.PrestigeTab, HighlightType.All, TUTORIAL.prestige)
     }
   }, [gameState])
 
   // End tutorial
   useEffect(() => {
-    if (!dialogueText) return
+    if (!dialogueBody) return
 
-    if (dialogueText === tutorialState.firstGenerator1.message && tutorialState.firstGenerator1.isCompleted) {
+    if (dialogueBody === TUTORIAL.firstGenerator1 && tutorialState.firstGenerator1) {
       hideTutorial()
     }
   }, [gameState.tutorialState])
 
   useEffect(() => {
-    if (!dialogueText) return
+    if (!dialogueBody) return
 
-    if (dialogueText === tutorialState.firstGenerator2.message && gameState.generatorStateById.get('1')!.owned > 1) {
+    if (dialogueBody === TUTORIAL.firstGenerator2 && gameState.generatorStateById.get('1')!.owned > 1) {
       hideAndCompleteTutorial("firstGenerator2")
     }
   }, [gameState.generatorStateById.get('1')!.owned])
 
   useEffect(() => {
-    if (!dialogueText) return
+    if (!dialogueBody) return
 
-    if (dialogueText === tutorialState.manager1.message && screen === Screen.Upgrades) {
+    if (dialogueBody === TUTORIAL.manager1 && screen === Screen.Upgrades) {
       hideAndCompleteTutorial('manager1')
     }
   }, [screen])
 
   useEffect(() => {
-    if (!dialogueText) return
+    if (!dialogueBody) return
 
-    if (dialogueText === tutorialState.manager2.message && screen === Screen.Upgrades && upgradeType === UpgradeType.ManagerUpgrade) {
+    if (dialogueBody === TUTORIAL.manager2 && screen === Screen.Upgrades && upgradeType === UpgradeType.ManagerUpgrade) {
       hideAndCompleteTutorial('manager2')
     }
   }, [screen, upgradeType])
@@ -448,9 +446,9 @@ export const Game = ({ screen, setScreen, gameState, setGameState, fitnessLocati
   }, [gameState.upgradeState.managerUpgradeIds])
 
   useEffect(() => {
-    if (!dialogueText) return
+    if (!dialogueBody) return
 
-    if (dialogueText === tutorialState.prestige.message && screen === Screen.Prestige) {
+    if (dialogueBody === TUTORIAL.prestige && screen === Screen.Prestige) {
       hideAndCompleteTutorial('prestige')
     }
   }, [screen])
@@ -538,7 +536,7 @@ export const Game = ({ screen, setScreen, gameState, setGameState, fitnessLocati
             highlightedElementId={highlightId}
             onDismiss={() => {}}
           />
-          { showDialogueModal && <DialogueModal onPress={() => setShowDialogueModal(false)} body={dialogueText}/> }
+          { showDialogueModal && <DialogueModal onPress={() => setShowDialogueModal(false)} body={dialogueBody}/> }
           { onScreenPress && <Pressable style={styles.invisibleScreen} onPress={onScreenPress}/> }
         </>
       )
@@ -556,7 +554,7 @@ export const Game = ({ screen, setScreen, gameState, setGameState, fitnessLocati
             highlightedElementId={highlightId}
             onDismiss={() => {}}
           />
-          { showDialogueModal && <DialogueModal onPress={() => setShowDialogueModal(false)} body={dialogueText}/> }
+          { showDialogueModal && <DialogueModal onPress={() => setShowDialogueModal(false)} body={dialogueBody}/> }
           { onScreenPress && <Pressable style={styles.invisibleScreen} onPress={onScreenPress}/> }
         </>
       )
