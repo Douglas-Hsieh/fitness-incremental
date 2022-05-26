@@ -1,10 +1,9 @@
-import React, { memo, useContext } from "react";
+import React, { memo } from "react";
 import { View, Image, StyleSheet, TouchableOpacity } from "react-native";
 import { HighlightableElement } from "react-native-highlight-overlay";
 import colors from "../../assets/colors/colors";
 import { HIGHLIGHTABLE_RECTANGLE_OPTIONS } from "../../assets/data/Constants";
 import { UpgradeType } from "../../assets/data/Upgrades";
-import { AppContext } from "../../contexts/AppContext";
 import { AnimatedOverlay } from "../components/GeneratorIcon";
 import { HighlightId } from "../enums/HightlightId";
 import { playSound, SoundFile } from "../util/sounds";
@@ -12,12 +11,12 @@ import { playSound, SoundFile } from "../util/sounds";
 interface UpgradeIconListProps {
   upgradeType: UpgradeType;
   setUpgradeType: React.Dispatch<React.SetStateAction<UpgradeType>>;
+  cashUpgradeHasBadge: boolean;
+  prestigeUpgradeHasBadge: boolean;
+  managerUpgradeHasBadge: boolean;
 }
 
-export const UpgradeIconList = memo(({upgradeType, setUpgradeType}: UpgradeIconListProps) => {
-
-  const context = useContext(AppContext)!
-  const {cashUpgradeHasBadge, prestigeUpgradeHasBadge, managerUpgradeHasBadge} = context
+export const UpgradeIconList = memo(({upgradeType, setUpgradeType, cashUpgradeHasBadge, prestigeUpgradeHasBadge, managerUpgradeHasBadge}: UpgradeIconListProps) => {
 
   return (
     <View style={styles.upgradeIconList}>

@@ -478,7 +478,7 @@ export const Game = ({ screen, setScreen, gameState, setGameState, fitnessLocati
   }, [gameState.fitnessRewardsByDate, currentLocation])
 
   // Upgrade badges
-  useEffect(() => {
+  useInterval(() => {
     const { generatorMultiplierCashUpgradeIds, managerUpgradeIds, generatorMultiplierPrestigeUpgradeIds } = gameState.upgradeState
 
     const ownedGenMultCashUpgrades = generatorMultiplierCashUpgradeIds
@@ -509,7 +509,7 @@ export const Game = ({ screen, setScreen, gameState, setGameState, fitnessLocati
     setPrestigeUpgradeHasBadge(shouldBuyPrestigeUpgrade)
     setManagerUpgradeHasBadge(shouldBuyManagerUpgrade)
 
-  }, [gameState.balance])
+  }, 1000)
 
   switch(screen) {
     case Screen.WelcomeBack:
