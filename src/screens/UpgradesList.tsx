@@ -64,7 +64,7 @@ const UpgradesList = ({ gameState, setGameState, upgradeType, setModalProps }: U
     return {
       upgradeType: upgradeType,
       upgrade: upgrade,
-      title: generatorName,
+      title: upgrade.title ? upgrade.title : generatorName,
       description: description,
       price: upgrade.price,
       currency: upgrade.priceCurrency,
