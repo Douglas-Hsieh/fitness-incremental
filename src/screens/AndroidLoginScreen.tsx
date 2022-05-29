@@ -2,7 +2,7 @@ import React, { useEffect } from "react"
 import { SafeAreaView, View, Text } from "react-native"
 import EStyleSheet from "react-native-extended-stylesheet"
 import colors from "../../assets/colors/colors"
-import { Background } from "../components/BackgroundImage"
+import { Background, FancyBackground } from "../components/BackgroundImage"
 import { APP_NAME, WEB_CLIENT_ID } from "../../assets/data/Constants"
 import {
   GoogleSignin,
@@ -65,7 +65,7 @@ export const AndroidLoginScreen = ({signInAuth, setSignInAuth}: AndroidLoginScre
 
   return (
     <SafeAreaView style={styles.container}>
-      <Background/>
+      <FancyBackground/>
       
       <View style={styles.screenWrapper}>
         <View style={styles.title}>
@@ -97,7 +97,7 @@ const styles = EStyleSheet.create({
 
   titleText: {
     fontFamily: 'oleo-script',
-    color: colors.black,
+    color: colors.white,
     fontSize: '4rem',
   },
   button: {
