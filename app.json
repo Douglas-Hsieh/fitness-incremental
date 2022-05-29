@@ -2,7 +2,7 @@
   "expo": {
     "name": "fitness-incremental",
     "slug": "fitness-incremental",
-    "version": "1.0.2",
+    "version": "1.0.3",
     "orientation": "portrait",
     "icon": "./assets/images/male-avatar.png",
     "splash": {
@@ -27,7 +27,8 @@
         "backgroundColor": "#FFFFFF"
       },
       "package": "com.randompermutation.fitnessincremental",
-      "googleServicesFile": "./google-services.json"
+      "googleServicesFile": "./google-services.json",
+      "versionCode": 2
     },
     "web": {
       "favicon": "./assets/favicon.png",

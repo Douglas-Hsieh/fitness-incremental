@@ -65,7 +65,7 @@ export const Game = ({ screen, setScreen, gameState, setGameState, fitnessLocati
   const [highlightId, setHighlightId] = useState<string | null>(null)
   const [generatorsHighlightId, setGeneratorsHighlightId] = useState<string | null>(null)
   const [onScreenPress, setOnScreenPress] = useState<(() => void) | null>(null)
-  const [onDialogueModalPress, setOnDialogueModalPress] = useState<() => void>(() => {})
+  const [onDialogueModalPress, setOnDialogueModalPress] = useState<() => void>(() => () => {})
   const [lastVisitStats, setLastVisitStats] = useState<LastVisitStats>(DEFAULT_LAST_VISIT_STATS);
 
   const context = useContext(AppContext)!
