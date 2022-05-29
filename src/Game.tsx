@@ -65,6 +65,7 @@ export const Game = ({ screen, setScreen, gameState, setGameState, fitnessLocati
   const [highlightId, setHighlightId] = useState<string | null>(null)
   const [generatorsHighlightId, setGeneratorsHighlightId] = useState<string | null>(null)
   const [onScreenPress, setOnScreenPress] = useState<(() => void) | null>(null)
+  const [onDialogueModalPress, setOnDialogueModalPress] = useState<() => void>(() => {})
   const [lastVisitStats, setLastVisitStats] = useState<LastVisitStats>(DEFAULT_LAST_VISIT_STATS);
 
   const context = useContext(AppContext)!
@@ -383,21 +384,23 @@ export const Game = ({ screen, setScreen, gameState, setGameState, fitnessLocati
       showTutorial(HighlightId.Generator1, HighlightType.Generators, TUTORIAL.firstGenerator2)
     } else if (!tutorialState.firstGenerator3 && tutorialState.firstGenerator2) {
       showTutorial(null, HighlightType.Generators, TUTORIAL.firstGenerator3)
-      setOnFirstScreenPress(() => hideAndCompleteTutorial('firstGenerator3'))
+      setOnDialogueModalPress(() => () => hideAndCompleteTutorial('firstGenerator3'))
     } else if (!tutorialState.ticks1 && gameState.balance > 250) {
       showTutorial(HighlightId.Ticks, HighlightType.All, TUTORIAL.ticks1)
-      setOnFirstScreenPress(() => hideAndCompleteTutorial('ticks1'))
+      setOnDialogueModalPress(() => () => hideAndCompleteTutorial('ticks1'))
     } else if (!tutorialState.ticks2 && tutorialState.ticks1) {
       showTutorial(HighlightId.Ticks, HighlightType.All, TUTORIAL.ticks2)
-      setOnFirstScreenPress(() => hideAndCompleteTutorial('ticks2'))
+      setOnDialogueModalPress(() => () => hideAndCompleteTutorial('ticks2'))
     } else if (!tutorialState.manager1 && gameState.balance >= MANAGER_UPGRADES[0].price) {
       showTutorial(HighlightId.UpgradesTab, HighlightType.All, TUTORIAL.manager1)
     } else if (!tutorialState.manager2 && tutorialState.manager1) {
       showTutorial(HighlightId.ManagerUpgrades, HighlightType.All, TUTORIAL.manager2)
     } else if (!tutorialState.manager3 && tutorialState.manager2) {
       showTutorial(HighlightId.ManagerUpgrade1, HighlightType.All, TUTORIAL.manager3)
+      setOnDialogueModalPress(() => () => hideAndCompleteTutorial('manager3'))
     } else if (!tutorialState.prestige && gameState.prestige >= 100) {
       showTutorial(HighlightId.PrestigeTab, HighlightType.All, TUTORIAL.prestige)
+      setOnDialogueModalPress(() => () => hideAndCompleteTutorial('prestige'))
     }
   }, [gameState])
 
@@ -536,8 +539,8 @@ export const Game = ({ screen, setScreen, gameState, setGameState, fitnessLocati
             highlightedElementId={highlightId}
             onDismiss={() => {}}
           />
-          { showDialogueModal && <DialogueModal onPress={() => setShowDialogueModal(false)} body={dialogueBody}/> }
-          { onScreenPress && <Pressable style={styles.invisibleScreen} onPress={onScreenPress}/> }
+          { showDialogueModal && <DialogueModal onPress={() => onDialogueModalPress()} body={dialogueBody}/> }
+          {/* { onScreenPress && <Pressable style={styles.invisibleScreen} onPress={onScreenPress}/> } */}
         </>
       )
     case Screen.Upgrades:
@@ -554,8 +557,8 @@ export const Game = ({ screen, setScreen, gameState, setGameState, fitnessLocati
             highlightedElementId={highlightId}
             onDismiss={() => {}}
           />
-          { showDialogueModal && <DialogueModal onPress={() => setShowDialogueModal(false)} body={dialogueBody}/> }
-          { onScreenPress && <Pressable style={styles.invisibleScreen} onPress={onScreenPress}/> }
+          { showDialogueModal && <DialogueModal onPress={() => onDialogueModalPress()} body={dialogueBody}/> }
+          {/* { onScreenPress && <Pressable style={styles.invisibleScreen} onPress={onScreenPress}/> } */}
         </>
       )
     case Screen.Unlocks:
